@@ -193,12 +193,12 @@ export class GrampsjsViewMap extends GrampsjsStaleDataMixin(GrampsjsView) {
       `
     }
     return html`${this._renderMarkers()}
-      ${this._showMigrationFlows
-        ? html`<grampsjs-map-migration-flow
-            .flows="${this._migrationFlows}"
-            .visible="${this._showMigrationFlows}"
-          ></grampsjs-map-migration-flow>`
-        : ''}`
+    ${this._showMigrationFlows
+      ? html`<grampsjs-map-migration-flow
+          .flows="${this._migrationFlows}"
+          .visible="${this._showMigrationFlows}"
+        ></grampsjs-map-migration-flow>`
+      : ''}`
   }
 
   _handleClusterPlaceClick(event) {
