@@ -89,7 +89,7 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 
 **Goal:** Turn genealogy into a collaborative family activity.
 
-- [ ] **Real-time Chat:** Enhanced chat with context awareness (linking directly to people/records in the chat).
+- [ ] **Real-time Chat:** Enhanced chat with context awareness and full editing/drafting capabilities (linking directly to people/records in the chat).
 - [ ] **Comments & Annotations:** Allow family members to comment on photos or stories without editing the core data.
 - [ ] **Activity Feed:** A social-media style feed showing recent additions ("John added a photo of Great-Grandma").
 - [ ] **Permissions System:** Granular privacy controls (e.g., "Private" records visible only to Editors, "Living" people hidden from Guests).
