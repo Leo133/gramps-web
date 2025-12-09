@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Gallery component with design tokens and accessibility
+ * @author Gramps.js
+ */
 import {LitElement, css, html} from 'lit'
 import '@material/mwc-button'
 import '@material/mwc-icon'
@@ -13,13 +17,20 @@ import './GrampsjsFormNewMedia.js'
 import {fireEvent} from '../util.js'
 import {GrampsjsAppStateMixin} from '../mixins/GrampsjsAppStateMixin.js'
 
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
+
 export class GrampsjsGallery extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
         .tile {
-          margin: 3px;
+          margin: var(--spacing-1, 3px);
           float: left;
           cursor: pointer;
           position: relative;
@@ -27,14 +38,21 @@ export class GrampsjsGallery extends GrampsjsAppStateMixin(LitElement) {
 
         .clear {
           clear: both;
-          padding-bottom: 2em;
+          padding-bottom: var(--spacing-5, 2em);
         }
 
         .delbtn {
           position: absolute;
-          right: 5px;
-          bottom: 5px;
+          right: var(--spacing-2, 5px);
+          bottom: var(--spacing-2, 5px);
           opacity: 0.7;
+          width: var(--touch-target-min-size, 48px);
+          height: var(--touch-target-min-size, 48px);
+        }
+        
+        mwc-icon-button {
+          width: var(--touch-target-min-size, 48px);
+          height: var(--touch-target-min-size, 48px);
         }
       `,
     ]

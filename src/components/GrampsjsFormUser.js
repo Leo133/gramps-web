@@ -1,6 +1,7 @@
-/*
-Element for selecting a Gramps type
-*/
+/**
+ * @fileoverview User form component with design tokens and accessibility
+ * @author Gramps.js
+ */
 
 import {html, css, LitElement} from 'lit'
 import '@material/mwc-textfield'
@@ -10,6 +11,10 @@ import '@material/mwc-icon'
 import {sharedStyles} from '../SharedStyles.js'
 import './GrampsjsFormString.js'
 import {GrampsjsAppStateMixin} from '../mixins/GrampsjsAppStateMixin.js'
+
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 
 export const userRoles = {
   '-2': 'unconfirmed',
@@ -26,6 +31,9 @@ class GrampsjsFormUser extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
         mwc-textfield.fullwidth {
           width: 100%;
@@ -37,6 +45,12 @@ class GrampsjsFormUser extends GrampsjsAppStateMixin(LitElement) {
 
         mwc-icon-button {
           color: var(--grampsjs-body-font-color-50);
+          width: var(--touch-target-min-size, 48px);
+          height: var(--touch-target-min-size, 48px);
+        }
+        
+        mwc-textfield {
+          min-height: var(--touch-target-min-size, 48px);
         }
       `,
     ]

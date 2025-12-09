@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Media object detail component with design tokens and accessibility
+ * @author Gramps.js
+ */
 /* eslint-disable no-nested-ternary */
 import {html, css} from 'lit'
 
@@ -13,6 +17,10 @@ import './GrampsjsTextRecognition.js'
 import {arrayEqual, fireEvent, getNameFromProfile, emptyDate} from '../util.js'
 import {renderIconSvg} from '../icons.js'
 
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
+
 import '@material/mwc-dialog'
 import '@material/mwc-icon'
 import '@material/mwc-icon-button'
@@ -21,12 +29,20 @@ export class GrampsjsMediaObject extends GrampsjsObject {
   static get styles() {
     return [
       super.styles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
         :host {
         }
 
         grampsjs-img {
-          margin: 30px 0;
+          margin: var(--spacing-6, 30px) 0;
+        }
+        
+        mwc-icon-button {
+          width: var(--touch-target-min-size, 48px);
+          height: var(--touch-target-min-size, 48px);
         }
 
         dl::after {
@@ -36,7 +52,7 @@ export class GrampsjsMediaObject extends GrampsjsObject {
         }
 
         .controls {
-          margin-top: 1em;
+          margin-top: var(--spacing-4, 1em);
         }
 
         .hidden {
@@ -45,12 +61,12 @@ export class GrampsjsMediaObject extends GrampsjsObject {
 
         .controls span {
           display: inline-block;
-          margin-left: 0.6em;
+          margin-left: var(--spacing-3, 0.6em);
         }
 
         .ocr {
-          padding: 1em 1em;
-          border-radius: 16px;
+          padding: var(--spacing-4, 1em);
+          border-radius: var(--radius-lg, 16px);
           background-color: var(--grampsjs-color-shade-230);
         }
 
