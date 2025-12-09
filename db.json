@@ -5,8 +5,8 @@
       "email": "owner@example.com",
       "full_name": "Owner User",
       "role": "owner",
-      "last_login": "2025-12-09T01:37:31.746Z",
-      "first_login": "2025-12-09T01:37:31.746Z",
+      "last_login": "2025-12-09T01:49:56.327Z",
+      "first_login": "2025-12-09T01:49:56.327Z",
       "email_verified": true,
       "enabled": true
     }
@@ -81,7 +81,19 @@
       "type": 1
     }
   ],
-  "events": [],
+  "events": [
+    {
+      "handle": "e0001",
+      "gramps_id": "E0001",
+      "type": {
+        "value": "Birth"
+      },
+      "date": {
+        "val": "1980-01-01"
+      },
+      "description": "Birth of John Doe"
+    }
+  ],
   "places": [],
   "media": [],
   "repositories": [],

@@ -1,3 +1,1 @@
 Gramps Web Lite server running on http://localhost:5555
-GET /api/families/ - 200 [4ms]
-GET /api/people/p0001 - 200 [1ms]

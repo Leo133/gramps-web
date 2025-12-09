@@ -13,20 +13,25 @@ This is a fully self-contained version of Gramps Web, running with a lightweight
 ## Getting Started
 
 1.  **Install Dependencies**:
+
     ```bash
     npm install
     ```
 
 2.  **Start the Backend**:
+
     ```bash
     npm run start:mock-api
     ```
+
     This starts the Lite server on port 5555.
 
 3.  **Start the Frontend**:
+
     ```bash
     npm start
     ```
+
     This starts the frontend on port 8001.
 
 4.  **Login**:
@@ -36,6 +41,7 @@ This is a fully self-contained version of Gramps Web, running with a lightweight
 ## Chat Features
 
 Go to the **Chat** page and try asking:
+
 - "Who is John Doe?"
 - "When was Jane Smith born?"
 - "How many people are in the tree?"

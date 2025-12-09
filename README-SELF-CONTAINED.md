@@ -12,14 +12,17 @@ This repository has been configured to run completely self-contained, without de
 You can run the frontend and a mock API server locally.
 
 1.  Install dependencies:
+
     ```bash
     npm install
     ```
 
 2.  Start the mock API server:
+
     ```bash
     npm run start:mock-api
     ```
+
     This runs the mock server on `http://localhost:5555`.
 
 3.  Start the frontend:
@@ -39,6 +42,7 @@ docker-compose -f docker-compose.self-contained.yml up --build
 ```
 
 This will expose:
+
 - Frontend via Proxy: `http://localhost:5555`
 - Frontend Direct: `http://localhost:8001`
 

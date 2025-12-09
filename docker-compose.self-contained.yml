@@ -7,7 +7,7 @@ services:
     volumes:
       - ./dev/nginx.mock.conf:/etc/nginx/nginx.conf
     ports:
-      - "5555:80"
+      - '5555:80'
     depends_on:
       - gramps-api
       - gramps-frontend
@@ -19,7 +19,7 @@ services:
     environment:
       - PORT=5000
     expose:
-      - "5000"
+      - '5000'
 
   gramps-frontend:
     container_name: gramps-frontend-mock
@@ -32,7 +32,7 @@ services:
     environment:
       - NODE_ENV=development
     ports:
-      - "8001:8001"
+      - '8001:8001'
 
 volumes:
   node_modules:
