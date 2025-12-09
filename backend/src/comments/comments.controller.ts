@@ -40,9 +40,21 @@ export class CommentsController {
   @Get()
   @ApiOperation({summary: 'Get comments'})
   @ApiResponse({status: 200, description: 'List of comments'})
-  @ApiQuery({name: 'entityType', required: false, description: 'Filter by entity type'})
-  @ApiQuery({name: 'entityId', required: false, description: 'Filter by entity ID'})
-  @ApiQuery({name: 'parentId', required: false, description: 'Filter by parent comment ID (use "null" for top-level)'})
+  @ApiQuery({
+    name: 'entityType',
+    required: false,
+    description: 'Filter by entity type',
+  })
+  @ApiQuery({
+    name: 'entityId',
+    required: false,
+    description: 'Filter by entity ID',
+  })
+  @ApiQuery({
+    name: 'parentId',
+    required: false,
+    description: 'Filter by parent comment ID (use "null" for top-level)',
+  })
   @ApiQuery({name: 'page', required: false, description: 'Page number'})
   @ApiQuery({name: 'pagesize', required: false, description: 'Page size'})
   async findAll(

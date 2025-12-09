@@ -37,9 +37,21 @@ export class ActivityFeedController {
   @Get()
   @ApiOperation({summary: 'Get activity feed'})
   @ApiResponse({status: 200, description: 'List of activities'})
-  @ApiQuery({name: 'entityType', required: false, description: 'Filter by entity type'})
-  @ApiQuery({name: 'entityId', required: false, description: 'Filter by entity ID'})
-  @ApiQuery({name: 'visibility', required: false, description: 'Filter by visibility'})
+  @ApiQuery({
+    name: 'entityType',
+    required: false,
+    description: 'Filter by entity type',
+  })
+  @ApiQuery({
+    name: 'entityId',
+    required: false,
+    description: 'Filter by entity ID',
+  })
+  @ApiQuery({
+    name: 'visibility',
+    required: false,
+    description: 'Filter by visibility',
+  })
   @ApiQuery({name: 'page', required: false, description: 'Page number'})
   @ApiQuery({name: 'pagesize', required: false, description: 'Page size'})
   async findAll(

@@ -40,7 +40,14 @@ export class ActivityFeedService {
     page?: number
     pagesize?: number
   }) {
-    const {entityType, entityId, visibility, userRole, page = 1, pagesize = 50} = query || {}
+    const {
+      entityType,
+      entityId,
+      visibility,
+      userRole,
+      page = 1,
+      pagesize = 50,
+    } = query || {}
 
     const where: Prisma.ActivityWhereInput = {}
 

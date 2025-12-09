@@ -40,9 +40,21 @@ export class ChatController {
   @Get()
   @ApiOperation({summary: 'Get chat messages'})
   @ApiResponse({status: 200, description: 'List of messages'})
-  @ApiQuery({name: 'channelId', required: false, description: 'Filter by channel'})
-  @ApiQuery({name: 'contextType', required: false, description: 'Filter by context type'})
-  @ApiQuery({name: 'contextId', required: false, description: 'Filter by context ID'})
+  @ApiQuery({
+    name: 'channelId',
+    required: false,
+    description: 'Filter by channel',
+  })
+  @ApiQuery({
+    name: 'contextType',
+    required: false,
+    description: 'Filter by context type',
+  })
+  @ApiQuery({
+    name: 'contextId',
+    required: false,
+    description: 'Filter by context ID',
+  })
   @ApiQuery({name: 'page', required: false, description: 'Page number'})
   @ApiQuery({name: 'pagesize', required: false, description: 'Page size'})
   async findAll(

@@ -37,7 +37,13 @@ export class ChatService {
     page?: number
     pagesize?: number
   }) {
-    const {channelId, contextType, contextId, page = 1, pagesize = 50} = query || {}
+    const {
+      channelId,
+      contextType,
+      contextId,
+      page = 1,
+      pagesize = 50,
+    } = query || {}
 
     const where: Prisma.ChatMessageWhereInput = {}
 

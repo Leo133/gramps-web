@@ -37,7 +37,13 @@ export class CommentsService {
     page?: number
     pagesize?: number
   }) {
-    const {entityType, entityId, parentId, page = 1, pagesize = 50} = query || {}
+    const {
+      entityType,
+      entityId,
+      parentId,
+      page = 1,
+      pagesize = 50,
+    } = query || {}
 
     const where: Prisma.CommentWhereInput = {}
 

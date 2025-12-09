@@ -2,7 +2,9 @@ import {IsString, IsOptional} from 'class-validator'
 import {ApiProperty} from '@nestjs/swagger'
 
 export class CreateActivityDto {
-  @ApiProperty({description: 'Action performed (added, updated, deleted, commented, etc.)'})
+  @ApiProperty({
+    description: 'Action performed (added, updated, deleted, commented, etc.)',
+  })
   @IsString()
   action: string
 
@@ -24,7 +26,11 @@ export class CreateActivityDto {
   @IsOptional()
   details?: string
 
-  @ApiProperty({required: false, default: 'all', description: 'Visibility level (all, editors, owners)'})
+  @ApiProperty({
+    required: false,
+    default: 'all',
+    description: 'Visibility level (all, editors, owners)',
+  })
   @IsString()
   @IsOptional()
   visibility?: string
