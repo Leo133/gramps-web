@@ -250,7 +250,8 @@ if (!db.data.users || db.data.users.length === 0) {
         gramps_id: 'S0001',
         title: '1900 United States Federal Census',
         author: 'U.S. Census Bureau',
-        pubinfo: 'Washington, D.C.: National Archives and Records Administration',
+        pubinfo:
+          'Washington, D.C.: National Archives and Records Administration',
         abbrev: '1900 Census',
         reporef_list: [
           {
@@ -278,7 +279,8 @@ if (!db.data.users || db.data.users.length === 0) {
         handle: 'n0001',
         gramps_id: 'N0001',
         text: {
-          string: 'This is a sample note about John Doe. He was born in New York City.',
+          string:
+            'This is a sample note about John Doe. He was born in New York City.',
         },
         type: {value: 'General'},
         private: false,
@@ -421,19 +423,25 @@ function validateFamily(family) {
           if (ageAtBirth < 12) {
             errors.push({
               field: 'children',
-              message: `Father was too young (${Math.floor(ageAtBirth)} years) at child's birth`,
+              message: `Father was too young (${Math.floor(
+                ageAtBirth
+              )} years) at child's birth`,
               severity: 'error',
             })
           } else if (ageAtBirth < 16) {
             warnings.push({
               field: 'children',
-              message: `Father was very young (${Math.floor(ageAtBirth)} years) at child's birth`,
+              message: `Father was very young (${Math.floor(
+                ageAtBirth
+              )} years) at child's birth`,
               severity: 'warning',
             })
           } else if (ageAtBirth > 80) {
             warnings.push({
               field: 'children',
-              message: `Father was very old (${Math.floor(ageAtBirth)} years) at child's birth`,
+              message: `Father was very old (${Math.floor(
+                ageAtBirth
+              )} years) at child's birth`,
               severity: 'warning',
             })
           }
@@ -456,19 +464,25 @@ function validateFamily(family) {
           if (ageAtBirth < 12) {
             errors.push({
               field: 'children',
-              message: `Mother was too young (${Math.floor(ageAtBirth)} years) at child's birth`,
+              message: `Mother was too young (${Math.floor(
+                ageAtBirth
+              )} years) at child's birth`,
               severity: 'error',
             })
           } else if (ageAtBirth < 15) {
             warnings.push({
               field: 'children',
-              message: `Mother was very young (${Math.floor(ageAtBirth)} years) at child's birth`,
+              message: `Mother was very young (${Math.floor(
+                ageAtBirth
+              )} years) at child's birth`,
               severity: 'warning',
             })
           } else if (ageAtBirth > 50) {
             warnings.push({
               field: 'children',
-              message: `Mother was very old (${Math.floor(ageAtBirth)} years) at child's birth`,
+              message: `Mother was very old (${Math.floor(
+                ageAtBirth
+              )} years) at child's birth`,
               severity: 'warning',
             })
           }
