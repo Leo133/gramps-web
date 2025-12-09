@@ -245,7 +245,11 @@ export class GrampsjsViewResearchPlanner extends GrampsjsView {
 
   _renderTaskCard(task) {
     return html`
-      <div class="task-card" @click="${() => this._handleEditTask(task)}">
+      <div
+        class="task-card"
+        @click="${() => this._handleEditTask(task)}"
+        @keydown="${e => e.key === 'Enter' && this._handleEditTask(task)}"
+      >
         <div class="task-title">${task.title}</div>
         ${task.description
           ? html`<div class="task-description">${task.description}</div>`
@@ -267,7 +271,9 @@ export class GrampsjsViewResearchPlanner extends GrampsjsView {
       <mwc-dialog
         ?open="${this._dialogOpen}"
         @closed="${this._handleDialogClosed}"
-        heading="${this._editingTask ? this._('Edit Task') : this._('New Task')}"
+        heading="${this._editingTask
+          ? this._('Edit Task')
+          : this._('New Task')}"
       >
         <div class="dialog-content">
           <mwc-textfield
@@ -428,7 +434,9 @@ export class GrampsjsViewResearchPlanner extends GrampsjsView {
   async _handleDeleteTask() {
     if (!this._editingTask) return
 
-    if (!confirm(this._('Are you sure you want to delete this task?'))) return
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(this._('Are you sure you want to delete this task?')))
+      return
 
     try {
       const response = await fetch(

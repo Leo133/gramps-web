@@ -169,6 +169,8 @@ export class GrampsjsViewAdvancedSearch extends GrampsjsView {
             <div
               class="result-item"
               @click="${() => this._handleResultClick(result)}"
+              @keydown="${e =>
+                e.key === 'Enter' && this._handleResultClick(result)}"
             >
               <div class="result-title">${result.content}</div>
               <div class="result-type">
@@ -231,6 +233,7 @@ export class GrampsjsViewAdvancedSearch extends GrampsjsView {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _handleResultClick(result) {
     // Navigate to the entity
     const path = `/${result.entityType.toLowerCase()}/${result.entityHandle}`

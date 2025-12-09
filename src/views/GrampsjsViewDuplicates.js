@@ -130,7 +130,9 @@ export class GrampsjsViewDuplicates extends GrampsjsView {
             @click="${this._handleScan}"
             ?disabled="${this._scanning}"
           >
-            ${this._scanning ? this._('Scanning...') : this._('Scan for Duplicates')}
+            ${this._scanning
+              ? this._('Scanning...')
+              : this._('Scan for Duplicates')}
           </mwc-button>
           <mwc-button
             outlined
@@ -144,8 +146,9 @@ export class GrampsjsViewDuplicates extends GrampsjsView {
         ${this._suggestions.length === 0
           ? html`<p>${this._('No duplicate suggestions found')}</p>`
           : ''}
-
-        ${this._suggestions.map(suggestion => this._renderSuggestion(suggestion))}
+        ${this._suggestions.map(suggestion =>
+          this._renderSuggestion(suggestion)
+        )}
       </div>
     `
   }
@@ -187,7 +190,9 @@ export class GrampsjsViewDuplicates extends GrampsjsView {
           ${matchReasons.map(
             reason => html`
               <div class="match-reason">
-                <span class="match-type">${reason.type.replace(/_/g, ' ')}:</span>
+                <span class="match-type"
+                  >${reason.type.replace(/_/g, ' ')}:</span
+                >
                 ${Math.round(reason.score * 100)}%
               </div>
             `
@@ -195,10 +200,7 @@ export class GrampsjsViewDuplicates extends GrampsjsView {
         </div>
 
         <div class="suggestion-actions">
-          <mwc-button
-            raised
-            @click="${() => this._handleMerge(suggestion)}"
-          >
+          <mwc-button raised @click="${() => this._handleMerge(suggestion)}">
             ${this._('Merge')}
           </mwc-button>
           <mwc-button
@@ -251,16 +253,16 @@ export class GrampsjsViewDuplicates extends GrampsjsView {
     }
   }
 
-  async _handleMerge(suggestion) {
+  async _handleMerge() {
     // TODO: Implement proper dialog with Material Web Components
     // For now, show a message explaining the feature is not yet available
     const message = this._(
       'Merge functionality is not yet implemented. This is a complex operation that requires careful handling of all entity relationships. Please manually merge records for now.'
-    );
-    
+    )
+
     // Using alert temporarily - should be replaced with mwc-snackbar or mwc-dialog
     // eslint-disable-next-line no-alert
-    alert(message);
+    alert(message)
   }
 
   async _handleDismiss(suggestion) {
@@ -279,7 +281,7 @@ export class GrampsjsViewDuplicates extends GrampsjsView {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.appState.auth.token}`,
       },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({status}),
     })
 
     return response.ok

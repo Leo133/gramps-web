@@ -258,7 +258,9 @@ export class GrampsjsViewShoebox extends GrampsjsView {
 
         <div class="item-content">
           ${item.itemType === 'url'
-            ? html`<a href="${item.content}" target="_blank">${item.content}</a>`
+            ? html`<a href="${item.content}" target="_blank"
+                >${item.content}</a
+              >`
             : item.content}
         </div>
 
@@ -283,7 +285,9 @@ export class GrampsjsViewShoebox extends GrampsjsView {
       <mwc-dialog
         ?open="${this._dialogOpen}"
         @closed="${this._handleDialogClosed}"
-        heading="${this._editingItem ? this._('Edit Item') : this._('New Item')}"
+        heading="${this._editingItem
+          ? this._('Edit Item')
+          : this._('New Item')}"
       >
         <div class="dialog-content">
           <mwc-select
@@ -397,7 +401,10 @@ export class GrampsjsViewShoebox extends GrampsjsView {
     if (!content) return
 
     const tags = tagsStr
-      ? tagsStr.split(',').map(t => t.trim()).filter(Boolean)
+      ? tagsStr
+          .split(',')
+          .map(t => t.trim())
+          .filter(Boolean)
       : []
 
     const itemData = {
@@ -433,7 +440,9 @@ export class GrampsjsViewShoebox extends GrampsjsView {
   }
 
   async _handleDeleteItem(item) {
-    if (!confirm(this._('Are you sure you want to delete this item?'))) return
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(this._('Are you sure you want to delete this item?')))
+      return
 
     try {
       const response = await fetch(`/api/shoebox/items/${item.id}`, {
