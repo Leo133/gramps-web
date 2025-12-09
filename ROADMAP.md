@@ -55,10 +55,13 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 - [ ] **Comparative Timelines:** Compare the lifespans and major events of multiple ancestors side-by-side.
 - [ ] **Age Analysis:** Visualizations of life expectancy, age at marriage, and generation gaps over centuries.
 
-## Phase 8: Data Quality & Research Tools
-**Goal:** Assist the researcher in cleaning data and breaking through brick walls.
+## Phase 8: Data Quality, Advanced Indexing & Research Tools
+**Goal:** Assist the researcher in cleaning data, finding records, and breaking through brick walls.
+- [ ] **Advanced Search Engine:** Implement a dedicated search index (Elasticsearch or Meilisearch) supporting fuzzy matching, wildcards, and boolean operators.
+- [ ] **Phonetic Indexing:** Index names using Soundex, Metaphone, and Double Metaphone to find ancestors with variant spellings.
 - [ ] **Duplicate Detection:** Fuzzy matching algorithms to suggest potential duplicate people or places for merging.
 - [ ] **Consistency Checker:** Automated reports flagging issues (e.g., "Mother was 8 years old at birth of child").
+- [ ] **Data Quality Dashboard:** A visual overview of tree health (completeness scores, disconnected branches, potential errors).
 - [ ] **Research Planner:** A Kanban-style board for tracking research tasks, to-dos, and correspondence.
 - [ ] **Clipboard/Shoebox:** A temporary holding area for snippets of text or images found while researching.
 
