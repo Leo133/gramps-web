@@ -32,10 +32,10 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 
 **Goal:** Ensure users can easily move data in and out of the system.
 
-- [ ] **GEDCOM 5.5.1 Import/Export:** Build a high-performance stream-based parser to import and export standard GEDCOM files.
-- [ ] **GEDCOM 7.0 Support:** Future-proof the platform with the latest standard (including Zip archives).
+- [x] **GEDCOM 5.5.1 Import/Export:** Build a high-performance stream-based parser to import and export standard GEDCOM files.
+- [x] **GEDCOM 7.0 Support:** Future-proof the platform with the latest standard (including Zip archives).
 - [ ] **Gramps XML Support:** Maintain compatibility with the desktop Gramps XML format for lossless data transfer.
-- [ ] **CSV Import:** Allow bulk import of people/events via simple spreadsheets.
+- [x] **CSV Import:** Allow bulk import of people/events via simple spreadsheets.
 
 ## Phase 4: Media Management & Digital Heritage
 
