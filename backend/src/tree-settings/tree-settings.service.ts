@@ -28,15 +28,17 @@ export class TreeSettingsService {
   }
 
   async updateSettings(data: any) {
-    for (const [key, value] of Object.entries(data)) {
-      const jsonValue = JSON.stringify(value)
-
-      await this.prisma.treeSettings.upsert({
-        where: {key},
-        create: {key, value: jsonValue},
-        update: {value: jsonValue},
-      })
-    }
+    // Use Prisma transaction for atomic batch updates
+    await this.prisma.$transaction(
+      Object.entries(data).map(([key, value]) => {
+        const jsonValue = JSON.stringify(value)
+        return this.prisma.treeSettings.upsert({
+          where: {key},
+          create: {key, value: jsonValue},
+          update: {value: jsonValue},
+        })
+      }),
+    )
 
     return this.getSettings()
   }

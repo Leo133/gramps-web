@@ -3,6 +3,24 @@ import {PrismaService} from '../prisma/prisma.service'
 import {CreatePersonDto, UpdatePersonDto} from './dto/person.dto'
 import {v4 as uuidv4} from 'uuid'
 
+interface FormattedPerson {
+  handle: string
+  gramps_id: string
+  gender: number
+  private: boolean
+  first_name?: string | null
+  surname?: string | null
+  call_name?: string | null
+  birth_date?: string | null
+  birth_place?: string | null
+  death_date?: string | null
+  death_place?: string | null
+  primary_name?: any
+  profile?: any
+  media_list?: any[]
+  event_ref_list?: any[]
+}
+
 @Injectable()
 export class PeopleService {
   constructor(private prisma: PrismaService) {}
@@ -102,9 +120,21 @@ export class PeopleService {
     return count + 1
   }
 
-  private formatPerson(person: any) {
+  private formatPerson(person: any): FormattedPerson {
     // Convert JSON strings back to objects if needed
-    const formatted: any = {...person}
+    const formatted: FormattedPerson = {
+      handle: person.handle,
+      gramps_id: person.grampsId,
+      gender: person.gender,
+      private: person.private,
+      first_name: person.firstName,
+      surname: person.surname,
+      call_name: person.callName,
+      birth_date: person.birthDate,
+      birth_place: person.birthPlace,
+      death_date: person.deathDate,
+      death_place: person.deathPlace,
+    }
 
     if (person.primaryName && typeof person.primaryName === 'string') {
       try {
@@ -112,7 +142,6 @@ export class PeopleService {
       } catch {
         formatted.primary_name = person.primaryName
       }
-      delete formatted.primaryName
     }
 
     if (person.profile && typeof person.profile === 'string') {
@@ -129,7 +158,6 @@ export class PeopleService {
       } catch {
         formatted.media_list = []
       }
-      delete formatted.mediaList
     }
 
     if (person.eventRefList && typeof person.eventRefList === 'string') {
@@ -138,34 +166,7 @@ export class PeopleService {
       } catch {
         formatted.event_ref_list = []
       }
-      delete formatted.eventRefList
     }
-
-    // Map snake_case for API compatibility
-    formatted.gramps_id = person.grampsId
-    delete formatted.grampsId
-
-    formatted.first_name = person.firstName
-    delete formatted.firstName
-
-    formatted.call_name = person.callName
-    delete formatted.callName
-
-    formatted.birth_date = person.birthDate
-    delete formatted.birthDate
-
-    formatted.birth_place = person.birthPlace
-    delete formatted.birthPlace
-
-    formatted.death_date = person.deathDate
-    delete formatted.deathDate
-
-    formatted.death_place = person.deathPlace
-    delete formatted.deathPlace
-
-    delete formatted.createdAt
-    delete formatted.updatedAt
-    delete formatted.id
 
     return formatted
   }

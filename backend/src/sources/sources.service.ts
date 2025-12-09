@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common'
+import {Injectable, NotImplementedException} from '@nestjs/common'
 import {PrismaService} from '../prisma/prisma.service'
 
 @Injectable()
@@ -6,22 +6,22 @@ export class SourcesService {
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
-    return []
+    throw new NotImplementedException('Sources listing not yet implemented')
   }
 
   async findOne(handle: string) {
-    return {}
+    throw new NotImplementedException('Source retrieval not yet implemented')
   }
 
   async create(data: any) {
-    return {}
+    throw new NotImplementedException('Source creation not yet implemented')
   }
 
   async update(handle: string, data: any) {
-    return {}
+    throw new NotImplementedException('Source update not yet implemented')
   }
 
   async remove(handle: string) {
-    return {message: 'Deleted successfully'}
+    throw new NotImplementedException('Source deletion not yet implemented')
   }
 }

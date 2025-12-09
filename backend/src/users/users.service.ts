@@ -77,7 +77,9 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.findOne(id)
 
-    const updateData: any = {...updateUserDto}
+    const updateData: Partial<UpdateUserDto> & {password?: string} = {
+      ...updateUserDto,
+    }
 
     if (updateUserDto.password) {
       updateData.password = await this.authService.hashPassword(
