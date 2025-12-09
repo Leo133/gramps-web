@@ -39,7 +39,7 @@ export class GrampsjsMediaObject extends GrampsjsObject {
         grampsjs-img {
           margin: var(--spacing-6, 30px) 0;
         }
-        
+
         mwc-icon-button {
           width: var(--touch-target-min-size, 48px);
           height: var(--touch-target-min-size, 48px);

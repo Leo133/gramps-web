@@ -3,29 +3,39 @@ import {designTokens} from './design-tokens.js'
 
 /**
  * Shared Styles for Gramps Web
- * 
+ *
  * Phase 10: Enhanced with design tokens and accessibility features
  */
 export const sharedStyles = css`
   ${designTokens}
-  
+
   :host {
     line-height: 1.6;
-    
+
     /* Legacy font variables (maintained for compatibility) */
-    --grampsjs-body-font-family: var(--font-family-body, 'Inter var', sans-serif);
-    --grampsjs-heading-font-family: var(--font-family-heading, 'Inter var', sans-serif);
+    --grampsjs-body-font-family: var(
+      --font-family-body,
+      'Inter var',
+      sans-serif
+    );
+    --grampsjs-heading-font-family: var(
+      --font-family-heading,
+      'Inter var',
+      sans-serif
+    );
     --md-ref-typeface-plain: var(--font-family-body, 'Inter var', sans-serif);
     --grampsjs-body-font-size: var(--type-body-large-size, 17px);
     font-size: var(--grampsjs-body-font-size);
     font-family: var(--grampsjs-body-font-family);
     --grampsjs-body-font-weight: var(--font-weight-regular, 340);
     font-weight: var(--grampsjs-body-font-weight);
-    
+
     /* Material Design typography */
     --mdc-typography-font-family: var(--grampsjs-body-font-family);
     --md-sys-typescale-headline-small-font: var(--grampsjs-heading-font-family);
-    --md-sys-typescale-headline-medium-font: var(--grampsjs-heading-font-family);
+    --md-sys-typescale-headline-medium-font: var(
+      --grampsjs-heading-font-family
+    );
     --md-sys-typescale-headline-large-font: var(--grampsjs-heading-font-family);
     --md-sys-typescale-body-small-font: var(--grampsjs-body-font-family);
     --md-sys-typescale-body-medium-font: var(--grampsjs-body-font-family);

@@ -35,8 +35,9 @@ export class GrampsjsEditableList extends GrampsjsAppStateMixin(LitElement) {
 
         mwc-list > * {
           /* Phase 10: Smooth transitions using design tokens */
-          transition: background-color var(--duration-short-2, 100ms) var(--easing-standard),
-                      color var(--duration-short-2, 100ms) var(--easing-standard);
+          transition: background-color var(--duration-short-2, 100ms)
+              var(--easing-standard),
+            color var(--duration-short-2, 100ms) var(--easing-standard);
           /* Phase 10: Touch-friendly list items */
           min-height: var(--list-item-height-medium, 56px);
           padding: var(--spacing-2, 8px) var(--spacing-4, 16px);
@@ -83,7 +84,8 @@ export class GrampsjsEditableList extends GrampsjsAppStateMixin(LitElement) {
 
         /* Phase 10: Enhanced focus states for accessibility */
         mwc-list-item:focus-visible {
-          outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, var(--md-sys-color-primary));
+          outline: var(--focus-ring-width, 2px) solid
+            var(--focus-ring-color, var(--md-sys-color-primary));
           outline-offset: -2px;
           border-radius: var(--radius-sm, 4px);
         }

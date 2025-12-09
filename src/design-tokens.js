@@ -1,10 +1,10 @@
 /**
  * Gramps Web Design Tokens
- * 
+ *
  * This file defines the design tokens for the Gramps Web application.
  * Design tokens are the visual design atoms of the design system - specifically,
  * they are named entities that store visual design attributes.
- * 
+ *
  * Phase 10: UI/UX Overhaul - Design System Foundation
  */
 
@@ -20,19 +20,19 @@ export const designTokens = css`
        SPACING SYSTEM
        ===================================================== */
     --spacing-0: 0;
-    --spacing-1: 4px;     /* 0.25rem */
-    --spacing-2: 8px;     /* 0.5rem */
-    --spacing-3: 12px;    /* 0.75rem */
-    --spacing-4: 16px;    /* 1rem - Base unit */
-    --spacing-5: 20px;    /* 1.25rem */
-    --spacing-6: 24px;    /* 1.5rem */
-    --spacing-7: 28px;    /* 1.75rem */
-    --spacing-8: 32px;    /* 2rem */
-    --spacing-10: 40px;   /* 2.5rem */
-    --spacing-12: 48px;   /* 3rem */
-    --spacing-16: 64px;   /* 4rem */
-    --spacing-20: 80px;   /* 5rem */
-    --spacing-24: 96px;   /* 6rem */
+    --spacing-1: 4px; /* 0.25rem */
+    --spacing-2: 8px; /* 0.5rem */
+    --spacing-3: 12px; /* 0.75rem */
+    --spacing-4: 16px; /* 1rem - Base unit */
+    --spacing-5: 20px; /* 1.25rem */
+    --spacing-6: 24px; /* 1.5rem */
+    --spacing-7: 28px; /* 1.75rem */
+    --spacing-8: 32px; /* 2rem */
+    --spacing-10: 40px; /* 2.5rem */
+    --spacing-12: 48px; /* 3rem */
+    --spacing-16: 64px; /* 4rem */
+    --spacing-20: 80px; /* 5rem */
+    --spacing-24: 96px; /* 6rem */
 
     /* Semantic spacing */
     --spacing-component-padding: var(--spacing-4);
@@ -46,11 +46,14 @@ export const designTokens = css`
        TYPOGRAPHY SCALE
        Based on Material Design 3 and optimized for readability
        ===================================================== */
-    
+
     /* Font families */
-    --font-family-body: 'Inter var', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    --font-family-heading: 'Inter var', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    --font-family-mono: 'Commit Mono', 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Droid Sans Mono', 'Source Code Pro', monospace;
+    --font-family-body: 'Inter var', -apple-system, BlinkMacSystemFont,
+      'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --font-family-heading: 'Inter var', -apple-system, BlinkMacSystemFont,
+      'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --font-family-mono: 'Commit Mono', 'SF Mono', 'Monaco', 'Inconsolata',
+      'Fira Code', 'Droid Sans Mono', 'Source Code Pro', monospace;
 
     /* Font weights */
     --font-weight-light: 300;
@@ -165,11 +168,16 @@ export const designTokens = css`
        Based on Material Design 3 elevation levels
        ===================================================== */
     --elevation-0: none;
-    --elevation-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
-    --elevation-2: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
-    --elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3);
-    --elevation-4: 0px 6px 10px 4px rgba(0, 0, 0, 0.15), 0px 2px 3px 0px rgba(0, 0, 0, 0.3);
-    --elevation-5: 0px 8px 12px 6px rgba(0, 0, 0, 0.15), 0px 4px 4px 0px rgba(0, 0, 0, 0.3);
+    --elevation-1: 0px 1px 2px 0px rgba(0, 0, 0, 0.3),
+      0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+    --elevation-2: 0px 1px 2px 0px rgba(0, 0, 0, 0.3),
+      0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+    --elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.15),
+      0px 1px 3px 0px rgba(0, 0, 0, 0.3);
+    --elevation-4: 0px 6px 10px 4px rgba(0, 0, 0, 0.15),
+      0px 2px 3px 0px rgba(0, 0, 0, 0.3);
+    --elevation-5: 0px 8px 12px 6px rgba(0, 0, 0, 0.15),
+      0px 4px 4px 0px rgba(0, 0, 0, 0.3);
 
     /* Dark mode elevation overlays */
     --elevation-dark-1: 0.05;
@@ -217,10 +225,13 @@ export const designTokens = css`
 
     /* Common transitions */
     --transition-fade: opacity var(--duration-short-4) var(--easing-standard);
-    --transition-scale: transform var(--duration-medium-2) var(--easing-emphasized);
-    --transition-slide: transform var(--duration-medium-2) var(--easing-emphasized);
-    --transition-color: background-color var(--duration-short-2) var(--easing-standard),
-                        color var(--duration-short-2) var(--easing-standard);
+    --transition-scale: transform var(--duration-medium-2)
+      var(--easing-emphasized);
+    --transition-slide: transform var(--duration-medium-2)
+      var(--easing-emphasized);
+    --transition-color: background-color var(--duration-short-2)
+        var(--easing-standard),
+      color var(--duration-short-2) var(--easing-standard);
 
     /* =====================================================
        Z-INDEX SYSTEM
@@ -258,7 +269,7 @@ export const designTokens = css`
     /* =====================================================
        COMPONENT-SPECIFIC TOKENS
        ===================================================== */
-    
+
     /* Buttons */
     --button-height-small: 32px;
     --button-height-medium: 40px;
@@ -306,13 +317,14 @@ export const designTokens = css`
     /* =====================================================
        ACCESSIBILITY
        ===================================================== */
-    
+
     /* Focus indicators */
     --focus-ring-width: 2px;
     --focus-ring-offset: 2px;
     --focus-ring-color: var(--md-sys-color-primary);
     --focus-ring: 0 0 0 var(--focus-ring-offset) var(--md-sys-color-background),
-                  0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-ring-color);
+      0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width))
+        var(--focus-ring-color);
 
     /* Touch targets - minimum 48x48px for WCAG compliance */
     --touch-target-min-size: 48px;
@@ -323,11 +335,11 @@ export const designTokens = css`
     /* =====================================================
        MOBILE OPTIMIZATIONS
        ===================================================== */
-    
+
     /* Mobile touch optimizations */
     --mobile-tap-highlight-color: transparent;
     --mobile-scroll-behavior: smooth;
-    
+
     /* Safe area insets for notched devices */
     --safe-area-inset-top: env(safe-area-inset-top);
     --safe-area-inset-right: env(safe-area-inset-right);
@@ -348,7 +360,7 @@ export const designTokens = css`
       --type-headline-large-size: 28px;
       --type-headline-medium-size: 24px;
       --type-headline-small-size: 20px;
-      
+
       /* Reduce spacing on mobile */
       --spacing-page-margin: var(--spacing-4);
       --spacing-section-margin: var(--spacing-6);

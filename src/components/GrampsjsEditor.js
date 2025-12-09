@@ -129,7 +129,10 @@ class GrampsjsEditor extends GrampsjsAppStateMixin(LitElement) {
             --grampsjs-note-font-family,
             var(--grampsjs-body-font-family)
           );
-          font-size: var(--grampsjs-note-font-size, var(--type-body-large-size, 17px));
+          font-size: var(
+            --grampsjs-note-font-size,
+            var(--type-body-large-size, 17px)
+          );
           line-height: var(--grampsjs-note-line-height, 1.5em);
           color: var(--grampsjs-note-color);
           white-space: pre-wrap;

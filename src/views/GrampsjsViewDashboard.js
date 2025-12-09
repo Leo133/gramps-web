@@ -117,11 +117,17 @@ export class GrampsjsViewDashboard extends GrampsjsView {
         /* Phase 10: Safe area insets for notched devices */
         @supports (padding: max(0px)) {
           .column:first-child {
-            padding-left: max(var(--spacing-2, 8px), var(--safe-area-inset-left, 0));
+            padding-left: max(
+              var(--spacing-2, 8px),
+              var(--safe-area-inset-left, 0)
+            );
           }
-          
+
           .column:last-child {
-            padding-right: max(var(--spacing-2, 8px), var(--safe-area-inset-right, 0));
+            padding-right: max(
+              var(--spacing-2, 8px),
+              var(--safe-area-inset-right, 0)
+            );
           }
         }
       `,

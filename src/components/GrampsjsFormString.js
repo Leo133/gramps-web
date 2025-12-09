@@ -25,7 +25,7 @@ class GrampsjsFormString extends GrampsjsAppStateMixin(LitElement) {
         mwc-textfield.fullwidth {
           width: 100%;
         }
-        
+
         mwc-textfield {
           min-height: var(--touch-target-min-size, 48px);
         }

@@ -30,7 +30,10 @@ class GrampsjsRelationshipChart extends GrampsjsChartBase {
           fill: var(--grampsjs-color-shade-230);
         }
         mwc-menu {
-          --mdc-typography-subtitle1-font-size: var(--type-label-large-size, 14px);
+          --mdc-typography-subtitle1-font-size: var(
+            --type-label-large-size,
+            14px
+          );
           --mdc-menu-item-height: var(--touch-target-min-size, 48px);
         }
       `,

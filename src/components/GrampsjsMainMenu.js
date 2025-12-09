@@ -65,7 +65,8 @@ class GrampsjsMainMenu extends GrampsjsAppStateMixin(LitElement) {
 
         /* Phase 10: Improved focus states */
         grampsjs-list-item:focus-visible {
-          outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, var(--md-sys-color-primary));
+          outline: var(--focus-ring-width, 2px) solid
+            var(--focus-ring-color, var(--md-sys-color-primary));
           outline-offset: -2px;
           border-radius: var(--radius-sm, 4px);
         }
@@ -88,7 +89,7 @@ class GrampsjsMainMenu extends GrampsjsAppStateMixin(LitElement) {
           grampsjs-list-item {
             padding: var(--spacing-3, 12px) var(--spacing-3, 12px);
           }
-          
+
           grampsjs-list-item span {
             font-size: var(--type-body-medium-size, 14px);
           }

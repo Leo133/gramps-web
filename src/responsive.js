@@ -1,8 +1,8 @@
 /**
  * Responsive Design Utilities for Gramps Web
- * 
+ *
  * Phase 10: UI/UX Overhaul - Mobile-First Responsive Design
- * 
+ *
  * This module provides utilities for creating responsive,
  * mobile-first user interfaces.
  */
@@ -16,7 +16,7 @@ export const responsiveStyles = css`
   /* =====================================================
      CONTAINER SYSTEM
      ===================================================== */
-  
+
   .container {
     width: 100%;
     margin-left: auto;
@@ -55,172 +55,386 @@ export const responsiveStyles = css`
      GRID SYSTEM
      Mobile-first responsive grid
      ===================================================== */
-  
+
   .grid {
     display: grid;
     gap: var(--spacing-4, 16px);
   }
 
-  .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-  .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .grid-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-  .grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .grid-cols-6 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .grid-cols-12 {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
 
   /* Responsive grid breakpoints */
   @media (min-width: 640px) {
-    .sm\\:grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .sm\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .sm\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .sm\\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .sm\\:grid-cols-1 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    .sm\\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .sm\\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .sm\\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 
   @media (min-width: 768px) {
-    .md\\:grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .md\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .md\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .md\\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .md\\:grid-cols-1 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    .md\\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .md\\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .md\\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 
   @media (min-width: 1024px) {
-    .lg\\:grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .lg\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .lg\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .lg\\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .lg\\:grid-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .lg\\:grid-cols-1 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    .lg\\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .lg\\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .lg\\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .lg\\:grid-cols-6 {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
   }
 
   /* =====================================================
      FLEX UTILITIES
      ===================================================== */
-  
-  .flex { display: flex; }
-  .inline-flex { display: inline-flex; }
-  .flex-row { flex-direction: row; }
-  .flex-col { flex-direction: column; }
-  .flex-wrap { flex-wrap: wrap; }
-  .flex-nowrap { flex-wrap: nowrap; }
-  .flex-1 { flex: 1 1 0%; }
-  .flex-auto { flex: 1 1 auto; }
-  .flex-initial { flex: 0 1 auto; }
-  .flex-none { flex: none; }
+
+  .flex {
+    display: flex;
+  }
+  .inline-flex {
+    display: inline-flex;
+  }
+  .flex-row {
+    flex-direction: row;
+  }
+  .flex-col {
+    flex-direction: column;
+  }
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+  .flex-nowrap {
+    flex-wrap: nowrap;
+  }
+  .flex-1 {
+    flex: 1 1 0%;
+  }
+  .flex-auto {
+    flex: 1 1 auto;
+  }
+  .flex-initial {
+    flex: 0 1 auto;
+  }
+  .flex-none {
+    flex: none;
+  }
 
   /* Flex alignment */
-  .items-start { align-items: flex-start; }
-  .items-end { align-items: flex-end; }
-  .items-center { align-items: center; }
-  .items-baseline { align-items: baseline; }
-  .items-stretch { align-items: stretch; }
+  .items-start {
+    align-items: flex-start;
+  }
+  .items-end {
+    align-items: flex-end;
+  }
+  .items-center {
+    align-items: center;
+  }
+  .items-baseline {
+    align-items: baseline;
+  }
+  .items-stretch {
+    align-items: stretch;
+  }
 
-  .justify-start { justify-content: flex-start; }
-  .justify-end { justify-content: flex-end; }
-  .justify-center { justify-content: center; }
-  .justify-between { justify-content: space-between; }
-  .justify-around { justify-content: space-around; }
-  .justify-evenly { justify-content: space-evenly; }
+  .justify-start {
+    justify-content: flex-start;
+  }
+  .justify-end {
+    justify-content: flex-end;
+  }
+  .justify-center {
+    justify-content: center;
+  }
+  .justify-between {
+    justify-content: space-between;
+  }
+  .justify-around {
+    justify-content: space-around;
+  }
+  .justify-evenly {
+    justify-content: space-evenly;
+  }
 
   /* Gap utilities */
-  .gap-0 { gap: 0; }
-  .gap-1 { gap: var(--spacing-1, 4px); }
-  .gap-2 { gap: var(--spacing-2, 8px); }
-  .gap-3 { gap: var(--spacing-3, 12px); }
-  .gap-4 { gap: var(--spacing-4, 16px); }
-  .gap-6 { gap: var(--spacing-6, 24px); }
-  .gap-8 { gap: var(--spacing-8, 32px); }
+  .gap-0 {
+    gap: 0;
+  }
+  .gap-1 {
+    gap: var(--spacing-1, 4px);
+  }
+  .gap-2 {
+    gap: var(--spacing-2, 8px);
+  }
+  .gap-3 {
+    gap: var(--spacing-3, 12px);
+  }
+  .gap-4 {
+    gap: var(--spacing-4, 16px);
+  }
+  .gap-6 {
+    gap: var(--spacing-6, 24px);
+  }
+  .gap-8 {
+    gap: var(--spacing-8, 32px);
+  }
 
   /* =====================================================
      DISPLAY UTILITIES
      ===================================================== */
-  
-  .block { display: block; }
-  .inline-block { display: inline-block; }
-  .inline { display: inline; }
-  .hidden { display: none; }
+
+  .block {
+    display: block;
+  }
+  .inline-block {
+    display: inline-block;
+  }
+  .inline {
+    display: inline;
+  }
+  .hidden {
+    display: none;
+  }
 
   /* Responsive display */
   @media (max-width: 639px) {
-    .xs\\:hidden { display: none; }
-    .xs\\:block { display: block; }
+    .xs\\:hidden {
+      display: none;
+    }
+    .xs\\:block {
+      display: block;
+    }
   }
 
   @media (min-width: 640px) {
-    .sm\\:hidden { display: none; }
-    .sm\\:block { display: block; }
+    .sm\\:hidden {
+      display: none;
+    }
+    .sm\\:block {
+      display: block;
+    }
   }
 
   @media (min-width: 768px) {
-    .md\\:hidden { display: none; }
-    .md\\:block { display: block; }
+    .md\\:hidden {
+      display: none;
+    }
+    .md\\:block {
+      display: block;
+    }
   }
 
   @media (min-width: 1024px) {
-    .lg\\:hidden { display: none; }
-    .lg\\:block { display: block; }
+    .lg\\:hidden {
+      display: none;
+    }
+    .lg\\:block {
+      display: block;
+    }
   }
 
   /* =====================================================
      SPACING UTILITIES
      ===================================================== */
-  
+
   /* Margin */
-  .m-0 { margin: 0; }
-  .m-1 { margin: var(--spacing-1, 4px); }
-  .m-2 { margin: var(--spacing-2, 8px); }
-  .m-3 { margin: var(--spacing-3, 12px); }
-  .m-4 { margin: var(--spacing-4, 16px); }
-  .m-6 { margin: var(--spacing-6, 24px); }
-  .m-8 { margin: var(--spacing-8, 32px); }
-  .m-auto { margin: auto; }
+  .m-0 {
+    margin: 0;
+  }
+  .m-1 {
+    margin: var(--spacing-1, 4px);
+  }
+  .m-2 {
+    margin: var(--spacing-2, 8px);
+  }
+  .m-3 {
+    margin: var(--spacing-3, 12px);
+  }
+  .m-4 {
+    margin: var(--spacing-4, 16px);
+  }
+  .m-6 {
+    margin: var(--spacing-6, 24px);
+  }
+  .m-8 {
+    margin: var(--spacing-8, 32px);
+  }
+  .m-auto {
+    margin: auto;
+  }
 
-  .mx-auto { margin-left: auto; margin-right: auto; }
-  .my-auto { margin-top: auto; margin-bottom: auto; }
+  .mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .my-auto {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
 
-  .mt-0 { margin-top: 0; }
-  .mt-1 { margin-top: var(--spacing-1, 4px); }
-  .mt-2 { margin-top: var(--spacing-2, 8px); }
-  .mt-4 { margin-top: var(--spacing-4, 16px); }
-  .mt-6 { margin-top: var(--spacing-6, 24px); }
-  .mt-8 { margin-top: var(--spacing-8, 32px); }
+  .mt-0 {
+    margin-top: 0;
+  }
+  .mt-1 {
+    margin-top: var(--spacing-1, 4px);
+  }
+  .mt-2 {
+    margin-top: var(--spacing-2, 8px);
+  }
+  .mt-4 {
+    margin-top: var(--spacing-4, 16px);
+  }
+  .mt-6 {
+    margin-top: var(--spacing-6, 24px);
+  }
+  .mt-8 {
+    margin-top: var(--spacing-8, 32px);
+  }
 
-  .mb-0 { margin-bottom: 0; }
-  .mb-1 { margin-bottom: var(--spacing-1, 4px); }
-  .mb-2 { margin-bottom: var(--spacing-2, 8px); }
-  .mb-4 { margin-bottom: var(--spacing-4, 16px); }
-  .mb-6 { margin-bottom: var(--spacing-6, 24px); }
-  .mb-8 { margin-bottom: var(--spacing-8, 32px); }
+  .mb-0 {
+    margin-bottom: 0;
+  }
+  .mb-1 {
+    margin-bottom: var(--spacing-1, 4px);
+  }
+  .mb-2 {
+    margin-bottom: var(--spacing-2, 8px);
+  }
+  .mb-4 {
+    margin-bottom: var(--spacing-4, 16px);
+  }
+  .mb-6 {
+    margin-bottom: var(--spacing-6, 24px);
+  }
+  .mb-8 {
+    margin-bottom: var(--spacing-8, 32px);
+  }
 
   /* Padding */
-  .p-0 { padding: 0; }
-  .p-1 { padding: var(--spacing-1, 4px); }
-  .p-2 { padding: var(--spacing-2, 8px); }
-  .p-3 { padding: var(--spacing-3, 12px); }
-  .p-4 { padding: var(--spacing-4, 16px); }
-  .p-6 { padding: var(--spacing-6, 24px); }
-  .p-8 { padding: var(--spacing-8, 32px); }
+  .p-0 {
+    padding: 0;
+  }
+  .p-1 {
+    padding: var(--spacing-1, 4px);
+  }
+  .p-2 {
+    padding: var(--spacing-2, 8px);
+  }
+  .p-3 {
+    padding: var(--spacing-3, 12px);
+  }
+  .p-4 {
+    padding: var(--spacing-4, 16px);
+  }
+  .p-6 {
+    padding: var(--spacing-6, 24px);
+  }
+  .p-8 {
+    padding: var(--spacing-8, 32px);
+  }
 
-  .px-2 { padding-left: var(--spacing-2, 8px); padding-right: var(--spacing-2, 8px); }
-  .px-4 { padding-left: var(--spacing-4, 16px); padding-right: var(--spacing-4, 16px); }
-  .px-6 { padding-left: var(--spacing-6, 24px); padding-right: var(--spacing-6, 24px); }
+  .px-2 {
+    padding-left: var(--spacing-2, 8px);
+    padding-right: var(--spacing-2, 8px);
+  }
+  .px-4 {
+    padding-left: var(--spacing-4, 16px);
+    padding-right: var(--spacing-4, 16px);
+  }
+  .px-6 {
+    padding-left: var(--spacing-6, 24px);
+    padding-right: var(--spacing-6, 24px);
+  }
 
-  .py-2 { padding-top: var(--spacing-2, 8px); padding-bottom: var(--spacing-2, 8px); }
-  .py-4 { padding-top: var(--spacing-4, 16px); padding-bottom: var(--spacing-4, 16px); }
-  .py-6 { padding-top: var(--spacing-6, 24px); padding-bottom: var(--spacing-6, 24px); }
+  .py-2 {
+    padding-top: var(--spacing-2, 8px);
+    padding-bottom: var(--spacing-2, 8px);
+  }
+  .py-4 {
+    padding-top: var(--spacing-4, 16px);
+    padding-bottom: var(--spacing-4, 16px);
+  }
+  .py-6 {
+    padding-top: var(--spacing-6, 24px);
+    padding-bottom: var(--spacing-6, 24px);
+  }
 
   /* =====================================================
      TEXT UTILITIES
      ===================================================== */
-  
-  .text-left { text-align: left; }
-  .text-center { text-align: center; }
-  .text-right { text-align: right; }
-  .text-justify { text-align: justify; }
 
-  .font-light { font-weight: var(--font-weight-light, 300); }
-  .font-normal { font-weight: var(--font-weight-regular, 400); }
-  .font-medium { font-weight: var(--font-weight-medium, 500); }
-  .font-semibold { font-weight: var(--font-weight-semibold, 600); }
-  .font-bold { font-weight: var(--font-weight-bold, 700); }
+  .text-left {
+    text-align: left;
+  }
+  .text-center {
+    text-align: center;
+  }
+  .text-right {
+    text-align: right;
+  }
+  .text-justify {
+    text-align: justify;
+  }
+
+  .font-light {
+    font-weight: var(--font-weight-light, 300);
+  }
+  .font-normal {
+    font-weight: var(--font-weight-regular, 400);
+  }
+  .font-medium {
+    font-weight: var(--font-weight-medium, 500);
+  }
+  .font-semibold {
+    font-weight: var(--font-weight-semibold, 600);
+  }
+  .font-bold {
+    font-weight: var(--font-weight-bold, 700);
+  }
 
   .truncate {
     overflow: hidden;
@@ -245,7 +459,7 @@ export const responsiveStyles = css`
   /* =====================================================
      MOBILE OPTIMIZATIONS
      ===================================================== */
-  
+
   /* Touch-friendly spacing */
   @media (max-width: 768px) {
     .touch-spacing {
@@ -256,23 +470,35 @@ export const responsiveStyles = css`
     /* Larger touch targets on mobile */
     button,
     a.button,
-    [role="button"] {
+    [role='button'] {
       min-height: var(--touch-target-min-size, 48px);
       padding: var(--spacing-3, 12px) var(--spacing-4, 16px);
     }
 
     /* Reduce font sizes slightly on very small screens */
-    h1 { font-size: var(--type-headline-medium-size, 28px); }
-    h2 { font-size: var(--type-headline-small-size, 24px); }
-    h3 { font-size: var(--type-title-large-size, 22px); }
+    h1 {
+      font-size: var(--type-headline-medium-size, 28px);
+    }
+    h2 {
+      font-size: var(--type-headline-small-size, 24px);
+    }
+    h3 {
+      font-size: var(--type-title-large-size, 22px);
+    }
   }
 
   /* Safe area insets for notched devices */
   @supports (padding: max(0px)) {
     .safe-area-inset {
       padding-top: max(var(--spacing-4, 16px), var(--safe-area-inset-top, 0));
-      padding-right: max(var(--spacing-4, 16px), var(--safe-area-inset-right, 0));
-      padding-bottom: max(var(--spacing-4, 16px), var(--safe-area-inset-bottom, 0));
+      padding-right: max(
+        var(--spacing-4, 16px),
+        var(--safe-area-inset-right, 0)
+      );
+      padding-bottom: max(
+        var(--spacing-4, 16px),
+        var(--safe-area-inset-bottom, 0)
+      );
       padding-left: max(var(--spacing-4, 16px), var(--safe-area-inset-left, 0));
     }
   }
@@ -280,35 +506,53 @@ export const responsiveStyles = css`
   /* =====================================================
      ORIENTATION HANDLING
      ===================================================== */
-  
+
   @media (orientation: landscape) {
-    .landscape\\:flex-row { flex-direction: row; }
-    .landscape\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .landscape\\:flex-row {
+      flex-direction: row;
+    }
+    .landscape\\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   @media (orientation: portrait) {
-    .portrait\\:flex-col { flex-direction: column; }
-    .portrait\\:grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    .portrait\\:flex-col {
+      flex-direction: column;
+    }
+    .portrait\\:grid-cols-1 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
   }
 
   /* =====================================================
      HOVER STATES (Disable on touch devices)
      ===================================================== */
-  
+
   @media (hover: hover) and (pointer: fine) {
-    .hover\\:opacity-80:hover { opacity: 0.8; }
-    .hover\\:scale-105:hover { transform: scale(1.05); }
-    .hover\\:shadow-lg:hover { box-shadow: var(--elevation-3); }
+    .hover\\:opacity-80:hover {
+      opacity: 0.8;
+    }
+    .hover\\:scale-105:hover {
+      transform: scale(1.05);
+    }
+    .hover\\:shadow-lg:hover {
+      box-shadow: var(--elevation-3);
+    }
   }
 
   /* =====================================================
      PRINT STYLES
      ===================================================== */
-  
+
   @media print {
-    .print\\:hidden { display: none !important; }
-    .print\\:block { display: block !important; }
-    
+    .print\\:hidden {
+      display: none !important;
+    }
+    .print\\:block {
+      display: block !important;
+    }
+
     /* Remove backgrounds and shadows for print */
     * {
       background: none !important;
@@ -321,9 +565,15 @@ export const responsiveStyles = css`
     }
 
     /* Page breaks */
-    .page-break-before { page-break-before: always; }
-    .page-break-after { page-break-after: always; }
-    .page-break-inside-avoid { page-break-inside: avoid; }
+    .page-break-before {
+      page-break-before: always;
+    }
+    .page-break-after {
+      page-break-after: always;
+    }
+    .page-break-inside-avoid {
+      page-break-inside: avoid;
+    }
   }
 `
 
@@ -436,21 +686,20 @@ export function isPortrait() {
  */
 export function onMediaQuery(query, callback) {
   const mediaQuery = window.matchMedia(query)
-  
+
   // Call immediately with current state
   callback(mediaQuery.matches)
-  
+
   // Listen for changes
   const listener = e => callback(e.matches)
-  
+
   if (mediaQuery.addEventListener) {
     mediaQuery.addEventListener('change', listener)
     return () => mediaQuery.removeEventListener('change', listener)
-  } else {
-    // Fallback for older browsers
-    mediaQuery.addListener(listener)
-    return () => mediaQuery.removeListener(listener)
   }
+  // Fallback for older browsers
+  mediaQuery.addListener(listener)
+  return () => mediaQuery.removeListener(listener)
 }
 
 /**
@@ -460,7 +709,7 @@ export function onMediaQuery(query, callback) {
  */
 export function watchBreakpoint(callback) {
   let currentBreakpoint = getCurrentBreakpoint()
-  
+
   function checkBreakpoint() {
     const newBreakpoint = getCurrentBreakpoint()
     if (newBreakpoint !== currentBreakpoint) {
@@ -470,10 +719,10 @@ export function watchBreakpoint(callback) {
   }
 
   window.addEventListener('resize', checkBreakpoint)
-  
+
   // Call immediately
   callback(currentBreakpoint)
-  
+
   return () => window.removeEventListener('resize', checkBreakpoint)
 }
 
@@ -518,7 +767,8 @@ export function throttle(func, limit = 250) {
  * Lock body scroll (useful for modals)
  */
 export function lockScroll() {
-  const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth
+  const scrollBarWidth =
+    window.innerWidth - document.documentElement.clientWidth
   document.body.style.overflow = 'hidden'
   document.body.style.paddingRight = `${scrollBarWidth}px`
 }
@@ -537,17 +787,18 @@ export function unlockScroll() {
  * @param {Object} options - Scroll options
  */
 export function scrollToElement(target, options = {}) {
-  const element = typeof target === 'string' ? document.querySelector(target) : target
-  
+  const element =
+    typeof target === 'string' ? document.querySelector(target) : target
+
   if (!element) return
-  
+
   const defaultOptions = {
     behavior: 'smooth',
     block: 'start',
     inline: 'nearest',
     ...options,
   }
-  
+
   element.scrollIntoView(defaultOptions)
 }
 
@@ -573,7 +824,9 @@ export function isInViewport(element, offset = 0) {
   return (
     rect.top >= -offset &&
     rect.left >= -offset &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) + offset &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth) + offset
+    rect.bottom <=
+      (window.innerHeight || document.documentElement.clientHeight) + offset &&
+    rect.right <=
+      (window.innerWidth || document.documentElement.clientWidth) + offset
   )
 }

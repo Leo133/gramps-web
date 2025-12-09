@@ -1,8 +1,8 @@
 /**
  * Gramps.js Update Available Component
- * 
+ *
  * Phase 10: UI/UX Overhaul - PWA Enhancement
- * 
+ *
  * Displays a notification when a new version of the app is available,
  * with an option to update immediately.
  */
@@ -33,7 +33,8 @@ export class GrampsjsUpdateAvailableNew extends LitElement {
         display: flex;
         align-items: center;
         gap: var(--spacing-4, 16px);
-        animation: slideUp var(--duration-medium-2, 300ms) var(--easing-emphasized);
+        animation: slideUp var(--duration-medium-2, 300ms)
+          var(--easing-emphasized);
         border: 1px solid var(--md-sys-color-outline-variant);
       }
 
@@ -167,14 +168,20 @@ export class GrampsjsUpdateAvailableNew extends LitElement {
 
   connectedCallback() {
     super.connectedCallback()
-    
+
     // Listen for update available event
-    window.addEventListener('app-update-available', this._handleUpdateAvailable.bind(this))
+    window.addEventListener(
+      'app-update-available',
+      this._handleUpdateAvailable.bind(this)
+    )
   }
 
   disconnectedCallback() {
     super.disconnectedCallback()
-    window.removeEventListener('app-update-available', this._handleUpdateAvailable.bind(this))
+    window.removeEventListener(
+      'app-update-available',
+      this._handleUpdateAvailable.bind(this)
+    )
   }
 
   _handleUpdateAvailable(event) {
@@ -184,6 +191,7 @@ export class GrampsjsUpdateAvailableNew extends LitElement {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _handleUpdate() {
     // Update the service worker
     updateServiceWorker()
@@ -217,12 +225,12 @@ export class GrampsjsUpdateAvailableNew extends LitElement {
             <path d="M16 16h5v5" />
           </svg>
         </div>
-        
+
         <div class="content">
           <p class="title">Update Available</p>
           <p class="message">${this.message}</p>
         </div>
-        
+
         <div class="actions">
           <button
             class="button-text"
@@ -244,4 +252,7 @@ export class GrampsjsUpdateAvailableNew extends LitElement {
   }
 }
 
-customElements.define('grampsjs-update-available-new', GrampsjsUpdateAvailableNew)
+customElements.define(
+  'grampsjs-update-available-new',
+  GrampsjsUpdateAvailableNew
+)

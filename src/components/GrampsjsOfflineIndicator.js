@@ -1,8 +1,8 @@
 /**
  * Gramps.js Offline Indicator Component
- * 
+ *
  * Phase 10: UI/UX Overhaul - PWA Enhancement
- * 
+ *
  * Displays an indicator when the app is offline.
  */
 
@@ -30,7 +30,8 @@ export class GrampsjsOfflineIndicator extends LitElement {
         gap: var(--spacing-2, 8px);
         font-size: var(--type-label-large-size, 14px);
         font-weight: var(--font-weight-medium, 500);
-        animation: slideDown var(--duration-medium-2, 300ms) var(--easing-emphasized);
+        animation: slideDown var(--duration-medium-2, 300ms)
+          var(--easing-emphasized);
         box-shadow: var(--elevation-1);
       }
 
@@ -46,7 +47,8 @@ export class GrampsjsOfflineIndicator extends LitElement {
       .online-bar {
         background: var(--md-sys-color-tertiary-container);
         color: var(--md-sys-color-on-tertiary-container);
-        animation: slideDown var(--duration-medium-2, 300ms) var(--easing-emphasized);
+        animation: slideDown var(--duration-medium-2, 300ms)
+          var(--easing-emphasized);
       }
 
       .icon {
@@ -62,7 +64,8 @@ export class GrampsjsOfflineIndicator extends LitElement {
       }
 
       @keyframes pulse {
-        0%, 100% {
+        0%,
+        100% {
           opacity: 1;
         }
         50% {
@@ -84,9 +87,18 @@ export class GrampsjsOfflineIndicator extends LitElement {
       @supports (padding: max(0px)) {
         .offline-bar,
         .online-bar {
-          padding-top: max(var(--spacing-2, 8px), var(--safe-area-inset-top, 0));
-          padding-left: max(var(--spacing-4, 16px), var(--safe-area-inset-left, 0));
-          padding-right: max(var(--spacing-4, 16px), var(--safe-area-inset-right, 0));
+          padding-top: max(
+            var(--spacing-2, 8px),
+            var(--safe-area-inset-top, 0)
+          );
+          padding-left: max(
+            var(--spacing-4, 16px),
+            var(--safe-area-inset-left, 0)
+          );
+          padding-right: max(
+            var(--spacing-4, 16px),
+            var(--safe-area-inset-right, 0)
+          );
         }
       }
     `
@@ -108,15 +120,21 @@ export class GrampsjsOfflineIndicator extends LitElement {
 
   connectedCallback() {
     super.connectedCallback()
-    
+
     // Listen for online/offline events
-    window.addEventListener('online-status-changed', this._handleStatusChange.bind(this))
+    window.addEventListener(
+      'online-status-changed',
+      this._handleStatusChange.bind(this)
+    )
   }
 
   disconnectedCallback() {
     super.disconnectedCallback()
-    window.removeEventListener('online-status-changed', this._handleStatusChange.bind(this))
-    
+    window.removeEventListener(
+      'online-status-changed',
+      this._handleStatusChange.bind(this)
+    )
+
     if (this._onlineTimeout) {
       clearTimeout(this._onlineTimeout)
     }
@@ -124,11 +142,11 @@ export class GrampsjsOfflineIndicator extends LitElement {
 
   _handleStatusChange(event) {
     this.online = event.detail.online
-    
+
     if (this.online) {
       // Show "back online" message temporarily
       this.showOnline = true
-      
+
       // Hide after 3 seconds
       if (this._onlineTimeout) {
         clearTimeout(this._onlineTimeout)
@@ -139,16 +157,18 @@ export class GrampsjsOfflineIndicator extends LitElement {
     } else {
       // Show offline indicator immediately
       this.showOnline = false
-      
+
       // Announce to screen readers
       this._announceOffline()
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _announceOffline() {
     const liveRegion = document.querySelector('[aria-live="polite"]')
     if (liveRegion) {
-      liveRegion.textContent = 'You are now offline. Some features may not be available.'
+      liveRegion.textContent =
+        'You are now offline. Some features may not be available.'
       setTimeout(() => {
         liveRegion.textContent = ''
       }, 1000)

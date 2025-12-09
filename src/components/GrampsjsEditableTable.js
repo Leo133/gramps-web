@@ -50,12 +50,14 @@ export class GrampsjsEditableTable extends GrampsjsTableBase {
           background-color: var(--grampsjs-color-shade-240);
           cursor: pointer;
           /* Phase 10: Smooth transition */
-          transition: background-color var(--duration-short-2, 100ms) var(--easing-standard);
+          transition: background-color var(--duration-short-2, 100ms)
+            var(--easing-standard);
         }
 
         /* Phase 10: Enhanced focus states for accessibility */
         tr:focus-visible td {
-          outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, var(--md-sys-color-primary));
+          outline: var(--focus-ring-width, 2px) solid
+            var(--focus-ring-color, var(--md-sys-color-primary));
           outline-offset: -2px;
         }
 
@@ -72,7 +74,8 @@ export class GrampsjsEditableTable extends GrampsjsTableBase {
             -webkit-overflow-scrolling: touch;
           }
 
-          th, td {
+          th,
+          td {
             padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
             font-size: var(--type-body-medium-size, 14px);
           }

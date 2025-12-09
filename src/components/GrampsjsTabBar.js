@@ -66,7 +66,8 @@ class GrampsjsTabBar extends GrampsjsAppStateMixin(LitElement) {
 
         /* Phase 10: Improved focus states for accessibility */
         md-primary-tab:focus-visible {
-          outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, var(--md-sys-color-primary));
+          outline: var(--focus-ring-width, 2px) solid
+            var(--focus-ring-color, var(--md-sys-color-primary));
           outline-offset: 2px;
           border-radius: var(--radius-sm, 4px);
         }
@@ -76,7 +77,8 @@ class GrampsjsTabBar extends GrampsjsAppStateMixin(LitElement) {
           md-primary-tab:hover {
             background-color: var(--md-sys-color-surface-container-low);
             border-radius: var(--radius-sm, 4px);
-            transition: background-color var(--duration-short-2, 100ms) var(--easing-standard);
+            transition: background-color var(--duration-short-2, 100ms)
+              var(--easing-standard);
           }
         }
 
@@ -101,8 +103,14 @@ class GrampsjsTabBar extends GrampsjsAppStateMixin(LitElement) {
         /* Phase 10: Safe area insets for notched devices */
         @supports (padding: max(0px)) {
           md-tabs {
-            padding-left: max(var(--spacing-5, 20px), var(--safe-area-inset-left, 0));
-            padding-right: max(var(--spacing-5, 20px), var(--safe-area-inset-right, 0));
+            padding-left: max(
+              var(--spacing-5, 20px),
+              var(--safe-area-inset-left, 0)
+            );
+            padding-right: max(
+              var(--spacing-5, 20px),
+              var(--safe-area-inset-right, 0)
+            );
           }
         }
       `,

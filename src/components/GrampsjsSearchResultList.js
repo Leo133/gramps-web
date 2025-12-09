@@ -66,7 +66,8 @@ export class GrampsjsSearchResultList extends GrampsjsAppStateMixin(
 
         /* Phase 10: Enhanced focus states for accessibility */
         mwc-list-item:focus-visible {
-          outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, var(--md-sys-color-primary));
+          outline: var(--focus-ring-width, 2px) solid
+            var(--focus-ring-color, var(--md-sys-color-primary));
           outline-offset: -2px;
           border-radius: var(--radius-sm, 4px);
         }

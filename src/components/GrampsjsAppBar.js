@@ -33,7 +33,10 @@ class GrampsjsAppBar extends GrampsjsAppStateMixin(LitElement) {
             --grampsjs-heading-font-family
           );
           --mdc-typography-headline6-font-weight: 550;
-          --mdc-typography-headline6-font-size: var(--type-body-large-size, 17px);
+          --mdc-typography-headline6-font-size: var(
+            --type-body-large-size,
+            17px
+          );
           --mdc-theme-primary: var(--grampsjs-top-app-bar-background-color);
           --mdc-theme-on-primary: var(--grampsjs-top-app-bar-font-color);
         }

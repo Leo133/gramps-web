@@ -1,8 +1,9 @@
+/* eslint-disable no-console, no-use-before-define */
 /**
  * PWA Utilities for Gramps Web
- * 
+ *
  * Phase 10: UI/UX Overhaul - PWA Enhancement
- * 
+ *
  * This module provides utilities for Progressive Web App features:
  * - Service worker registration and updates
  * - Install prompt handling
@@ -21,9 +22,12 @@ export async function registerServiceWorker() {
   }
 
   try {
-    const registration = await navigator.serviceWorker.register('/service-worker.js', {
-      scope: '/',
-    })
+    const registration = await navigator.serviceWorker.register(
+      '/service-worker.js',
+      {
+        scope: '/',
+      }
+    )
 
     console.log('Service worker registered:', registration.scope)
 
@@ -39,7 +43,10 @@ export async function registerServiceWorker() {
       const newWorker = registration.installing
 
       newWorker.addEventListener('statechange', () => {
-        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+        if (
+          newWorker.state === 'installed' &&
+          navigator.serviceWorker.controller
+        ) {
           // New service worker available
           notifyAppUpdate()
         }
@@ -140,7 +147,9 @@ export async function getServiceWorkerVersion() {
     }
 
     if (registration.active) {
-      registration.active.postMessage({type: 'GET_VERSION'}, [messageChannel.port2])
+      registration.active.postMessage({type: 'GET_VERSION'}, [
+        messageChannel.port2,
+      ])
     } else {
       resolve('No active worker')
     }
@@ -159,10 +168,10 @@ export function initInstallPrompt() {
   window.addEventListener('beforeinstallprompt', e => {
     // Prevent the mini-infobar from appearing on mobile
     e.preventDefault()
-    
+
     // Save the event for later use
     deferredInstallPrompt = e
-    
+
     // Dispatch custom event to show install button
     const event = new CustomEvent('app-installable', {
       detail: {
@@ -176,7 +185,7 @@ export function initInstallPrompt() {
   window.addEventListener('appinstalled', () => {
     console.log('App installed successfully')
     deferredInstallPrompt = null
-    
+
     // Dispatch custom event
     const event = new CustomEvent('app-installed')
     window.dispatchEvent(event)
@@ -257,7 +266,7 @@ export function initOnlineDetection() {
  */
 function updateOnlineStatus(online) {
   console.log(`App is now ${online ? 'online' : 'offline'}`)
-  
+
   // Dispatch custom event
   const event = new CustomEvent('online-status-changed', {
     detail: {online},
@@ -265,7 +274,10 @@ function updateOnlineStatus(online) {
   window.dispatchEvent(event)
 
   // Update UI
-  document.documentElement.setAttribute('data-online', online ? 'true' : 'false')
+  document.documentElement.setAttribute(
+    'data-online',
+    online ? 'true' : 'false'
+  )
 }
 
 /**
@@ -324,8 +336,11 @@ export function getNetworkQuality() {
     }
   }
 
-  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
-  
+  const connection =
+    navigator.connection ||
+    navigator.mozConnection ||
+    navigator.webkitConnection
+
   return {
     effectiveType: connection.effectiveType, // '4g', '3g', '2g', 'slow-2g'
     downlink: connection.downlink, // Mbps
@@ -356,7 +371,7 @@ export function initAppLifecycle() {
   document.addEventListener('visibilitychange', () => {
     const visible = !document.hidden
     console.log(`App is now ${visible ? 'visible' : 'hidden'}`)
-    
+
     const event = new CustomEvent('app-visibility-changed', {
       detail: {visible},
     })
@@ -394,7 +409,7 @@ export async function initPWA() {
   initAppLifecycle()
 
   console.log('PWA features initialized')
-  
+
   // Log PWA status
   console.log('PWA Status:', {
     installed: isAppInstalled(),
@@ -430,7 +445,7 @@ export async function requestPersistentStorage() {
   }
 
   const isPersisted = await navigator.storage.persisted()
-  
+
   if (isPersisted) {
     console.log('Storage is already persistent')
     return true
@@ -451,7 +466,7 @@ export async function getStorageEstimate() {
   }
 
   const estimate = await navigator.storage.estimate()
-  
+
   return {
     usage: estimate.usage,
     quota: estimate.quota,

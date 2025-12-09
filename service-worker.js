@@ -1,8 +1,9 @@
+/* eslint-disable no-restricted-globals, no-console, no-undef, no-use-before-define */
 /**
  * Service Worker for Gramps Web PWA
- * 
+ *
  * Phase 10: UI/UX Overhaul - PWA Enhancement
- * 
+ *
  * This service worker provides:
  * - Offline support with caching strategies
  * - Background sync
@@ -42,23 +43,15 @@ const STATIC_ASSETS = [
   '/fonts/fonts.css',
 ]
 
-// API endpoints to cache with network-first strategy
-const API_ENDPOINTS = [
-  '/api/metadata',
-  '/api/trees/-',
-]
-
 // Maximum cache sizes
-const MAX_DYNAMIC_CACHE_SIZE = 50
 const MAX_IMAGE_CACHE_SIZE = 100
-const MAX_API_CACHE_AGE = 5 * 60 * 1000 // 5 minutes
 
 /**
  * Install event - cache static assets
  */
 self.addEventListener('install', event => {
   console.log('[SW] Installing service worker...')
-  
+
   event.waitUntil(
     caches
       .open(STATIC_CACHE)
@@ -70,7 +63,7 @@ self.addEventListener('install', event => {
         console.error('[SW] Error caching static assets:', err)
       })
   )
-  
+
   // Activate immediately
   self.skipWaiting()
 })
@@ -80,26 +73,25 @@ self.addEventListener('install', event => {
  */
 self.addEventListener('activate', event => {
   console.log('[SW] Activating service worker...')
-  
+
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
+    caches.keys().then(cacheNames =>
+      Promise.all(
         cacheNames
-          .filter(cacheName => {
-            // Remove old cache versions
-            return (
+          .filter(
+            cacheName =>
+              // Remove old cache versions
               cacheName.startsWith('gramps-web-') &&
               !cacheName.startsWith(CACHE_VERSION)
-            )
-          })
+          )
           .map(cacheName => {
             console.log('[SW] Deleting old cache:', cacheName)
             return caches.delete(cacheName)
           })
       )
-    })
+    )
   )
-  
+
   // Take control immediately
   return self.clients.claim()
 })
@@ -127,7 +119,9 @@ self.addEventListener('fetch', event => {
     event.respondWith(cacheFirst(request, STATIC_CACHE))
   } else if (isImage(url)) {
     // Images: Cache-first with size limit
-    event.respondWith(cacheFirstWithLimit(request, IMAGE_CACHE, MAX_IMAGE_CACHE_SIZE))
+    event.respondWith(
+      cacheFirstWithLimit(request, IMAGE_CACHE, MAX_IMAGE_CACHE_SIZE)
+    )
   } else if (isAPIRequest(url)) {
     // API requests: Network-first with cache fallback
     event.respondWith(networkFirstWithCache(request, API_CACHE))
@@ -144,11 +138,11 @@ self.addEventListener('fetch', event => {
 async function cacheFirst(request, cacheName) {
   const cache = await caches.open(cacheName)
   const cached = await cache.match(request)
-  
+
   if (cached) {
     return cached
   }
-  
+
   try {
     const response = await fetch(request)
     if (response.ok) {
@@ -171,17 +165,17 @@ async function cacheFirst(request, cacheName) {
 async function cacheFirstWithLimit(request, cacheName, maxSize) {
   const cache = await caches.open(cacheName)
   const cached = await cache.match(request)
-  
+
   if (cached) {
     return cached
   }
-  
+
   try {
     const response = await fetch(request)
     if (response.ok) {
       // Add to cache
       cache.put(request, response.clone())
-      
+
       // Trim cache if needed
       trimCache(cacheName, maxSize)
     }
@@ -201,25 +195,25 @@ async function cacheFirstWithLimit(request, cacheName, maxSize) {
  */
 async function networkFirstWithCache(request, cacheName) {
   const cache = await caches.open(cacheName)
-  
+
   try {
     const response = await fetch(request)
-    
+
     if (response.ok) {
       // Update cache with fresh response
       cache.put(request, response.clone())
     }
-    
+
     return response
   } catch (error) {
     // Network failed, try cache
     const cached = await cache.match(request)
-    
+
     if (cached) {
       console.log('[SW] Serving from cache (offline):', request.url)
       return cached
     }
-    
+
     // No cache available
     console.error('[SW] Request failed and no cache available:', error)
     return new Response(
@@ -246,13 +240,15 @@ async function networkFirstWithCache(request, cacheName) {
 async function trimCache(cacheName, maxSize) {
   const cache = await caches.open(cacheName)
   const keys = await cache.keys()
-  
+
   if (keys.length > maxSize) {
     // Delete excess entries (simple FIFO approach)
     // Note: Cache order is not guaranteed, this is best-effort
     const toDelete = keys.slice(0, keys.length - maxSize)
     await Promise.all(toDelete.map(key => cache.delete(key)))
-    console.log(`[SW] Trimmed ${cacheName} cache from ${keys.length} to ${maxSize} items`)
+    console.log(
+      `[SW] Trimmed ${cacheName} cache from ${keys.length} to ${maxSize} items`
+    )
   }
 }
 
@@ -322,9 +318,7 @@ self.addEventListener('push', event => {
     vibrate: [200, 100, 200],
   }
 
-  event.waitUntil(
-    self.registration.showNotification('Gramps Web', options)
-  )
+  event.waitUntil(self.registration.showNotification('Gramps Web', options))
 })
 
 /**
@@ -332,10 +326,8 @@ self.addEventListener('push', event => {
  */
 self.addEventListener('notificationclick', event => {
   event.notification.close()
-  
-  event.waitUntil(
-    clients.openWindow('/')
-  )
+
+  event.waitUntil(clients.openWindow('/'))
 })
 
 /**
@@ -345,17 +337,17 @@ self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting()
   }
-  
+
   if (event.data && event.data.type === 'CLEAR_CACHE') {
     event.waitUntil(
-      caches.keys().then(cacheNames => {
-        return Promise.all(
-          cacheNames.map(cacheName => caches.delete(cacheName))
+      caches
+        .keys()
+        .then(cacheNames =>
+          Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)))
         )
-      })
     )
   }
-  
+
   if (event.data && event.data.type === 'GET_VERSION') {
     event.ports[0].postMessage({version: CACHE_VERSION})
   }

@@ -48,7 +48,7 @@ class GrampsjsFormUser extends GrampsjsAppStateMixin(LitElement) {
           width: var(--touch-target-min-size, 48px);
           height: var(--touch-target-min-size, 48px);
         }
-        
+
         mwc-textfield {
           min-height: var(--touch-target-min-size, 48px);
         }

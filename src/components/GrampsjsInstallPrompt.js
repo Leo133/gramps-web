@@ -1,8 +1,8 @@
 /**
  * Gramps.js PWA Install Prompt Component
- * 
+ *
  * Phase 10: UI/UX Overhaul - PWA Enhancement
- * 
+ *
  * Displays a prompt to install the app as a PWA when available.
  */
 
@@ -25,7 +25,8 @@ export class GrampsjsInstallPrompt extends LitElement {
         align-items: center;
         gap: var(--spacing-4, 16px);
         margin: var(--spacing-4, 16px);
-        animation: fadeIn var(--duration-medium-2, 300ms) var(--easing-emphasized);
+        animation: fadeIn var(--duration-medium-2, 300ms)
+          var(--easing-emphasized);
       }
 
       @keyframes fadeIn {
@@ -103,7 +104,8 @@ export class GrampsjsInstallPrompt extends LitElement {
       }
 
       .button-install:focus {
-        outline: var(--focus-ring-width, 2px) solid var(--md-sys-color-on-primary-container);
+        outline: var(--focus-ring-width, 2px) solid
+          var(--md-sys-color-on-primary-container);
         outline-offset: var(--focus-ring-offset, 2px);
       }
 
@@ -119,7 +121,8 @@ export class GrampsjsInstallPrompt extends LitElement {
       }
 
       .button-close:focus {
-        outline: var(--focus-ring-width, 2px) solid var(--md-sys-color-on-primary-container);
+        outline: var(--focus-ring-width, 2px) solid
+          var(--md-sys-color-on-primary-container);
         outline-offset: var(--focus-ring-offset, 2px);
       }
 
@@ -163,21 +166,30 @@ export class GrampsjsInstallPrompt extends LitElement {
 
   connectedCallback() {
     super.connectedCallback()
-    
+
     // Check if user previously dismissed
     this.dismissed = localStorage.getItem('pwa-install-dismissed') === 'true'
-    
+
     // Listen for installable event
-    window.addEventListener('app-installable', this._handleInstallable.bind(this))
-    
+    window.addEventListener(
+      'app-installable',
+      this._handleInstallable.bind(this)
+    )
+
     // Listen for installed event
     window.addEventListener('app-installed', this._handleInstalled.bind(this))
   }
 
   disconnectedCallback() {
     super.disconnectedCallback()
-    window.removeEventListener('app-installable', this._handleInstallable.bind(this))
-    window.removeEventListener('app-installed', this._handleInstalled.bind(this))
+    window.removeEventListener(
+      'app-installable',
+      this._handleInstallable.bind(this)
+    )
+    window.removeEventListener(
+      'app-installed',
+      this._handleInstalled.bind(this)
+    )
   }
 
   _handleInstallable() {
@@ -213,14 +225,15 @@ export class GrampsjsInstallPrompt extends LitElement {
         <div class="icon" aria-hidden="true">
           <img src="/images/icon192.png" alt="Gramps Web icon" />
         </div>
-        
+
         <div class="content">
           <p class="title">Install Gramps Web</p>
           <p class="description">
-            Install the app for a faster, more reliable experience with offline access
+            Install the app for a faster, more reliable experience with offline
+            access
           </p>
         </div>
-        
+
         <div class="actions">
           <button
             class="button-install"

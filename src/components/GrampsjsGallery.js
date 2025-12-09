@@ -49,7 +49,7 @@ export class GrampsjsGallery extends GrampsjsAppStateMixin(LitElement) {
           width: var(--touch-target-min-size, 48px);
           height: var(--touch-target-min-size, 48px);
         }
-        
+
         mwc-icon-button {
           width: var(--touch-target-min-size, 48px);
           height: var(--touch-target-min-size, 48px);

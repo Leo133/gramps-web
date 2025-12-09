@@ -1,8 +1,8 @@
 /**
  * Accessibility Utilities for Gramps Web
- * 
+ *
  * Phase 10: UI/UX Overhaul - Accessibility (WCAG 2.1 AA Compliance)
- * 
+ *
  * This module provides utilities and helpers for ensuring accessibility
  * across the Gramps Web application.
  */
@@ -16,16 +16,18 @@ export const a11yStyles = css`
   /* =====================================================
      FOCUS MANAGEMENT
      ===================================================== */
-  
+
   /* Ensure all interactive elements have visible focus indicators */
   .focusable:focus {
-    outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, var(--md-sys-color-primary));
+    outline: var(--focus-ring-width, 2px) solid
+      var(--focus-ring-color, var(--md-sys-color-primary));
     outline-offset: var(--focus-ring-offset, 2px);
   }
 
   /* Enhanced focus for keyboard navigation */
   .focus-visible:focus-visible {
-    outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, var(--md-sys-color-primary));
+    outline: var(--focus-ring-width, 2px) solid
+      var(--focus-ring-color, var(--md-sys-color-primary));
     outline-offset: var(--focus-ring-offset, 2px);
     box-shadow: var(--focus-ring);
   }
@@ -39,7 +41,7 @@ export const a11yStyles = css`
   /* =====================================================
      SKIP NAVIGATION
      ===================================================== */
-  
+
   .skip-link {
     position: absolute;
     top: -40px;
@@ -62,7 +64,7 @@ export const a11yStyles = css`
   /* =====================================================
      SCREEN READER UTILITIES
      ===================================================== */
-  
+
   /* Visually hide content but keep it accessible to screen readers */
   .sr-only {
     position: absolute;
@@ -91,7 +93,7 @@ export const a11yStyles = css`
      COLOR CONTRAST
      Ensure sufficient contrast for text readability
      ===================================================== */
-  
+
   /* High contrast mode support */
   @media (prefers-contrast: high) {
     :host {
@@ -112,7 +114,7 @@ export const a11yStyles = css`
      TOUCH TARGETS
      Ensure minimum touch target size (48x48px) for WCAG AA
      ===================================================== */
-  
+
   .touch-target {
     min-width: var(--touch-target-min-size, 48px);
     min-height: var(--touch-target-min-size, 48px);
@@ -133,7 +135,7 @@ export const a11yStyles = css`
      REDUCED MOTION
      Respect user's motion preferences
      ===================================================== */
-  
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -148,7 +150,7 @@ export const a11yStyles = css`
   /* =====================================================
      KEYBOARD NAVIGATION
      ===================================================== */
-  
+
   /* Ensure tab order is logical */
   .tab-trap {
     position: relative;
@@ -156,26 +158,27 @@ export const a11yStyles = css`
 
   /* Visual indicator for keyboard navigation mode */
   body.keyboard-nav *:focus {
-    outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, var(--md-sys-color-primary));
+    outline: var(--focus-ring-width, 2px) solid
+      var(--focus-ring-color, var(--md-sys-color-primary));
     outline-offset: var(--focus-ring-offset, 2px);
   }
 
   /* =====================================================
      SEMANTIC REGIONS
      ===================================================== */
-  
+
   /* Ensure main content regions are properly labeled */
-  [role="main"],
-  [role="navigation"],
-  [role="complementary"],
-  [role="contentinfo"] {
+  [role='main'],
+  [role='navigation'],
+  [role='complementary'],
+  [role='contentinfo'] {
     position: relative;
   }
 
   /* =====================================================
      ARIA LIVE REGIONS
      ===================================================== */
-  
+
   .live-region-polite {
     position: absolute;
     left: -10000px;
@@ -184,8 +187,8 @@ export const a11yStyles = css`
     overflow: hidden;
   }
 
-  [aria-live="polite"],
-  [aria-live="assertive"] {
+  [aria-live='polite'],
+  [aria-live='assertive'] {
     position: absolute;
     left: -10000px;
     width: 1px;
@@ -196,9 +199,9 @@ export const a11yStyles = css`
   /* =====================================================
      TOOLTIPS & HINTS
      ===================================================== */
-  
+
   /* Ensure tooltips are accessible */
-  [role="tooltip"] {
+  [role='tooltip'] {
     position: absolute;
     z-index: var(--z-index-tooltip, 1070);
     max-width: 300px;
@@ -207,7 +210,7 @@ export const a11yStyles = css`
   /* =====================================================
      LINK ACCESSIBILITY
      ===================================================== */
-  
+
   /* Ensure links are distinguishable */
   a {
     text-decoration-thickness: 1px;
@@ -221,8 +224,8 @@ export const a11yStyles = css`
   }
 
   /* External links indicator */
-  a[target="_blank"]::after {
-    content: " (opens in new window)";
+  a[target='_blank']::after {
+    content: ' (opens in new window)';
     position: absolute;
     left: -10000px;
   }
@@ -230,7 +233,7 @@ export const a11yStyles = css`
   /* =====================================================
      FORM ACCESSIBILITY
      ===================================================== */
-  
+
   /* Ensure form labels are properly associated */
   label {
     cursor: pointer;
@@ -238,13 +241,13 @@ export const a11yStyles = css`
 
   /* Required field indicator */
   [required]::after,
-  [aria-required="true"]::after {
-    content: " *";
+  [aria-required='true']::after {
+    content: ' *';
     color: var(--md-sys-color-error);
   }
 
   /* Error state styling */
-  [aria-invalid="true"] {
+  [aria-invalid='true'] {
     border-color: var(--md-sys-color-error);
   }
 
@@ -258,7 +261,7 @@ export const a11yStyles = css`
   /* =====================================================
      TABLE ACCESSIBILITY
      ===================================================== */
-  
+
   /* Ensure table headers are properly marked */
   table {
     border-collapse: collapse;
@@ -277,16 +280,16 @@ export const a11yStyles = css`
   /* =====================================================
      LOADING & PROGRESS STATES
      ===================================================== */
-  
+
   /* Ensure loading states are announced to screen readers */
-  [aria-busy="true"] {
+  [aria-busy='true'] {
     position: relative;
   }
 
   /* =====================================================
      MOBILE ACCESSIBILITY
      ===================================================== */
-  
+
   /* Prevent horizontal scrolling */
   .no-scroll {
     overflow-x: hidden;
@@ -300,7 +303,7 @@ export const a11yStyles = css`
   /* =====================================================
      PRINT ACCESSIBILITY
      ===================================================== */
-  
+
   @media print {
     /* Hide non-essential elements when printing */
     .no-print {
@@ -309,7 +312,7 @@ export const a11yStyles = css`
 
     /* Ensure links are visible */
     a[href]::after {
-      content: " (" attr(href) ")";
+      content: ' (' attr(href) ')';
     }
 
     /* Expand collapsed sections */
@@ -360,12 +363,10 @@ export function trapFocus(container) {
         e.preventDefault()
         lastFocusable.focus()
       }
-    } else {
+    } else if (document.activeElement === lastFocusable) {
       // Tab
-      if (document.activeElement === lastFocusable) {
-        e.preventDefault()
-        firstFocusable.focus()
-      }
+      e.preventDefault()
+      firstFocusable.focus()
     }
   }
 
@@ -393,19 +394,21 @@ export function getContrastRatio(color1, color2) {
     // Validate hex color format
     const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
     if (!hexPattern.test(color)) {
-      throw new Error(`Invalid hex color format: ${color}. Use #RRGGBB or #RGB format.`)
+      throw new Error(
+        `Invalid hex color format: ${color}. Use #RRGGBB or #RGB format.`
+      )
     }
-    
+
     // Normalize 3-digit hex to 6-digit
     let hex = color.replace(/^#/, '')
     if (hex.length === 3) {
       hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2]
     }
-    
+
     const rgb = hex
       .match(/.{2}/g)
       .map(x => parseInt(x, 16) / 255)
-      .map(x => (x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)))
+      .map(x => (x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4))
     return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]
   }
 
@@ -443,7 +446,7 @@ export function disableKeyboardNav() {
  */
 export function initKeyboardNavDetection() {
   let keydownTimeout = null
-  
+
   // Detect keyboard usage (debounced)
   document.addEventListener('keydown', e => {
     if (e.key === 'Tab') {
@@ -560,7 +563,9 @@ export function validateAria(element) {
 
       if (!hasRequiredAttr) {
         errors.push(
-          `Element with role="${role}" is missing required attributes: ${roleRequirements[role].join(' or ')}`
+          `Element with role="${role}" is missing required attributes: ${roleRequirements[
+            role
+          ].join(' or ')}`
         )
       }
     }
@@ -595,13 +600,13 @@ export function checkColorContrast(element) {
   const bgColor = style.backgroundColor
   const textColor = style.color
   const fontSize = parseFloat(style.fontSize)
-  const fontWeight = style.fontWeight
+  const {fontWeight} = style
 
   const ratio = getContrastRatio(textColor, bgColor)
 
   // Large text is 18pt+ or 14pt+ bold (roughly 24px+ or 19px+ bold)
   const isLargeText =
-    fontSize >= 24 || (fontSize >= 19 && parseInt(fontWeight) >= 700)
+    fontSize >= 24 || (fontSize >= 19 && parseInt(fontWeight, 10) >= 700)
 
   // WCAG AA requires 4.5:1 for normal text, 3:1 for large text
   const requiredRatio = isLargeText ? 3 : 4.5
