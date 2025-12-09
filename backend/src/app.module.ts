@@ -15,6 +15,11 @@ import {MetadataModule} from './metadata/metadata.module'
 import {TreeSettingsModule} from './tree-settings/tree-settings.module'
 import {VisualizationsModule} from './visualizations/visualizations.module'
 import {GeospatialModule} from './geospatial/geospatial.module'
+import {SearchModule} from './search/search.module'
+import {QualityCheckModule} from './quality-check/quality-check.module'
+import {DuplicatesModule} from './duplicates/duplicates.module'
+import {ResearchPlannerModule} from './research-planner/research-planner.module'
+import {ShoeboxModule} from './shoebox/shoebox.module'
 
 @Module({
   imports: [
@@ -36,6 +41,11 @@ import {GeospatialModule} from './geospatial/geospatial.module'
     TreeSettingsModule,
     VisualizationsModule,
     GeospatialModule,
+    SearchModule,
+    QualityCheckModule,
+    DuplicatesModule,
+    ResearchPlannerModule,
+    ShoeboxModule,
   ],
 })
 export class AppModule {}
