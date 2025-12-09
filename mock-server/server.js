@@ -21,6 +21,11 @@ import {
   analyzeCsv,
   parseCsvWithMapping,
 } from './csv-parser.js'
+import {
+  processMediaFile,
+  detectFaces,
+  generateIIIFManifest,
+} from './media-processor.js'
 
 const app = express()
 const upload = multer({storage: multer.memoryStorage()})
@@ -600,6 +605,323 @@ app.get('/api/users/', (req, res) => {
   res.json(db.data.users)
 })
 
+// ==================== MEDIA PROCESSING (Phase 4) ====================
+
+/**
+ * Upload media with automatic processing
+ * Generates thumbnails and extracts metadata
+ */
+app.post('/api/media/upload', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({error: 'No file provided'})
+    }
+
+    const {buffer, originalname, mimetype} = req.file
+    console.log(
+      `Processing media upload: ${originalname} (${mimetype}, ${buffer.length} bytes)`
+    )
+
+    // Process the media file
+    const processingResult = await processMediaFile(
+      buffer,
+      originalname,
+      mimetype
+    )
+
+    // Generate unique gramps_id by finding max existing ID
+    let maxId = 0
+    if (db.data.media && db.data.media.length > 0) {
+      db.data.media.forEach(m => {
+        const match = m.gramps_id?.match(/^M(\d+)$/)
+        if (match) {
+          maxId = Math.max(maxId, parseInt(match[1], 10))
+        }
+      })
+    }
+    const newGrampsId = `M${String(maxId + 1).padStart(4, '0')}`
+
+    // Create media object in database
+    const mediaObject = {
+      handle: processingResult.handle,
+      gramps_id: newGrampsId,
+      desc: originalname.replace(/\.[^/.]+$/, ''), // filename without extension
+      path: `/uploads/${processingResult.handle}_${originalname}`,
+      mime: mimetype,
+      checksum: crypto.createHash('md5').update(buffer).digest('hex'),
+      date: {
+        modifier: 0,
+        dateval: [0, 0, 0, false],
+        sortval: 0,
+      },
+      attribute_list: [],
+      citation_list: [],
+      note_list: [],
+      tag_list: [],
+      private: false,
+      change: Date.now(),
+      // Phase 4 additions
+      size: buffer.length,
+      thumbnails: processingResult.thumbnails,
+      metadata: processingResult.metadata,
+      suggestions: processingResult.suggestions,
+      faces: [],
+    }
+
+    // Initialize media array if it doesn't exist
+    if (!db.data.media) {
+      db.data.media = []
+    }
+
+    db.data.media.push(mediaObject)
+    await db.write()
+
+    return res.json({
+      success: true,
+      message: 'Media uploaded and processed successfully',
+      data: mediaObject,
+    })
+  } catch (error) {
+    console.error('Media upload error:', error)
+    return res.status(500).json({error: error.message || 'Upload failed'})
+  }
+})
+
+/**
+ * Get thumbnail for a media object
+ */
+app.get('/api/media/:handle/thumbnail', async (req, res) => {
+  const {handle} = req.params
+  const {size = 'medium'} = req.query
+
+  const mediaItem = (db.data.media || []).find(m => m.handle === handle)
+  if (!mediaItem) {
+    return res.status(404).json({error: 'Media not found'})
+  }
+
+  if (!mediaItem.thumbnails) {
+    return res
+      .status(404)
+      .json({error: 'No thumbnails available for this media'})
+  }
+
+  const thumbnail = mediaItem.thumbnails[size]
+  if (!thumbnail) {
+    return res.status(400).json({error: `Invalid thumbnail size: ${size}`})
+  }
+
+  // In production, this would return the actual thumbnail image
+  // For mock server, return thumbnail metadata
+  return res.json({
+    handle,
+    size,
+    thumbnail,
+    url: `/api/media/${handle}/thumbnail/${size}`,
+  })
+})
+
+/**
+ * Extract metadata from media
+ */
+app.get('/api/media/:handle/metadata', async (req, res) => {
+  const {handle} = req.params
+
+  const mediaItem = (db.data.media || []).find(m => m.handle === handle)
+  if (!mediaItem) {
+    return res.status(404).json({error: 'Media not found'})
+  }
+
+  // Return stored metadata or extract fresh if not available
+  if (mediaItem.metadata) {
+    return res.json(mediaItem.metadata)
+  }
+
+  return res.json({
+    error: 'No metadata available. Upload the file again to extract metadata.',
+  })
+})
+
+/**
+ * Detect faces in media
+ */
+app.post('/api/media/:handle/detect-faces', async (req, res) => {
+  const {handle} = req.params
+
+  const mediaItem = (db.data.media || []).find(m => m.handle === handle)
+  if (!mediaItem) {
+    return res.status(404).json({error: 'Media not found'})
+  }
+
+  if (!mediaItem.mime?.startsWith('image/')) {
+    return res.status(400).json({error: 'Face detection only works on images'})
+  }
+
+  try {
+    // Mock face detection - in production would analyze actual image
+    const faces = await detectFaces(Buffer.from('mock'))
+
+    // Store detected faces
+    const index = db.data.media.findIndex(m => m.handle === handle)
+    if (index !== -1) {
+      db.data.media[index].faces = faces
+      await db.write()
+    }
+
+    return res.json({
+      success: true,
+      faces,
+      count: faces.length,
+    })
+  } catch (error) {
+    console.error('Face detection error:', error)
+    return res
+      .status(500)
+      .json({error: error.message || 'Face detection failed'})
+  }
+})
+
+/**
+ * Get faces for media
+ */
+app.get('/api/media/:handle/faces', async (req, res) => {
+  const {handle} = req.params
+
+  const mediaItem = (db.data.media || []).find(m => m.handle === handle)
+  if (!mediaItem) {
+    return res.status(404).json({error: 'Media not found'})
+  }
+
+  return res.json({
+    faces: mediaItem.faces || [],
+    count: (mediaItem.faces || []).length,
+  })
+})
+
+/**
+ * Update face tags (link faces to people)
+ */
+app.put('/api/media/:handle/faces/:faceId', async (req, res) => {
+  const {handle, faceId} = req.params
+  const {person_handle} = req.body
+
+  const mediaIndex = (db.data.media || []).findIndex(m => m.handle === handle)
+  if (mediaIndex === -1) {
+    return res.status(404).json({error: 'Media not found'})
+  }
+
+  const faces = db.data.media[mediaIndex].faces || []
+  const faceIndex = faces.findIndex(f => f.id === faceId)
+
+  if (faceIndex === -1) {
+    return res.status(404).json({error: 'Face not found'})
+  }
+
+  // Update face with person handle
+  db.data.media[mediaIndex].faces[faceIndex].person_handle = person_handle
+  await db.write()
+
+  return res.json({
+    success: true,
+    face: db.data.media[mediaIndex].faces[faceIndex],
+  })
+})
+
+/**
+ * Get IIIF manifest for deep zoom
+ */
+app.get('/api/media/:handle/iiif', async (req, res) => {
+  const {handle} = req.params
+
+  const mediaItem = (db.data.media || []).find(m => m.handle === handle)
+  if (!mediaItem) {
+    return res.status(404).json({error: 'Media not found'})
+  }
+
+  if (!mediaItem.mime?.startsWith('image/')) {
+    return res
+      .status(400)
+      .json({error: 'IIIF manifest only available for images'})
+  }
+
+  const imageInfo = {
+    width: mediaItem.metadata?.exif?.width || 1024,
+    height: mediaItem.metadata?.exif?.height || 768,
+  }
+
+  const manifest = generateIIIFManifest(handle, imageInfo)
+
+  return res.json(manifest)
+})
+
+/**
+ * Get media gallery with filtering and sorting
+ */
+app.get('/api/media/gallery', async (req, res) => {
+  const {
+    filter_type, // photo, document, audio, video
+    sort = 'date', // date, name, size, type
+    order = 'desc',
+    page = 1,
+    pagesize = 20,
+  } = req.query
+
+  let results = db.data.media || []
+
+  // Filter by media type
+  if (filter_type) {
+    const typeMap = {
+      photo: 'image/',
+      document: 'application/',
+      audio: 'audio/',
+      video: 'video/',
+    }
+    const mimePrefix = typeMap[filter_type]
+    if (mimePrefix) {
+      results = results.filter(m => m.mime?.startsWith(mimePrefix))
+    }
+  }
+
+  // Sort results
+  results.sort((a, b) => {
+    let comparison = 0
+    switch (sort) {
+      case 'date':
+        comparison = (a.change || 0) - (b.change || 0)
+        break
+      case 'name':
+        comparison = (a.desc || '').localeCompare(b.desc || '')
+        break
+      case 'size':
+        comparison = (a.size || 0) - (b.size || 0)
+        break
+      case 'type':
+        comparison = (a.mime || '').localeCompare(b.mime || '')
+        break
+      default:
+        comparison = 0
+    }
+    return order === 'asc' ? comparison : -comparison
+  })
+
+  const totalCount = results.length
+  const pageNum = parseInt(page, 10)
+  const pageSizeNum = parseInt(pagesize, 10)
+  const start = (pageNum - 1) * pageSizeNum
+  const end = start + pageSizeNum
+  const paginatedResults = results.slice(start, end)
+
+  res.setHeader('X-Total-Count', totalCount)
+  res.setHeader('Access-Control-Expose-Headers', 'X-Total-Count')
+
+  return res.json({
+    data: paginatedResults,
+    total: totalCount,
+    page: pageNum,
+    pagesize: pageSizeNum,
+  })
+})
+
+// Generic handler for other requests (logging)
 // Generic Resource Handler (People, Families, etc.)
 const resourceTypes = [
   'people',
