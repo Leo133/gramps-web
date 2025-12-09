@@ -99,7 +99,6 @@ export const DesignTokens = {
 export function getColor(colorName) {
   const token = DesignTokens.colors[colorName]
   if (!token) {
-    console.warn(`Unknown color token: ${colorName}`)
     return ''
   }
   return getDesignToken(token)
@@ -113,7 +112,6 @@ export function getColor(colorName) {
 export function getSurface(surfaceName) {
   const token = DesignTokens.surfaces[surfaceName]
   if (!token) {
-    console.warn(`Unknown surface token: ${surfaceName}`)
     return ''
   }
   return getDesignToken(token)
@@ -167,11 +165,11 @@ export function applyCustomTheme(tokens) {
 export function resetDesignTokens() {
   // Remove custom properties from inline styles
   const root = document.documentElement
-  const style = root.style
+  const {style} = root
   const customProps = []
   
   // Collect all custom properties
-  for (let i = 0; i < style.length; i++) {
+  for (let i = 0; i < style.length; i += 1) {
     const prop = style[i]
     if (prop.startsWith('--')) {
       customProps.push(prop)
@@ -193,7 +191,7 @@ export function exportTheme() {
   const styles = getComputedStyle(document.documentElement)
   
   // Get all CSS custom properties
-  for (let i = 0; i < styles.length; i++) {
+  for (let i = 0; i < styles.length; i += 1) {
     const prop = styles[i]
     if (prop.startsWith('--')) {
       tokens[prop] = styles.getPropertyValue(prop).trim()
@@ -229,7 +227,7 @@ export function getContrastRatio(foreground, background) {
     
     const [r, g, b] = rgb.map(val => {
       const sRGB = val / 255
-      return sRGB <= 0.03928 ? sRGB / 12.92 : Math.pow((sRGB + 0.055) / 1.055, 2.4)
+      return sRGB <= 0.03928 ? sRGB / 12.92 : ((sRGB + 0.055) / 1.055) ** 2.4
     })
     
     return 0.2126 * r + 0.7152 * g + 0.0722 * b

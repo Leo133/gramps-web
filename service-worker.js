@@ -1,3 +1,6 @@
+/* eslint-env serviceworker */
+/* global clients */
+
 /**
  * Gramps Web Service Worker
  * 
@@ -42,75 +45,6 @@ async function limitCacheSize(cacheName, maxItems) {
 }
 
 /**
- * Service Worker Install Event
- * Pre-cache static assets
- */
-self.addEventListener('install', event => {
-  console.log('[Service Worker] Installing...')
-  
-  event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then(cache => {
-        console.log('[Service Worker] Caching static assets')
-        return cache.addAll(STATIC_ASSETS)
-      })
-      .then(() => self.skipWaiting())
-  )
-})
-
-/**
- * Service Worker Activate Event
- * Clean up old caches
- */
-self.addEventListener('activate', event => {
-  console.log('[Service Worker] Activating...')
-  
-  event.waitUntil(
-    caches.keys()
-      .then(cacheNames => {
-        return Promise.all(
-          cacheNames
-            .filter(name => name.startsWith('gramps-web-') && name !== STATIC_CACHE && name !== DYNAMIC_CACHE && name !== IMAGE_CACHE)
-            .map(name => {
-              console.log('[Service Worker] Deleting old cache:', name)
-              return caches.delete(name)
-            })
-        )
-      })
-      .then(() => self.clients.claim())
-  )
-})
-
-/**
- * Service Worker Fetch Event
- * Implement caching strategies
- */
-self.addEventListener('fetch', event => {
-  const {request} = event
-  const url = new URL(request.url)
-  
-  // Skip cross-origin requests
-  if (url.origin !== location.origin) {
-    return
-  }
-  
-  // API requests: Network-first strategy
-  if (url.pathname.startsWith('/api/')) {
-    event.respondWith(networkFirst(request, DYNAMIC_CACHE))
-    return
-  }
-  
-  // Image requests: Cache-first strategy
-  if (request.destination === 'image') {
-    event.respondWith(cacheFirst(request, IMAGE_CACHE))
-    return
-  }
-  
-  // Static assets: Cache-first with network fallback
-  event.respondWith(cacheFirst(request, STATIC_CACHE))
-})
-
-/**
  * Cache-first strategy
  * Look in cache first, fall back to network
  */
@@ -137,8 +71,6 @@ async function cacheFirst(request, cacheName) {
     
     return response
   } catch (error) {
-    console.error('[Service Worker] Fetch failed:', error)
-    
     // Return offline page for navigation requests
     if (request.mode === 'navigate') {
       return cache.match('/index.html')
@@ -168,8 +100,6 @@ async function networkFirst(request, cacheName) {
     
     return response
   } catch (error) {
-    console.error('[Service Worker] Network request failed, checking cache:', error)
-    
     const cached = await cache.match(request)
     if (cached) {
       return cached
@@ -180,16 +110,76 @@ async function networkFirst(request, cacheName) {
 }
 
 /**
- * Message handler for cache management
+ * Background sync placeholder
+ */
+async function syncData() {
+  // Placeholder for future background sync implementation
+  return Promise.resolve()
+}
+
+/**
+ * Service Worker Install Event
+ */
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(STATIC_CACHE)
+      .then(cache => cache.addAll(STATIC_ASSETS))
+      .then(() => self.skipWaiting())
+  )
+})
+
+/**
+ * Service Worker Activate Event
+ */
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(cacheNames => Promise.all(
+        cacheNames
+          .filter(name => name.startsWith('gramps-web-') && name !== STATIC_CACHE && name !== DYNAMIC_CACHE && name !== IMAGE_CACHE)
+          .map(name => caches.delete(name))
+      ))
+      .then(() => self.clients.claim())
+  )
+})
+
+/**
+ * Service Worker Fetch Event
+ */
+self.addEventListener('fetch', event => {
+  const {request} = event
+  const url = new URL(request.url)
+  
+  // Skip cross-origin requests
+  if (url.origin !== self.location.origin) {
+    return
+  }
+  
+  // API requests: Network-first strategy
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(networkFirst(request, DYNAMIC_CACHE))
+    return
+  }
+  
+  // Image requests: Cache-first strategy
+  if (request.destination === 'image') {
+    event.respondWith(cacheFirst(request, IMAGE_CACHE))
+    return
+  }
+  
+  // Static assets: Cache-first with network fallback
+  event.respondWith(cacheFirst(request, STATIC_CACHE))
+})
+
+/**
+ * Message handler
  */
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'CLEAR_CACHE') {
     event.waitUntil(
-      caches.keys().then(cacheNames => {
-        return Promise.all(
-          cacheNames.map(cacheName => caches.delete(cacheName))
-        )
-      })
+      caches.keys().then(cacheNames => Promise.all(
+        cacheNames.map(cacheName => caches.delete(cacheName))
+      ))
     )
   }
   
@@ -199,7 +189,7 @@ self.addEventListener('message', event => {
 })
 
 /**
- * Background sync for offline actions (future enhancement)
+ * Background sync handler
  */
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-data') {
@@ -207,13 +197,8 @@ self.addEventListener('sync', event => {
   }
 })
 
-async function syncData() {
-  // Placeholder for future background sync implementation
-  console.log('[Service Worker] Background sync triggered')
-}
-
 /**
- * Push notification handler (future enhancement)
+ * Push notification handler
  */
 self.addEventListener('push', event => {
   const data = event.data ? event.data.json() : {}

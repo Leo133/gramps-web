@@ -23,13 +23,13 @@ export function getCurrentBreakpoint() {
   
   if (width < Breakpoints.mobile) {
     return 'mobile'
-  } else if (width < Breakpoints.tablet) {
+  } if (width < Breakpoints.tablet) {
     return 'tablet'
-  } else if (width < Breakpoints.desktop) {
+  } if (width < Breakpoints.desktop) {
     return 'large-tablet'
-  } else {
+  } 
     return 'desktop'
-  }
+  
 }
 
 /**

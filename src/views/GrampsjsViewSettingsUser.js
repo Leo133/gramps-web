@@ -158,7 +158,7 @@ export class GrampsjsViewSettingsUser extends GrampsjsView {
   }
 
   _handleThemePreviewSelected(event) {
-    const theme = event.detail.theme
+    const {theme} = event.detail
     this.appState.updateSettings({theme})
     applyTheme(theme)
   }

@@ -27,6 +27,52 @@ export function getCurrentTheme(theme) {
 }
 
 /**
+ * Store theme preference in localStorage
+ * @param {string} theme - Theme preference to store
+ */
+export function storeThemePreference(theme) {
+  try {
+    localStorage.setItem('gramps-theme-preference', theme)
+  } catch {
+    // Silently fail if localStorage is not available
+  }
+}
+
+/**
+ * Load theme preference from localStorage
+ * @returns {string|null} Stored theme preference or null
+ */
+export function loadThemePreference() {
+  try {
+    return localStorage.getItem('gramps-theme-preference')
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Set up listener for system theme changes
+ */
+export function setupSystemThemeListener() {
+  // Remove existing listener if any
+  if (systemThemeListener) {
+    window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', systemThemeListener)
+  }
+  
+  // Create new listener
+  systemThemeListener = () => {
+    const currentPreference = loadThemePreference()
+    // Only auto-switch if user has 'system' preference
+    if (currentPreference === 'system' || !currentPreference) {
+      applyTheme('system', true)
+    }
+  }
+  
+  // Add listener
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', systemThemeListener)
+}
+
+/**
  * Apply theme with optional transition animation
  * @param {string} theme - 'light', 'dark', or 'system'
  * @param {boolean} withTransition - Enable smooth transition (default: true)
@@ -59,31 +105,6 @@ export function applyTheme(theme, withTransition = true) {
 }
 
 /**
- * Store theme preference in localStorage
- * @param {string} theme - Theme preference to store
- */
-export function storeThemePreference(theme) {
-  try {
-    localStorage.setItem('gramps-theme-preference', theme)
-  } catch (e) {
-    console.warn('Failed to store theme preference:', e)
-  }
-}
-
-/**
- * Load theme preference from localStorage
- * @returns {string|null} Stored theme preference or null
- */
-export function loadThemePreference() {
-  try {
-    return localStorage.getItem('gramps-theme-preference')
-  } catch (e) {
-    console.warn('Failed to load theme preference:', e)
-    return null
-  }
-}
-
-/**
  * Initialize theme system with preference detection
  * @returns {string} The initialized theme
  */
@@ -98,28 +119,6 @@ export function initializeTheme() {
   setupSystemThemeListener()
   
   return storedTheme
-}
-
-/**
- * Set up listener for system theme changes
- */
-export function setupSystemThemeListener() {
-  // Remove existing listener if any
-  if (systemThemeListener) {
-    window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', systemThemeListener)
-  }
-  
-  // Create new listener
-  systemThemeListener = (e) => {
-    const currentPreference = loadThemePreference()
-    // Only auto-switch if user has 'system' preference
-    if (currentPreference === 'system' || !currentPreference) {
-      applyTheme('system', true)
-    }
-  }
-  
-  // Add listener
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', systemThemeListener)
 }
 
 /**
