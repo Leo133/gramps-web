@@ -76,7 +76,7 @@ class GrampsjsTabBar extends GrampsjsAppStateMixin(LitElement) {
           md-primary-tab:hover {
             background-color: var(--md-sys-color-surface-container-low);
             border-radius: var(--radius-sm, 4px);
-            transition: var(--transition-color);
+            transition: background-color var(--duration-short-2, 100ms) var(--easing-standard);
           }
         }
 

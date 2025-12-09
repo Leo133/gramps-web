@@ -35,7 +35,8 @@ export class GrampsjsEditableList extends GrampsjsAppStateMixin(LitElement) {
 
         mwc-list > * {
           /* Phase 10: Smooth transitions using design tokens */
-          transition: var(--transition-color);
+          transition: background-color var(--duration-short-2, 100ms) var(--easing-standard),
+                      color var(--duration-short-2, 100ms) var(--easing-standard);
           /* Phase 10: Touch-friendly list items */
           min-height: var(--list-item-height-medium, 56px);
           padding: var(--spacing-2, 8px) var(--spacing-4, 16px);

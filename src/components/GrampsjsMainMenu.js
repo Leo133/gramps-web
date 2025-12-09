@@ -22,7 +22,7 @@ const BASE_DIR = ''
 const selectedColor = 'var(--grampsjs-color-icon-selected)'
 const defaultColor = 'var(--grampsjs-color-icon-default)'
 
-class GrampsjsAppBar extends GrampsjsAppStateMixin(LitElement) {
+class GrampsjsMainMenu extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
     return [
       sharedStyles,
@@ -276,4 +276,4 @@ class GrampsjsAppBar extends GrampsjsAppStateMixin(LitElement) {
   }
 }
 
-window.customElements.define('grampsjs-main-menu', GrampsjsAppBar)
+window.customElements.define('grampsjs-main-menu', GrampsjsMainMenu)
