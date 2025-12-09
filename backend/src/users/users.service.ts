@@ -71,7 +71,7 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    const updateData: any = { ...updateUserDto };
+    const updateData: Partial<UpdateUserDto> = { ...updateUserDto };
     
     if (updateUserDto.password) {
       updateData.password = await bcrypt.hash(updateUserDto.password, 10);

@@ -13,7 +13,7 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
+  async validateUser(username: string, password: string): Promise<Omit<User, 'password'> | null> {
     const user = await this.usersService.findByUsername(username);
     if (!user) {
       return null;

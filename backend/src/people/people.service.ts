@@ -18,7 +18,7 @@ export class PeopleService {
     const pagesize = parseInt(String(query.pagesize || '25'), 10);
     const skip = (page - 1) * pagesize;
 
-    const where: any = {};
+    const where: { grampsId?: string; OR?: Array<{ firstName?: { contains: string; mode: 'insensitive' }; surname?: { contains: string; mode: 'insensitive' }; grampsId?: { contains: string; mode: 'insensitive' } }> } = {};
 
     if (query.gramps_id) {
       where.grampsId = query.gramps_id;
