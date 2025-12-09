@@ -13,6 +13,7 @@ import {SourcesModule} from './sources/sources.module'
 import {NotesModule} from './notes/notes.module'
 import {MetadataModule} from './metadata/metadata.module'
 import {TreeSettingsModule} from './tree-settings/tree-settings.module'
+import {VisualizationsModule} from './visualizations/visualizations.module'
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import {TreeSettingsModule} from './tree-settings/tree-settings.module'
     NotesModule,
     MetadataModule,
     TreeSettingsModule,
+    VisualizationsModule,
   ],
 })
 export class AppModule {}
