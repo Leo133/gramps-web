@@ -12,8 +12,13 @@ import Fuse from 'fuse.js'
 import crypto from 'crypto'
 
 import compression from 'compression'
+import multer from 'multer'
+import {parseGedcom} from './gedcom-parser.js'
+import {generateGedcom} from './gedcom-generator.js'
+import {parseCsv, generateCsvTemplate} from './csv-parser.js'
 
 const app = express()
+const upload = multer({storage: multer.memoryStorage()})
 const PORT = process.env.PORT || 5555
 
 app.use(compression())
@@ -520,6 +525,205 @@ app.get('/api/sources/', (req, res) => {
     results: [],
     count: 0,
   })
+})
+
+// ==================== IMPORTERS ====================
+
+// List available importers
+app.get('/api/importers/', (req, res) => {
+  res.json({
+    data: [
+      {
+        extension: 'ged',
+        name: 'GEDCOM',
+        description:
+          'Import GEDCOM 5.5.1 files - the standard format for genealogical data exchange.',
+      },
+      {
+        extension: 'gedcom',
+        name: 'GEDCOM 7.0',
+        description:
+          'Import GEDCOM 7.0 files - the latest GEDCOM standard with improved support for modern genealogy.',
+      },
+      {
+        extension: 'gramps',
+        name: 'Gramps XML',
+        description:
+          'Import Gramps XML files for lossless data transfer from Gramps Desktop.',
+      },
+      {
+        extension: 'csv',
+        name: 'CSV',
+        description:
+          'Import people and events from CSV spreadsheets. Download template for required format.',
+      },
+    ],
+  })
+})
+
+// Import file
+app.post('/api/importers/:format/file', upload.single('file'), async (req, res) => {
+  const {format} = req.params
+  const file = req.file
+
+  if (!file) {
+    return res.status(400).json({error: 'No file uploaded'})
+  }
+
+  console.log(`Import request for format: ${format}, file: ${file.originalname}`)
+
+  try {
+    const content = file.buffer.toString('utf-8')
+    let importedData = null
+
+    switch (format) {
+      case 'ged':
+        importedData = parseGedcom(content, '5.5.1')
+        break
+      case 'gedcom':
+        importedData = parseGedcom(content, '7.0')
+        break
+      case 'csv':
+        importedData = parseCsv(content)
+        break
+      case 'gramps':
+        // For now, return error for unsupported XML format
+        return res.status(400).json({
+          error:
+            'Gramps XML import is not yet implemented in the lite server. Please use GEDCOM format.',
+        })
+      default:
+        return res.status(400).json({error: 'Unsupported format'})
+    }
+
+    if (!importedData) {
+      return res.status(400).json({error: 'Failed to parse file'})
+    }
+
+    // Merge imported data into database
+    if (importedData.people) {
+      db.data.people = [...(db.data.people || []), ...importedData.people]
+    }
+    if (importedData.families) {
+      db.data.families = [...(db.data.families || []), ...importedData.families]
+    }
+    if (importedData.events) {
+      db.data.events = [...(db.data.events || []), ...importedData.events]
+    }
+    if (importedData.places) {
+      db.data.places = [...(db.data.places || []), ...importedData.places]
+    }
+    if (importedData.sources) {
+      db.data.sources = [...(db.data.sources || []), ...importedData.sources]
+    }
+    if (importedData.repositories) {
+      db.data.repositories = [
+        ...(db.data.repositories || []),
+        ...importedData.repositories,
+      ]
+    }
+    if (importedData.notes) {
+      db.data.notes = [...(db.data.notes || []), ...importedData.notes]
+    }
+    if (importedData.media) {
+      db.data.media = [...(db.data.media || []), ...importedData.media]
+    }
+
+    await db.write()
+
+    res.json({
+      success: true,
+      message: `Successfully imported ${importedData.people?.length || 0} people, ${importedData.families?.length || 0} families`,
+    })
+  } catch (error) {
+    console.error('Import error:', error)
+    res.status(500).json({error: error.message || 'Import failed'})
+  }
+})
+
+// Download CSV template
+app.get('/api/importers/csv/template', (req, res) => {
+  const template = generateCsvTemplate()
+  res.setHeader('Content-Type', 'text/csv')
+  res.setHeader('Content-Disposition', 'attachment; filename="import-template.csv"')
+  res.send(template)
+})
+
+// ==================== EXPORTERS ====================
+
+// List available exporters
+app.get('/api/exporters/', (req, res) => {
+  res.json({
+    data: [
+      {
+        extension: 'ged',
+        name: 'GEDCOM 5.5.1',
+        description:
+          'Export to GEDCOM 5.5.1 format - compatible with most genealogy software.',
+      },
+      {
+        extension: 'gedcom',
+        name: 'GEDCOM 7.0',
+        description:
+          'Export to GEDCOM 7.0 format - the latest standard with improved features.',
+      },
+      {
+        extension: 'gramps',
+        name: 'Gramps XML',
+        description:
+          'Export to Gramps XML format for lossless import into Gramps Desktop.',
+      },
+    ],
+  })
+})
+
+// Export file
+app.post('/api/exporters/:format/file', async (req, res) => {
+  const {format} = req.params
+
+  console.log(`Export request for format: ${format}`)
+
+  try {
+    let content = ''
+    let filename = 'grampsweb-export'
+    let mimeType = 'text/plain'
+
+    switch (format) {
+      case 'ged':
+        content = generateGedcom(db.data, '5.5.1')
+        filename = 'grampsweb-export.ged'
+        mimeType = 'text/x-gedcom'
+        break
+      case 'gedcom':
+        content = generateGedcom(db.data, '7.0')
+        filename = 'grampsweb-export.gedcom'
+        mimeType = 'text/x-gedcom'
+        break
+      case 'gramps':
+        // For now, return error for unsupported XML format
+        return res.status(400).json({
+          error:
+            'Gramps XML export is not yet implemented in the lite server. Please use GEDCOM format.',
+        })
+      default:
+        return res.status(400).json({error: 'Unsupported format'})
+    }
+
+    // In a real implementation, this would save to a file and return a URL
+    // For the mock server, we'll return the content directly as a base64 data URL
+    const base64Content = Buffer.from(content).toString('base64')
+    const dataUrl = `data:${mimeType};base64,${base64Content}`
+
+    res.json({
+      data: {
+        url: dataUrl,
+        filename,
+      },
+    })
+  } catch (error) {
+    console.error('Export error:', error)
+    res.status(500).json({error: error.message || 'Export failed'})
+  }
 })
 
 // Generic handler for other requests (logging)
