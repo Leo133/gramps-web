@@ -6,6 +6,25 @@ body {
   background-color: var(--md-sys-color-background);
 }
 
+/* Smooth theme transition support */
+:root.theme-transition,
+:root.theme-transition *,
+:root.theme-transition *:before,
+:root.theme-transition *:after {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+  transition-delay: 0s !important;
+}
+
+/* Respect user's motion preference */
+@media (prefers-reduced-motion: reduce) {
+  :root.theme-transition,
+  :root.theme-transition *,
+  :root.theme-transition *:before,
+  :root.theme-transition *:after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
 :root {
   color: var(--md-sys-color-on-surface);
   --color-boy: #64b5f6;
@@ -314,4 +333,76 @@ body {
   --mdc-theme-text-icon-on-background: var(--grampsjs-body-font-color-60);
   --mdc-checkbox-unchecked-color: var(--md-sys-color-on-surface-variant);
   --mdc-checkbox-disabled-color: rgba(229, 226, 225, 0.38);
+}
+
+/* Accessibility: Enhanced focus indicators */
+body.keyboard-navigation *:focus {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+body.keyboard-navigation *:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Skip link styles */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 10000;
+  transition: top 0.2s;
+  font-weight: 500;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  :root {
+    --grampsjs-body-font-color: rgba(0, 0, 0, 1);
+  }
+  
+  :root[data-theme='dark'] {
+    --grampsjs-body-font-color: rgba(255, 255, 255, 1);
+  }
+  
+  * {
+    border-width: 2px !important;
+  }
+}
+
+/* Reduced motion support for animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus-visible polyfill support */
+.js-focus-visible :focus:not(.focus-visible) {
+  outline: none;
 }

@@ -35,8 +35,10 @@ import './components/GrampsjsUndoTransaction.js'
 import './components/GrampsjsUpdateAvailable.js'
 import './components/GrampsjsUpgradeDb.js'
 import {sharedStyles} from './SharedStyles.js'
-import {applyTheme} from './theme.js'
+import {applyTheme, initializeTheme} from './theme.js'
 import {handleOIDCCallback, handleOIDCComplete} from './oidc.js'
+import {initializePWA} from './pwa.js'
+import {initializeAccessibility} from './accessibility.js'
 
 const LOADING_STATE_INITIAL = 0
 const LOADING_STATE_UNAUTHORIZED = 1
@@ -528,6 +530,16 @@ export class GrampsJs extends LitElement {
   connectedCallback() {
     super.connectedCallback()
 
+    // Initialize Phase 10 features: PWA and Accessibility
+    initializePWA()
+    initializeAccessibility()
+    
+    // Initialize theme system with preference detection
+    const storedTheme = initializeTheme()
+    if (storedTheme !== this.appState.settings.theme) {
+      this.appState.updateSettings({theme: storedTheme})
+    }
+
     window.addEventListener('storage', () => this._handleStorage())
     window.addEventListener('settings:changed', () => this._handleSettings())
     window.addEventListener('db:changed', () => this._loadDbInfo(false))
@@ -556,7 +568,8 @@ export class GrampsJs extends LitElement {
       this._loadFrontendStrings(this.appState.settings.lang)
     }
 
-    applyTheme(this.appState.settings.theme)
+    // Note: applyTheme is now called by initializeTheme()
+    // but we keep the system theme listener for runtime changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     mediaQuery.addEventListener('change', () =>
       applyTheme(this.appState.settings.theme)
