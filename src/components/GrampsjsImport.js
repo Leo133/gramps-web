@@ -130,7 +130,7 @@ export class GrampsjsImport extends GrampsjsAppStateMixin(LitElement) {
     }
 
     const ext = uploadForm.file.name.split('.').pop().toLowerCase()
-    if (!['gpkg', 'gramps', 'gw', 'def', 'vcf', 'csv', 'ged'].includes(ext)) {
+    if (!['gpkg', 'gramps', 'gw', 'def', 'vcf', 'csv', 'ged', 'gedcom'].includes(ext)) {
       this._uploadHint = html`<p class="alert error">
         ${this._('Unsupported format')}
       </p>`
@@ -149,7 +149,22 @@ export class GrampsjsImport extends GrampsjsAppStateMixin(LitElement) {
       this._state = STATE_INITIAL
       return
     }
-    if (ext !== 'gramps') {
+    if (ext === 'ged' || ext === 'gedcom') {
+      this._uploadHint = html`<p class="alert info">
+        ${this._(
+          'GEDCOM format is widely supported. GEDCOM 5.5.1 and 7.0 are both supported.'
+        )}
+      </p>`
+    } else if (ext === 'csv') {
+      this._uploadHint = html`<p class="alert info">
+        ${this._(
+          'CSV import supports bulk import of people with basic information.'
+        )}
+        <a href="/api/importers/csv/template" download="import-template.csv">
+          ${this._('Download CSV template')}
+        </a>
+      </p>`
+    } else if (ext !== 'gramps') {
       this._uploadHint = html`<p class="alert warn">
         ${this._(
           'If you intend to synchronize an existing Gramps database with Gramps Web, use the Gramps XML (.gramps) format instead.'
