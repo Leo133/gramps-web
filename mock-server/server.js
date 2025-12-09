@@ -134,14 +134,145 @@ if (!db.data.users || db.data.users.length === 0) {
         gramps_id: 'E0001',
         type: {value: 'Birth'},
         date: {val: '1980-01-01'},
+        place: 'pl0001',
         description: 'Birth of John Doe',
+        private: false,
+        citation_list: [],
+      },
+      {
+        handle: 'e0002',
+        gramps_id: 'E0002',
+        type: {value: 'Birth'},
+        date: {val: '1982-05-15'},
+        place: 'pl0002',
+        description: 'Birth of Jane Smith',
+        private: false,
+        citation_list: [],
       },
     ],
-    places: [],
+    places: [
+      {
+        handle: 'pl0001',
+        gramps_id: 'P0001',
+        name: {value: 'New York'},
+        title: 'New York, New York, USA',
+        type: {value: 'City'},
+        lat: '40.7128',
+        long: '-74.0060',
+        placeref_list: [
+          {ref: 'pl0003'}, // New York State
+        ],
+        private: false,
+      },
+      {
+        handle: 'pl0002',
+        gramps_id: 'P0002',
+        name: {value: 'London'},
+        title: 'London, England, United Kingdom',
+        type: {value: 'City'},
+        lat: '51.5074',
+        long: '-0.1278',
+        placeref_list: [
+          {ref: 'pl0004'}, // England
+        ],
+        private: false,
+      },
+      {
+        handle: 'pl0003',
+        gramps_id: 'P0003',
+        name: {value: 'New York'},
+        title: 'New York, USA',
+        type: {value: 'State'},
+        placeref_list: [
+          {ref: 'pl0005'}, // USA
+        ],
+        private: false,
+      },
+      {
+        handle: 'pl0004',
+        gramps_id: 'P0004',
+        name: {value: 'England'},
+        title: 'England, United Kingdom',
+        type: {value: 'State'},
+        placeref_list: [
+          {ref: 'pl0006'}, // UK
+        ],
+        private: false,
+      },
+      {
+        handle: 'pl0005',
+        gramps_id: 'P0005',
+        name: {value: 'United States'},
+        title: 'United States of America',
+        type: {value: 'Country'},
+        placeref_list: [],
+        private: false,
+      },
+      {
+        handle: 'pl0006',
+        gramps_id: 'P0006',
+        name: {value: 'United Kingdom'},
+        title: 'United Kingdom',
+        type: {value: 'Country'},
+        placeref_list: [],
+        private: false,
+      },
+    ],
     media: [],
-    repositories: [],
-    sources: [],
-    notes: [],
+    repositories: [
+      {
+        handle: 'r0001',
+        gramps_id: 'R0001',
+        name: 'National Archives',
+        type: {value: 'Library'},
+        address_list: [
+          {
+            street: '700 Pennsylvania Avenue NW',
+            city: 'Washington',
+            state: 'DC',
+            postal: '20408',
+            country: 'USA',
+          },
+        ],
+        urls: [
+          {
+            href: 'https://www.archives.gov/',
+            desc: 'National Archives Website',
+            type: {value: 'Web Home'},
+          },
+        ],
+        private: false,
+      },
+    ],
+    sources: [
+      {
+        handle: 's0001',
+        gramps_id: 'S0001',
+        title: '1900 United States Federal Census',
+        author: 'U.S. Census Bureau',
+        pubinfo: 'Washington, D.C.: National Archives and Records Administration',
+        abbrev: '1900 Census',
+        reporef_list: [
+          {
+            ref: 'r0001',
+            call_number: 'T623',
+            media_type: {value: 'Microfilm'},
+          },
+        ],
+        private: false,
+      },
+    ],
+    notes: [
+      {
+        handle: 'n0001',
+        gramps_id: 'N0001',
+        text: {
+          string: 'This is a sample note about John Doe. He was born in New York City.',
+        },
+        type: {value: 'General'},
+        private: false,
+      },
+    ],
     metadata: {
       version: '1.0.0',
       title: 'Gramps Web Lite',
@@ -185,6 +316,203 @@ function createMockToken(payload) {
     iat: Math.floor(Date.now() / 1000),
   })
   return `${encodedHeader}.${encodedPayload}.mockSignature`
+}
+
+// Validation Functions
+function parseDate(dateStr) {
+  if (!dateStr) return null
+  // Handle different date formats
+  if (typeof dateStr === 'object' && dateStr.val) {
+    dateStr = dateStr.val
+  }
+  try {
+    return new Date(dateStr)
+  } catch (e) {
+    return null
+  }
+}
+
+function validatePerson(person) {
+  const errors = []
+  const warnings = []
+
+  // Get birth and death events
+  const birthEvent = (person.event_ref_list || [])
+    .map(ref => (db.data.events || []).find(e => e.handle === ref.ref))
+    .find(e => e && e.type.value === 'Birth')
+
+  const deathEvent = (person.event_ref_list || [])
+    .map(ref => (db.data.events || []).find(e => e.handle === ref.ref))
+    .find(e => e && e.type.value === 'Death')
+
+  // Birth must be before death
+  if (birthEvent && deathEvent) {
+    const birthDate = parseDate(birthEvent.date)
+    const deathDate = parseDate(deathEvent.date)
+
+    if (birthDate && deathDate && birthDate > deathDate) {
+      errors.push({
+        field: 'events',
+        message: 'Birth date must be before death date',
+        severity: 'error',
+      })
+    }
+  }
+
+  return {valid: errors.length === 0, errors, warnings}
+}
+
+function validateFamily(family) {
+  const errors = []
+  const warnings = []
+
+  // Get parents
+  const father = (db.data.people || []).find(
+    p => p.handle === family.father_handle
+  )
+  const mother = (db.data.people || []).find(
+    p => p.handle === family.mother_handle
+  )
+
+  // Get children
+  const children = (family.child_ref_list || []).map(ref =>
+    (db.data.people || []).find(p => p.handle === ref.ref)
+  )
+
+  // Check parent-child age relationships
+  if (father || mother) {
+    children.forEach(child => {
+      if (!child) return
+
+      const childBirthEvent = (child.event_ref_list || [])
+        .map(ref => (db.data.events || []).find(e => e.handle === ref.ref))
+        .find(e => e && e.type.value === 'Birth')
+
+      const childBirthDate = childBirthEvent
+        ? parseDate(childBirthEvent.date)
+        : null
+
+      if (father && childBirthDate) {
+        const fatherBirthEvent = (father.event_ref_list || [])
+          .map(ref => (db.data.events || []).find(e => e.handle === ref.ref))
+          .find(e => e && e.type.value === 'Birth')
+
+        const fatherBirthDate = fatherBirthEvent
+          ? parseDate(fatherBirthEvent.date)
+          : null
+
+        if (fatherBirthDate && childBirthDate) {
+          const ageAtBirth =
+            (childBirthDate - fatherBirthDate) / (1000 * 60 * 60 * 24 * 365.25)
+
+          if (ageAtBirth < 12) {
+            errors.push({
+              field: 'children',
+              message: `Father was too young (${Math.floor(ageAtBirth)} years) at child's birth`,
+              severity: 'error',
+            })
+          } else if (ageAtBirth < 16) {
+            warnings.push({
+              field: 'children',
+              message: `Father was very young (${Math.floor(ageAtBirth)} years) at child's birth`,
+              severity: 'warning',
+            })
+          } else if (ageAtBirth > 80) {
+            warnings.push({
+              field: 'children',
+              message: `Father was very old (${Math.floor(ageAtBirth)} years) at child's birth`,
+              severity: 'warning',
+            })
+          }
+        }
+      }
+
+      if (mother && childBirthDate) {
+        const motherBirthEvent = (mother.event_ref_list || [])
+          .map(ref => (db.data.events || []).find(e => e.handle === ref.ref))
+          .find(e => e && e.type.value === 'Birth')
+
+        const motherBirthDate = motherBirthEvent
+          ? parseDate(motherBirthEvent.date)
+          : null
+
+        if (motherBirthDate && childBirthDate) {
+          const ageAtBirth =
+            (childBirthDate - motherBirthDate) / (1000 * 60 * 60 * 24 * 365.25)
+
+          if (ageAtBirth < 12) {
+            errors.push({
+              field: 'children',
+              message: `Mother was too young (${Math.floor(ageAtBirth)} years) at child's birth`,
+              severity: 'error',
+            })
+          } else if (ageAtBirth < 15) {
+            warnings.push({
+              field: 'children',
+              message: `Mother was very young (${Math.floor(ageAtBirth)} years) at child's birth`,
+              severity: 'warning',
+            })
+          } else if (ageAtBirth > 50) {
+            warnings.push({
+              field: 'children',
+              message: `Mother was very old (${Math.floor(ageAtBirth)} years) at child's birth`,
+              severity: 'warning',
+            })
+          }
+        }
+      }
+    })
+  }
+
+  // Check gender consistency
+  if (father && father.gender !== 1) {
+    warnings.push({
+      field: 'father',
+      message: 'Father has non-male gender',
+      severity: 'warning',
+    })
+  }
+
+  if (mother && mother.gender !== 0) {
+    warnings.push({
+      field: 'mother',
+      message: 'Mother has non-female gender',
+      severity: 'warning',
+    })
+  }
+
+  return {valid: errors.length === 0, errors, warnings}
+}
+
+function validateEvent(event) {
+  const errors = []
+  const warnings = []
+
+  // Validate date format
+  if (event.date && event.date.val) {
+    const date = parseDate(event.date.val)
+    if (!date || isNaN(date.getTime())) {
+      errors.push({
+        field: 'date',
+        message: 'Invalid date format',
+        severity: 'error',
+      })
+    }
+  }
+
+  // Validate place reference
+  if (event.place) {
+    const place = (db.data.places || []).find(p => p.handle === event.place)
+    if (!place) {
+      errors.push({
+        field: 'place',
+        message: 'Referenced place does not exist',
+        severity: 'error',
+      })
+    }
+  }
+
+  return {valid: errors.length === 0, errors, warnings}
 }
 
 // --- Routes ---
@@ -302,14 +630,34 @@ resourceTypes.forEach(type => {
     const index = collection.findIndex(i => i.handle === handle)
 
     if (index !== -1) {
-      // Merge existing item with updates (or replace?)
-      // Usually PUT replaces, but let's be safe and merge if needed,
-      // though typically the frontend sends the full object.
-      // However, we must preserve the handle and gramps_id if not provided (though they should be).
+      // Validate before updating
+      let validationResult = {valid: true, errors: [], warnings: []}
 
+      if (type === 'people') {
+        validationResult = validatePerson(updatedItem)
+      } else if (type === 'families') {
+        validationResult = validateFamily(updatedItem)
+      } else if (type === 'events') {
+        validationResult = validateEvent(updatedItem)
+      }
+
+      // Return validation errors
+      if (!validationResult.valid) {
+        return res.status(400).json({
+          error: 'Validation failed',
+          validation: validationResult,
+        })
+      }
+
+      // Merge existing item with updates
       db.data[type][index] = {...collection[index], ...updatedItem}
       await db.write()
-      res.json(db.data[type][index])
+
+      // Return updated item with validation warnings
+      res.json({
+        ...db.data[type][index],
+        _validation: validationResult.warnings.length > 0 ? validationResult : undefined,
+      })
     } else {
       res.status(404).json({error: 'Not found'})
     }
@@ -334,6 +682,7 @@ resourceTypes.forEach(type => {
 app.post('/api/objects/', async (req, res) => {
   const objects = req.body // Array of objects to create
   const createdObjects = []
+  const validationErrors = []
 
   for (const obj of objects) {
     const typeMap = {
@@ -378,6 +727,26 @@ app.post('/api/objects/', async (req, res) => {
       obj.handle = crypto.randomBytes(8).toString('hex')
     }
 
+    // Validate before creating
+    let validationResult = {valid: true, errors: [], warnings: []}
+
+    if (obj._class === 'Person') {
+      validationResult = validatePerson(obj)
+    } else if (obj._class === 'Family') {
+      validationResult = validateFamily(obj)
+    } else if (obj._class === 'Event') {
+      validationResult = validateEvent(obj)
+    }
+
+    // Skip if validation fails
+    if (!validationResult.valid) {
+      validationErrors.push({
+        object: obj,
+        validation: validationResult,
+      })
+      continue
+    }
+
     // Add to DB
     if (!db.data[collectionName]) db.data[collectionName] = []
     db.data[collectionName].push(obj)
@@ -386,7 +755,33 @@ app.post('/api/objects/', async (req, res) => {
   }
 
   await db.write()
-  res.json({data: createdObjects})
+
+  // Return results with validation errors if any
+  const response = {data: createdObjects}
+  if (validationErrors.length > 0) {
+    response.validation_errors = validationErrors
+  }
+  res.json(response)
+})
+
+// Validation Endpoint
+app.post('/api/validate/:type', (req, res) => {
+  const {type} = req.params
+  const object = req.body
+
+  let validationResult = {valid: true, errors: [], warnings: []}
+
+  if (type === 'person' || type === 'people') {
+    validationResult = validatePerson(object)
+  } else if (type === 'family' || type === 'families') {
+    validationResult = validateFamily(object)
+  } else if (type === 'event' || type === 'events') {
+    validationResult = validateEvent(object)
+  } else {
+    return res.status(400).json({error: 'Unknown validation type'})
+  }
+
+  res.json(validationResult)
 })
 
 // Tree Settings

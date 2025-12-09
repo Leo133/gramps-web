@@ -91,14 +91,189 @@
       "date": {
         "val": "1980-01-01"
       },
-      "description": "Birth of John Doe"
+      "place": "pl0001",
+      "description": "Birth of John Doe",
+      "private": false,
+      "citation_list": []
+    },
+    {
+      "handle": "e0002",
+      "gramps_id": "E0002",
+      "type": {
+        "value": "Birth"
+      },
+      "date": {
+        "val": "1982-05-15"
+      },
+      "place": "pl0002",
+      "description": "Birth of Jane Smith",
+      "private": false,
+      "citation_list": []
     }
   ],
-  "places": [],
+  "places": [
+    {
+      "handle": "pl0001",
+      "gramps_id": "P0001",
+      "name": {
+        "value": "New York"
+      },
+      "title": "New York, New York, USA",
+      "type": {
+        "value": "City"
+      },
+      "lat": "40.7128",
+      "long": "-74.0060",
+      "placeref_list": [
+        {
+          "ref": "pl0003"
+        }
+      ],
+      "private": false
+    },
+    {
+      "handle": "pl0002",
+      "gramps_id": "P0002",
+      "name": {
+        "value": "London"
+      },
+      "title": "London, England, United Kingdom",
+      "type": {
+        "value": "City"
+      },
+      "lat": "51.5074",
+      "long": "-0.1278",
+      "placeref_list": [
+        {
+          "ref": "pl0004"
+        }
+      ],
+      "private": false
+    },
+    {
+      "handle": "pl0003",
+      "gramps_id": "P0003",
+      "name": {
+        "value": "New York"
+      },
+      "title": "New York, USA",
+      "type": {
+        "value": "State"
+      },
+      "placeref_list": [
+        {
+          "ref": "pl0005"
+        }
+      ],
+      "private": false
+    },
+    {
+      "handle": "pl0004",
+      "gramps_id": "P0004",
+      "name": {
+        "value": "England"
+      },
+      "title": "England, United Kingdom",
+      "type": {
+        "value": "State"
+      },
+      "placeref_list": [
+        {
+          "ref": "pl0006"
+        }
+      ],
+      "private": false
+    },
+    {
+      "handle": "pl0005",
+      "gramps_id": "P0005",
+      "name": {
+        "value": "United States"
+      },
+      "title": "United States of America",
+      "type": {
+        "value": "Country"
+      },
+      "placeref_list": [],
+      "private": false
+    },
+    {
+      "handle": "pl0006",
+      "gramps_id": "P0006",
+      "name": {
+        "value": "United Kingdom"
+      },
+      "title": "United Kingdom",
+      "type": {
+        "value": "Country"
+      },
+      "placeref_list": [],
+      "private": false
+    }
+  ],
   "media": [],
-  "repositories": [],
-  "sources": [],
-  "notes": [],
+  "repositories": [
+    {
+      "handle": "r0001",
+      "gramps_id": "R0001",
+      "name": "National Archives",
+      "type": {
+        "value": "Library"
+      },
+      "address_list": [
+        {
+          "street": "700 Pennsylvania Avenue NW",
+          "city": "Washington",
+          "state": "DC",
+          "postal": "20408",
+          "country": "USA"
+        }
+      ],
+      "urls": [
+        {
+          "href": "https://www.archives.gov/",
+          "desc": "National Archives Website",
+          "type": {
+            "value": "Web Home"
+          }
+        }
+      ],
+      "private": false
+    }
+  ],
+  "sources": [
+    {
+      "handle": "s0001",
+      "gramps_id": "S0001",
+      "title": "1900 United States Federal Census",
+      "author": "U.S. Census Bureau",
+      "pubinfo": "Washington, D.C.: National Archives and Records Administration",
+      "abbrev": "1900 Census",
+      "reporef_list": [
+        {
+          "ref": "r0001",
+          "call_number": "T623",
+          "media_type": {
+            "value": "Microfilm"
+          }
+        }
+      ],
+      "private": false
+    }
+  ],
+  "notes": [
+    {
+      "handle": "n0001",
+      "gramps_id": "N0001",
+      "text": {
+        "string": "This is a sample note about John Doe. He was born in New York City."
+      },
+      "type": {
+        "value": "General"
+      },
+      "private": false
+    }
+  ],
   "metadata": {
     "version": "1.0.0",
     "title": "Gramps Web Lite",
