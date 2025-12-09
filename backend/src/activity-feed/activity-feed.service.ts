@@ -1,6 +1,7 @@
 import {Injectable, NotFoundException} from '@nestjs/common'
 import {PrismaService} from '../prisma/prisma.service'
 import {CreateActivityDto} from './dto/activity.dto'
+import {Prisma} from '@prisma/client'
 
 @Injectable()
 export class ActivityFeedService {
@@ -41,7 +42,7 @@ export class ActivityFeedService {
   }) {
     const {entityType, entityId, visibility, userRole, page = 1, pagesize = 50} = query || {}
 
-    const where: any = {}
+    const where: Prisma.ActivityWhereInput = {}
 
     if (entityType) {
       where.entityType = entityType

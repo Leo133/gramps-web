@@ -1,6 +1,7 @@
 import {Injectable, NotFoundException, ForbiddenException} from '@nestjs/common'
 import {PrismaService} from '../prisma/prisma.service'
 import {CreateChatMessageDto, UpdateChatMessageDto} from './dto/chat.dto'
+import {Prisma} from '@prisma/client'
 
 @Injectable()
 export class ChatService {
@@ -38,7 +39,7 @@ export class ChatService {
   }) {
     const {channelId, contextType, contextId, page = 1, pagesize = 50} = query || {}
 
-    const where: any = {}
+    const where: Prisma.ChatMessageWhereInput = {}
 
     if (channelId) {
       where.channelId = channelId

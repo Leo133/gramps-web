@@ -1,6 +1,7 @@
 import {Injectable, NotFoundException, ForbiddenException} from '@nestjs/common'
 import {PrismaService} from '../prisma/prisma.service'
 import {CreateCommentDto, UpdateCommentDto} from './dto/comment.dto'
+import {Prisma} from '@prisma/client'
 
 @Injectable()
 export class CommentsService {
@@ -38,7 +39,7 @@ export class CommentsService {
   }) {
     const {entityType, entityId, parentId, page = 1, pagesize = 50} = query || {}
 
-    const where: any = {}
+    const where: Prisma.CommentWhereInput = {}
 
     if (entityType) {
       where.entityType = entityType
