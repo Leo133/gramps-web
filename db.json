@@ -135,6 +135,19 @@
       "private": false,
       "gramps_id": "E0004",
       "handle": "8dfc91cec5403d55"
+    },
+    {
+      "_class": "Event",
+      "type": {
+        "value": "Marriage"
+      },
+      "date": {
+        "val": "2000-06-15"
+      },
+      "description": "Test marriage event",
+      "private": false,
+      "gramps_id": "E0005",
+      "handle": "f6309bcc3112f6bf"
     }
   ],
   "places": [
@@ -265,6 +278,21 @@
       "private": false,
       "gramps_id": "P0008",
       "handle": "9cee5dd3241039b2"
+    },
+    {
+      "_class": "Place",
+      "name": {
+        "value": "Paris"
+      },
+      "title": "Paris, France",
+      "type": {
+        "value": "City"
+      },
+      "lat": "48.8566",
+      "long": "2.3522",
+      "private": false,
+      "gramps_id": "P0009",
+      "handle": "e9d32434b89d03f9"
     }
   ],
   "media": [],
@@ -365,6 +393,18 @@
       "private": false,
       "gramps_id": "N0003",
       "handle": "278232f902916f9e"
+    },
+    {
+      "_class": "Note",
+      "text": {
+        "string": "This is a test note with rich content."
+      },
+      "type": {
+        "value": "General"
+      },
+      "private": false,
+      "gramps_id": "N0004",
+      "handle": "246325a876c66ef5"
     }
   ],
   "metadata": {

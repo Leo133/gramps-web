@@ -333,11 +333,12 @@ function createMockToken(payload) {
 function parseDate(dateStr) {
   if (!dateStr) return null
   // Handle different date formats
+  let dateString = dateStr
   if (typeof dateStr === 'object' && dateStr.val) {
-    dateStr = dateStr.val
+    dateString = dateStr.val
   }
   try {
-    return new Date(dateStr)
+    return new Date(dateString)
   } catch (e) {
     return null
   }
@@ -502,7 +503,7 @@ function validateEvent(event) {
   // Validate date format
   if (event.date && event.date.val) {
     const date = parseDate(event.date.val)
-    if (!date || isNaN(date.getTime())) {
+    if (!date || Number.isNaN(date.getTime())) {
       errors.push({
         field: 'date',
         message: 'Invalid date format',
@@ -667,13 +668,13 @@ resourceTypes.forEach(type => {
       await db.write()
 
       // Return updated item with validation warnings
-      res.json({
+      return res.json({
         ...db.data[type][index],
-        _validation: validationResult.warnings.length > 0 ? validationResult : undefined,
+        _validation:
+          validationResult.warnings.length > 0 ? validationResult : undefined,
       })
-    } else {
-      res.status(404).json({error: 'Not found'})
     }
+    return res.status(404).json({error: 'Not found'})
   })
 
   app.delete(`/api/${type}/:handle`, async (req, res) => {
@@ -796,7 +797,7 @@ app.post('/api/validate/:type', (req, res) => {
     return res.status(400).json({error: 'Unknown validation type'})
   }
 
-  res.json(validationResult)
+  return res.json(validationResult)
 })
 
 // Tree Settings
