@@ -16,7 +16,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Login with username and password' })
   @ApiResponse({ status: 200, description: 'Returns JWT access and refresh tokens' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async login(@Request() req, @Body() loginDto: LoginDto) {
+  async login(@Request() req: any, @Body() loginDto: LoginDto) {
     return this.authService.login(req.user);
   }
 
@@ -27,7 +27,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Returns new JWT access token' })
   @ApiResponse({ status: 401, description: 'Invalid or expired token' })
-  async refresh(@Request() req) {
+  async refresh(@Request() req: any) {
     return this.authService.refreshToken(req.user);
   }
 }

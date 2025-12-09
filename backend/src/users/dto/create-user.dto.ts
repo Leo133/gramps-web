@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, IsNotEmpty, IsEnum, IsOptional, IsBoolean } from 'class-validator';
-import { Role } from '@prisma/client';
+import { IsString, IsEmail, IsNotEmpty, IsOptional, IsBoolean, IsIn } from 'class-validator';
+
+const VALID_ROLES = ['OWNER', 'EDITOR', 'CONTRIBUTOR', 'MEMBER', 'GUEST'] as const;
 
 export class CreateUserDto {
   @ApiProperty({ example: 'johndoe', description: 'Username' })
@@ -23,10 +24,10 @@ export class CreateUserDto {
   @IsOptional()
   fullName?: string;
 
-  @ApiProperty({ enum: Role, example: 'MEMBER', description: 'User role' })
-  @IsEnum(Role)
+  @ApiProperty({ enum: VALID_ROLES, example: 'MEMBER', description: 'User role' })
+  @IsIn(VALID_ROLES)
   @IsOptional()
-  role?: Role;
+  role?: string;
 
   @ApiProperty({ example: true, description: 'Is user enabled', required: false })
   @IsBoolean()
