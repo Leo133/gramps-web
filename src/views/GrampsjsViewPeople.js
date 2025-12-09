@@ -1,15 +1,43 @@
-/*
-People list view
-*/
+/**
+ * @fileoverview People list view component
+ * Phase 10: Enhanced with design tokens and responsive layout
+ * @author Gramps Web Contributors
+ */
 
-import {html} from 'lit'
+import {html, css} from 'lit'
 import {GrampsjsViewObjectsBase} from './GrampsjsViewObjectsBase.js'
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 import {prettyTimeDiffTimestamp, personFilter, filterCounts} from '../util.js'
 import '../components/GrampsjsFilterYears.js'
 import '../components/GrampsjsFilterProperties.js'
 import '../components/GrampsjsFilterTags.js'
 
 export class GrampsjsViewPeople extends GrampsjsViewObjectsBase {
+  static get styles() {
+    return [
+      super.styles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
+      css`
+        /* Phase 10: Enhanced list view styling */
+        :host {
+          /* Phase 10: Token-based spacing */
+          padding: var(--spacing-4, 16px);
+        }
+
+        /* Phase 10: Mobile optimization */
+        @media (max-width: 768px) {
+          :host {
+            padding: var(--spacing-2, 8px);
+          }
+        }
+      `,
+    ]
+  }
+
   constructor() {
     super()
     this._columns = {
