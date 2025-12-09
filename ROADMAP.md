@@ -15,14 +15,18 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 
 **Goal:** Perfect the CRUD operations for the fundamental building blocks of genealogy.
 
+**Status:** ✅ COMPLETE
+
 - [x] **People:** Create, Read, Update, Delete (CRUD) for People.
 - [x] **Families:** Link people as parents/children/spouses.
-- [ ] **Events:** Full support for Birth, Death, Marriage, Census, etc., with dates and places.
-- [ ] **Places:** Hierarchical place management (Country -> State -> City) with coordinates.
-- [ ] **Sources & Citations:** Rigorous academic sourcing (Source -> Citation -> Event).
-- [ ] **Repositories:** Managing archives and libraries.
-- [ ] **Notes:** Rich text notes attached to any object.
-- [ ] **Validation Logic:** Implement strict genealogical consistency checks (e.g., birth must be before death, children cannot be older than parents).
+- [x] **Events:** Full support for Birth, Death, Marriage, Census, etc., with dates and places.
+- [x] **Places:** Hierarchical place management (Country -> State -> City) with coordinates.
+- [x] **Sources & Citations:** Rigorous academic sourcing (Source -> Citation -> Event).
+- [x] **Repositories:** Managing archives and libraries.
+- [x] **Notes:** Rich text notes attached to any object.
+- [x] **Validation Logic:** Implement strict genealogical consistency checks (e.g., birth must be before death, children cannot be older than parents).
+
+**Implementation Details:** See [docs/PHASE2.md](docs/PHASE2.md) for complete documentation.
 
 ## Phase 3: Data Portability & Interoperability
 
