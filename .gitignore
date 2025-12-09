@@ -20,3 +20,12 @@
 /_site/
 /dist/
 /out-tsc/
+
+# backend
+/backend/node_modules/
+/backend/dist/
+/backend/*.db
+/backend/*.db-journal
+/backend/.env
+gramps.db
+gramps.db-journal
