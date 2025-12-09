@@ -262,6 +262,17 @@ if (!db.data.users || db.data.users.length === 0) {
         private: false,
       },
     ],
+    citations: [
+      {
+        handle: 'c0001',
+        gramps_id: 'C0001',
+        source_handle: 's0001',
+        page: 'Sheet 5, Line 23',
+        confidence: 2, // High confidence
+        date: {val: '1900-06-01'},
+        private: false,
+      },
+    ],
     notes: [
       {
         handle: 'n0001',
@@ -572,6 +583,7 @@ const resourceTypes = [
   'media',
   'repositories',
   'sources',
+  'citations',
   'notes',
 ]
 
@@ -588,6 +600,7 @@ const searchKeys = {
   media: ['gramps_id', 'handle', 'desc', 'path'],
   repositories: ['gramps_id', 'handle', 'name'],
   sources: ['gramps_id', 'handle', 'title', 'author'],
+  citations: ['gramps_id', 'handle', 'page'],
   notes: ['gramps_id', 'handle', 'content'],
 }
 
@@ -693,6 +706,7 @@ app.post('/api/objects/', async (req, res) => {
       Media: 'media',
       Repository: 'repositories',
       Source: 'sources',
+      Citation: 'citations',
       Note: 'notes',
     }
 
@@ -712,6 +726,7 @@ app.post('/api/objects/', async (req, res) => {
         Media: 'O',
         Repository: 'R',
         Source: 'S',
+        Citation: 'C',
         Note: 'N',
       }
       const prefix = prefixMap[obj._class] || 'X'
