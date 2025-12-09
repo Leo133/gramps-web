@@ -1,9 +1,9 @@
 /* eslint-env serviceworker */
-/* global clients */
+/* eslint-disable no-restricted-globals, no-redeclare */
 
 /**
  * Gramps Web Service Worker
- * 
+ *
  * Provides offline support and performance improvements for the PWA
  * Version: 1.0.0
  */
@@ -36,10 +36,12 @@ const MAX_IMAGE_CACHE_SIZE = 100
 async function limitCacheSize(cacheName, maxItems) {
   const cache = await caches.open(cacheName)
   const keys = await cache.keys()
-  
+
   if (keys.length > maxItems) {
     // Delete oldest items
-    const deletePromises = keys.slice(0, keys.length - maxItems).map(key => cache.delete(key))
+    const deletePromises = keys
+      .slice(0, keys.length - maxItems)
+      .map(key => cache.delete(key))
     await Promise.all(deletePromises)
   }
 }
@@ -51,31 +53,31 @@ async function limitCacheSize(cacheName, maxItems) {
 async function cacheFirst(request, cacheName) {
   const cache = await caches.open(cacheName)
   const cached = await cache.match(request)
-  
+
   if (cached) {
     return cached
   }
-  
+
   try {
     const response = await fetch(request)
-    
+
     // Cache successful responses
     if (response && response.status === 200) {
       cache.put(request, response.clone())
-      
+
       // Limit cache size for images
       if (cacheName === IMAGE_CACHE) {
         limitCacheSize(IMAGE_CACHE, MAX_IMAGE_CACHE_SIZE)
       }
     }
-    
+
     return response
   } catch (error) {
     // Return offline page for navigation requests
     if (request.mode === 'navigate') {
       return cache.match('/index.html')
     }
-    
+
     throw error
   }
 }
@@ -86,25 +88,25 @@ async function cacheFirst(request, cacheName) {
  */
 async function networkFirst(request, cacheName) {
   const cache = await caches.open(cacheName)
-  
+
   try {
     const response = await fetch(request)
-    
+
     // Cache successful responses
     if (response && response.status === 200) {
       cache.put(request, response.clone())
-      
+
       // Limit cache size
       limitCacheSize(cacheName, MAX_DYNAMIC_CACHE_SIZE)
     }
-    
+
     return response
   } catch (error) {
     const cached = await cache.match(request)
     if (cached) {
       return cached
     }
-    
+
     throw error
   }
 }
@@ -122,7 +124,8 @@ async function syncData() {
  */
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(STATIC_CACHE)
+    caches
+      .open(STATIC_CACHE)
       .then(cache => cache.addAll(STATIC_ASSETS))
       .then(() => self.skipWaiting())
   )
@@ -133,12 +136,21 @@ self.addEventListener('install', event => {
  */
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys()
-      .then(cacheNames => Promise.all(
-        cacheNames
-          .filter(name => name.startsWith('gramps-web-') && name !== STATIC_CACHE && name !== DYNAMIC_CACHE && name !== IMAGE_CACHE)
-          .map(name => caches.delete(name))
-      ))
+    caches
+      .keys()
+      .then(cacheNames =>
+        Promise.all(
+          cacheNames
+            .filter(
+              name =>
+                name.startsWith('gramps-web-') &&
+                name !== STATIC_CACHE &&
+                name !== DYNAMIC_CACHE &&
+                name !== IMAGE_CACHE
+            )
+            .map(name => caches.delete(name))
+        )
+      )
       .then(() => self.clients.claim())
   )
 })
@@ -149,24 +161,24 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const {request} = event
   const url = new URL(request.url)
-  
+
   // Skip cross-origin requests
   if (url.origin !== self.location.origin) {
     return
   }
-  
+
   // API requests: Network-first strategy
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(networkFirst(request, DYNAMIC_CACHE))
     return
   }
-  
+
   // Image requests: Cache-first strategy
   if (request.destination === 'image') {
     event.respondWith(cacheFirst(request, IMAGE_CACHE))
     return
   }
-  
+
   // Static assets: Cache-first with network fallback
   event.respondWith(cacheFirst(request, STATIC_CACHE))
 })
@@ -177,12 +189,14 @@ self.addEventListener('fetch', event => {
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'CLEAR_CACHE') {
     event.waitUntil(
-      caches.keys().then(cacheNames => Promise.all(
-        cacheNames.map(cacheName => caches.delete(cacheName))
-      ))
+      caches
+        .keys()
+        .then(cacheNames =>
+          Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)))
+        )
     )
   }
-  
+
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting()
   }
@@ -207,12 +221,10 @@ self.addEventListener('push', event => {
     body: data.body || 'New update available',
     icon: '/images/icon192.png',
     badge: '/images/icon192.png',
-    ...data.options
+    ...data.options,
   }
-  
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  )
+
+  event.waitUntil(self.registration.showNotification(title, options))
 })
 
 /**
@@ -220,8 +232,6 @@ self.addEventListener('push', event => {
  */
 self.addEventListener('notificationclick', event => {
   event.notification.close()
-  
-  event.waitUntil(
-    clients.openWindow(event.notification.data?.url || '/')
-  )
+
+  event.waitUntil(clients.openWindow(event.notification.data?.url || '/'))
 })

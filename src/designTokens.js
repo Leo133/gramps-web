@@ -11,8 +11,12 @@
  * @returns {string} The computed value
  */
 export function getDesignToken(propertyName) {
-  const prop = propertyName.startsWith('--') ? propertyName : `--${propertyName}`
-  return getComputedStyle(document.documentElement).getPropertyValue(prop).trim()
+  const prop = propertyName.startsWith('--')
+    ? propertyName
+    : `--${propertyName}`
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(prop)
+    .trim()
 }
 
 /**
@@ -21,7 +25,9 @@ export function getDesignToken(propertyName) {
  * @param {string} value - The value to set
  */
 export function setDesignToken(propertyName, value) {
-  const prop = propertyName.startsWith('--') ? propertyName : `--${propertyName}`
+  const prop = propertyName.startsWith('--')
+    ? propertyName
+    : `--${propertyName}`
   document.documentElement.style.setProperty(prop, value)
 }
 
@@ -124,8 +130,11 @@ export function getSurface(surfaceName) {
  */
 export function getOpacityToken(opacity) {
   // Round to nearest valid opacity value
-  const validOpacities = [0, 2, 5, 6, 10, 15, 20, 25, 30, 35, 38, 40, 45, 48, 50, 60, 70, 75, 78, 87, 90, 100]
-  const nearest = validOpacities.reduce((prev, curr) => 
+  const validOpacities = [
+    0, 2, 5, 6, 10, 15, 20, 25, 30, 35, 38, 40, 45, 48, 50, 60, 70, 75, 78, 87,
+    90, 100,
+  ]
+  const nearest = validOpacities.reduce((prev, curr) =>
     Math.abs(curr - opacity) < Math.abs(prev - opacity) ? curr : prev
   )
   return `grampsjs-body-font-color-${nearest}`
@@ -138,7 +147,7 @@ export function getOpacityToken(opacity) {
  */
 export function getShadeToken(shade) {
   const validShades = [40, 120, 200, 220, 230, 240, 255]
-  const nearest = validShades.reduce((prev, curr) => 
+  const nearest = validShades.reduce((prev, curr) =>
     Math.abs(curr - shade) < Math.abs(prev - shade) ? curr : prev
   )
   return `grampsjs-color-shade-${nearest}`
@@ -167,7 +176,7 @@ export function resetDesignTokens() {
   const root = document.documentElement
   const {style} = root
   const customProps = []
-  
+
   // Collect all custom properties
   for (let i = 0; i < style.length; i += 1) {
     const prop = style[i]
@@ -175,7 +184,7 @@ export function resetDesignTokens() {
       customProps.push(prop)
     }
   }
-  
+
   // Remove them
   customProps.forEach(prop => {
     style.removeProperty(prop)
@@ -189,7 +198,7 @@ export function resetDesignTokens() {
 export function exportTheme() {
   const tokens = {}
   const styles = getComputedStyle(document.documentElement)
-  
+
   // Get all CSS custom properties
   for (let i = 0; i < styles.length; i += 1) {
     const prop = styles[i]
@@ -197,7 +206,7 @@ export function exportTheme() {
       tokens[prop] = styles.getPropertyValue(prop).trim()
     }
   }
-  
+
   return tokens
 }
 
@@ -224,20 +233,20 @@ export function getContrastRatio(foreground, background) {
     document.body.appendChild(temp)
     const rgb = getComputedStyle(temp).color.match(/\d+/g).map(Number)
     document.body.removeChild(temp)
-    
+
     const [r, g, b] = rgb.map(val => {
       const sRGB = val / 255
       return sRGB <= 0.03928 ? sRGB / 12.92 : ((sRGB + 0.055) / 1.055) ** 2.4
     })
-    
+
     return 0.2126 * r + 0.7152 * g + 0.0722 * b
   }
-  
+
   const l1 = getLuminance(foreground)
   const l2 = getLuminance(background)
   const lighter = Math.max(l1, l2)
   const darker = Math.min(l1, l2)
-  
+
   return (lighter + 0.05) / (darker + 0.05)
 }
 
@@ -248,11 +257,15 @@ export function getContrastRatio(foreground, background) {
  * @param {boolean} isLargeText - Whether text is large (18pt+ or 14pt+ bold)
  * @returns {Object} Compliance results
  */
-export function checkWCAGCompliance(foreground, background, isLargeText = false) {
+export function checkWCAGCompliance(
+  foreground,
+  background,
+  isLargeText = false
+) {
   const ratio = getContrastRatio(foreground, background)
   const minRatioAA = isLargeText ? 3 : 4.5
   const minRatioAAA = isLargeText ? 4.5 : 7
-  
+
   return {
     ratio: ratio.toFixed(2),
     passAA: ratio >= minRatioAA,

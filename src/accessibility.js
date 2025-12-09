@@ -1,6 +1,7 @@
+/* eslint-disable no-console */
 /**
  * Accessibility Utilities for Gramps Web
- * 
+ *
  * Provides comprehensive accessibility features including:
  * - Keyboard navigation helpers
  * - Focus management
@@ -21,7 +22,7 @@ let liveRegion = null
 function getLiveRegion() {
   if (!liveRegion) {
     liveRegion = document.getElementById('a11y-live-region')
-    
+
     if (!liveRegion) {
       liveRegion = document.createElement('div')
       liveRegion.id = 'a11y-live-region'
@@ -38,7 +39,7 @@ function getLiveRegion() {
       document.body.appendChild(liveRegion)
     }
   }
-  
+
   return liveRegion
 }
 
@@ -50,7 +51,7 @@ function getLiveRegion() {
 export function announceToScreenReader(message, priority = 'polite') {
   const region = getLiveRegion()
   region.setAttribute('aria-live', priority)
-  
+
   // Clear and set message (triggering announcement)
   region.textContent = ''
   setTimeout(() => {
@@ -63,13 +64,16 @@ export function announceToScreenReader(message, priority = 'polite') {
  * @param {string} targetId - ID of main content area
  * @param {string} label - Link text (default: 'Skip to main content')
  */
-export function createSkipLink(targetId = 'main-content', label = 'Skip to main content') {
+export function createSkipLink(
+  targetId = 'main-content',
+  label = 'Skip to main content'
+) {
   const skipLink = document.createElement('a')
   skipLink.href = `#${targetId}`
   skipLink.className = 'skip-link'
   skipLink.textContent = label
   skipLink.setAttribute('tabindex', '0')
-  
+
   // Style the skip link (hidden until focused)
   skipLink.style.cssText = `
     position: absolute;
@@ -82,16 +86,16 @@ export function createSkipLink(targetId = 'main-content', label = 'Skip to main 
     z-index: 10000;
     transition: top 0.2s;
   `
-  
+
   skipLink.addEventListener('focus', () => {
     skipLink.style.top = '0'
   })
-  
+
   skipLink.addEventListener('blur', () => {
     skipLink.style.top = '-40px'
   })
-  
-  skipLink.addEventListener('click', (e) => {
+
+  skipLink.addEventListener('click', e => {
     e.preventDefault()
     const target = document.getElementById(targetId)
     if (target) {
@@ -99,14 +103,14 @@ export function createSkipLink(targetId = 'main-content', label = 'Skip to main 
       target.scrollIntoView()
     }
   })
-  
+
   // Insert at the beginning of body
   if (document.body.firstChild) {
     document.body.insertBefore(skipLink, document.body.firstChild)
   } else {
     document.body.appendChild(skipLink)
   }
-  
+
   return skipLink
 }
 
@@ -119,7 +123,7 @@ export class FocusTrap {
     this.focusableElements = []
     this.previouslyFocused = null
   }
-  
+
   /**
    * Get all focusable elements within container
    */
@@ -137,57 +141,57 @@ export class FocusTrap {
       'md-outlined-button:not([disabled])',
       'md-text-button:not([disabled])',
     ].join(',')
-    
-    return Array.from(this.element.querySelectorAll(focusableSelectors))
-      .filter(el => el.offsetParent !== null) // Exclude hidden elements
+
+    return Array.from(this.element.querySelectorAll(focusableSelectors)).filter(
+      el => el.offsetParent !== null
+    ) // Exclude hidden elements
   }
-  
+
   /**
    * Activate focus trap
    */
   activate() {
     this.previouslyFocused = document.activeElement
     this.focusableElements = this.getFocusableElements()
-    
+
     if (this.focusableElements.length > 0) {
       this.focusableElements[0].focus()
     }
-    
+
     this.element.addEventListener('keydown', this.handleKeyDown)
   }
-  
+
   /**
    * Deactivate focus trap
    */
   deactivate() {
     this.element.removeEventListener('keydown', this.handleKeyDown)
-    
+
     if (this.previouslyFocused && this.previouslyFocused.focus) {
       this.previouslyFocused.focus()
     }
   }
-  
+
   /**
    * Handle Tab key navigation
    */
-  handleKeyDown = (e) => {
+  handleKeyDown = e => {
     if (e.key !== 'Tab') return
-    
+
     const firstElement = this.focusableElements[0]
-    const lastElement = this.focusableElements[this.focusableElements.length - 1]
-    
+    const lastElement =
+      this.focusableElements[this.focusableElements.length - 1]
+
     if (e.shiftKey) {
       // Shift + Tab
       if (document.activeElement === firstElement) {
         e.preventDefault()
         lastElement.focus()
       }
-    } else {
+    } else if (document.activeElement === lastElement) {
       // Tab
-      if (document.activeElement === lastElement) {
-        e.preventDefault()
-        firstElement.focus()
-      }
+      e.preventDefault()
+      firstElement.focus()
     }
   }
 }
@@ -208,15 +212,15 @@ export function createFocusTrap(element) {
  */
 export function manageFocus(element, message) {
   if (!element) return
-  
+
   // Make element focusable if needed
   if (!element.hasAttribute('tabindex')) {
     element.setAttribute('tabindex', '-1')
   }
-  
+
   // Focus element
   element.focus()
-  
+
   // Announce navigation if message provided
   if (message) {
     announceToScreenReader(message)
@@ -235,31 +239,33 @@ export function addKeyboardNavigation(listElement, options = {}) {
     loop = true,
     orientation = 'vertical', // 'vertical' or 'horizontal'
   } = options
-  
-  const getItems = () => Array.from(listElement.querySelectorAll(itemSelector))
-    .filter(el => el.offsetParent !== null)
-  
+
+  const getItems = () =>
+    Array.from(listElement.querySelectorAll(itemSelector)).filter(
+      el => el.offsetParent !== null
+    )
+
   const getCurrentIndex = () => {
     const items = getItems()
     const focused = document.activeElement
     return items.indexOf(focused)
   }
-  
-  const focusItem = (index) => {
+
+  const focusItem = index => {
     const items = getItems()
     if (items[index]) {
       items[index].focus()
     }
   }
-  
-  listElement.addEventListener('keydown', (e) => {
+
+  listElement.addEventListener('keydown', e => {
     const items = getItems()
     const currentIndex = getCurrentIndex()
-    
+
     if (currentIndex === -1) return
-    
+
     let nextIndex = currentIndex
-    
+
     if (orientation === 'vertical') {
       if (e.key === 'ArrowDown') {
         e.preventDefault()
@@ -289,7 +295,7 @@ export function addKeyboardNavigation(listElement, options = {}) {
         }
       }
     }
-    
+
     if (e.key === 'Home') {
       e.preventDefault()
       nextIndex = 0
@@ -297,15 +303,19 @@ export function addKeyboardNavigation(listElement, options = {}) {
       e.preventDefault()
       nextIndex = items.length - 1
     }
-    
+
     if (e.key === 'Enter' || e.key === ' ') {
       if (onSelect) {
         e.preventDefault()
         onSelect(items[currentIndex], currentIndex)
       }
     }
-    
-    if (nextIndex !== currentIndex && nextIndex >= 0 && nextIndex < items.length) {
+
+    if (
+      nextIndex !== currentIndex &&
+      nextIndex >= 0 &&
+      nextIndex < items.length
+    ) {
       focusItem(nextIndex)
     }
   })
@@ -318,23 +328,24 @@ export function addKeyboardNavigation(listElement, options = {}) {
  */
 export function isVisibleToScreenReader(element) {
   if (!element) return false
-  
+
   // Check aria-hidden
   if (element.getAttribute('aria-hidden') === 'true') return false
-  
+
   // Check display and visibility
   const style = getComputedStyle(element)
   if (style.display === 'none' || style.visibility === 'hidden') return false
-  
+
   // Check parent elements
   let parent = element.parentElement
   while (parent) {
     if (parent.getAttribute('aria-hidden') === 'true') return false
     const parentStyle = getComputedStyle(parent)
-    if (parentStyle.display === 'none' || parentStyle.visibility === 'hidden') return false
+    if (parentStyle.display === 'none' || parentStyle.visibility === 'hidden')
+      return false
     parent = parent.parentElement
   }
-  
+
   return true
 }
 
@@ -362,7 +373,7 @@ export function setAccessibleLabel(element, label, type = 'label') {
  */
 export function createAccessibleTooltip(trigger, text) {
   const tooltipId = `tooltip-${Math.random().toString(36).substr(2, 9)}`
-  
+
   const tooltip = document.createElement('div')
   tooltip.id = tooltipId
   tooltip.setAttribute('role', 'tooltip')
@@ -379,27 +390,27 @@ export function createAccessibleTooltip(trigger, text) {
     opacity: 0;
     transition: opacity 0.2s;
   `
-  
+
   document.body.appendChild(tooltip)
-  
+
   trigger.setAttribute('aria-describedby', tooltipId)
-  
+
   const show = () => {
     const rect = trigger.getBoundingClientRect()
     tooltip.style.top = `${rect.bottom + 8}px`
     tooltip.style.left = `${rect.left}px`
     tooltip.style.opacity = '1'
   }
-  
+
   const hide = () => {
     tooltip.style.opacity = '0'
   }
-  
+
   trigger.addEventListener('mouseenter', show)
   trigger.addEventListener('mouseleave', hide)
   trigger.addEventListener('focus', show)
   trigger.addEventListener('blur', hide)
-  
+
   return tooltip
 }
 
@@ -408,23 +419,23 @@ export function createAccessibleTooltip(trigger, text) {
  */
 export function initializeAccessibility() {
   console.log('[A11y] Initializing accessibility features...')
-  
+
   // Create skip link
   createSkipLink('main-content', 'Skip to main content')
-  
+
   // Create live region
   getLiveRegion()
-  
+
   // Add keyboard navigation hints
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', e => {
     if (e.key === 'Tab') {
       document.body.classList.add('keyboard-navigation')
     }
   })
-  
+
   document.addEventListener('mousedown', () => {
     document.body.classList.remove('keyboard-navigation')
   })
-  
+
   console.log('[A11y] Accessibility features initialized')
 }

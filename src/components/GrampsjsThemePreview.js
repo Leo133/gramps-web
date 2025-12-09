@@ -3,7 +3,7 @@ import {sharedStyles} from '../SharedStyles.js'
 
 /**
  * Theme Preview Component
- * 
+ *
  * Shows a visual preview of light and dark themes
  * to help users choose their preferred theme.
  */
@@ -160,9 +160,12 @@ export class GrampsjsThemePreview extends LitElement {
 
   render() {
     return html`
-      <div class="preview-container" role="radiogroup" aria-label="Theme selection">
-        ${this._renderLightPreview()}
-        ${this._renderDarkPreview()}
+      <div
+        class="preview-container"
+        role="radiogroup"
+        aria-label="Theme selection"
+      >
+        ${this._renderLightPreview()} ${this._renderDarkPreview()}
         ${this._renderSystemPreview()}
       </div>
     `

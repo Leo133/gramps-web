@@ -1,6 +1,7 @@
+/* eslint-disable max-classes-per-file, no-param-reassign */
 /**
  * Mobile Touch Gesture Utilities
- * 
+ *
  * Provides utilities for handling touch gestures on mobile devices,
  * including swipe detection, long press, and touch optimization.
  */
@@ -19,54 +20,58 @@ export class SwipeDetector {
       onSwipeUp: options.onSwipeUp || null,
       onSwipeDown: options.onSwipeDown || null,
     }
-    
+
     this.startX = 0
     this.startY = 0
     this.startTime = 0
-    
+
     // Bind handlers once and store references
     this.boundTouchStart = this.handleTouchStart.bind(this)
     this.boundTouchEnd = this.handleTouchEnd.bind(this)
-    
+
     this.bind()
   }
-  
+
   bind() {
-    this.element.addEventListener('touchstart', this.boundTouchStart, {passive: true})
-    this.element.addEventListener('touchend', this.boundTouchEnd, {passive: false})
+    this.element.addEventListener('touchstart', this.boundTouchStart, {
+      passive: true,
+    })
+    this.element.addEventListener('touchend', this.boundTouchEnd, {
+      passive: false,
+    })
   }
-  
+
   unbind() {
     this.element.removeEventListener('touchstart', this.boundTouchStart)
     this.element.removeEventListener('touchend', this.boundTouchEnd)
   }
-  
+
   handleTouchStart(e) {
     const touch = e.touches[0]
     this.startX = touch.clientX
     this.startY = touch.clientY
     this.startTime = Date.now()
   }
-  
+
   handleTouchEnd(e) {
     const touch = e.changedTouches[0]
     const endX = touch.clientX
     const endY = touch.clientY
     const endTime = Date.now()
-    
+
     const deltaX = endX - this.startX
     const deltaY = endY - this.startY
     const deltaTime = endTime - this.startTime
-    
+
     // Check if gesture is within time threshold
     if (deltaTime > this.options.timeout) {
       return
     }
-    
+
     // Determine primary direction
     const absX = Math.abs(deltaX)
     const absY = Math.abs(deltaY)
-    
+
     if (absX > absY && absX > this.options.threshold) {
       // Horizontal swipe
       if (deltaX > 0) {
@@ -75,12 +80,10 @@ export class SwipeDetector {
           e.preventDefault()
           this.options.onSwipeRight(e)
         }
-      } else {
+      } else if (this.options.onSwipeLeft) {
         // Swipe left
-        if (this.options.onSwipeLeft) {
-          e.preventDefault()
-          this.options.onSwipeLeft(e)
-        }
+        e.preventDefault()
+        this.options.onSwipeLeft(e)
       }
     } else if (absY > absX && absY > this.options.threshold) {
       // Vertical swipe
@@ -90,12 +93,10 @@ export class SwipeDetector {
           e.preventDefault()
           this.options.onSwipeDown(e)
         }
-      } else {
+      } else if (this.options.onSwipeUp) {
         // Swipe up
-        if (this.options.onSwipeUp) {
-          e.preventDefault()
-          this.options.onSwipeUp(e)
-        }
+        e.preventDefault()
+        this.options.onSwipeUp(e)
       }
     }
   }
@@ -111,30 +112,32 @@ export class LongPressDetector {
       duration: options.duration || 500, // Long press duration
       onLongPress: options.onLongPress || null,
     }
-    
+
     this.timer = null
     this.touchStarted = false
-    
+
     // Bind handlers once and store references
     this.boundTouchStart = this.handleTouchStart.bind(this)
     this.boundTouchEnd = this.handleTouchEnd.bind(this)
     this.boundTouchMove = this.handleTouchMove.bind(this)
-    
+
     this.bind()
   }
-  
+
   bind() {
-    this.element.addEventListener('touchstart', this.boundTouchStart, {passive: true})
+    this.element.addEventListener('touchstart', this.boundTouchStart, {
+      passive: true,
+    })
     this.element.addEventListener('touchend', this.boundTouchEnd)
     this.element.addEventListener('touchmove', this.boundTouchMove)
   }
-  
+
   unbind() {
     this.element.removeEventListener('touchstart', this.boundTouchStart)
     this.element.removeEventListener('touchend', this.boundTouchEnd)
     this.element.removeEventListener('touchmove', this.boundTouchMove)
   }
-  
+
   handleTouchStart(e) {
     this.touchStarted = true
     this.timer = setTimeout(() => {
@@ -143,7 +146,7 @@ export class LongPressDetector {
       }
     }, this.options.duration)
   }
-  
+
   handleTouchEnd() {
     this.touchStarted = false
     if (this.timer) {
@@ -151,7 +154,7 @@ export class LongPressDetector {
       this.timer = null
     }
   }
-  
+
   handleTouchMove() {
     this.touchStarted = false
     if (this.timer) {
@@ -189,15 +192,15 @@ export function createLongPressDetector(element, options) {
 export function optimizeTouchTarget(element) {
   const rect = element.getBoundingClientRect()
   const minSize = 44 // WCAG minimum touch target size
-  
+
   if (rect.width < minSize || rect.height < minSize) {
     // Add padding to increase touch target
-    const currentPadding = parseInt(getComputedStyle(element).padding) || 0
+    const currentPadding = parseInt(getComputedStyle(element).padding, 10) || 0
     const paddingNeeded = Math.max(
       0,
       Math.ceil((minSize - Math.min(rect.width, rect.height)) / 2)
     )
-    
+
     element.style.padding = `${currentPadding + paddingNeeded}px`
   }
 }
@@ -222,9 +225,15 @@ export function hapticFeedback(type = 'light') {
  * @param {HTMLElement} element
  */
 export function preventDefaultTouch(element) {
-  element.addEventListener('touchstart', e => e.preventDefault(), {passive: false})
-  element.addEventListener('touchmove', e => e.preventDefault(), {passive: false})
-  element.addEventListener('touchend', e => e.preventDefault(), {passive: false})
+  element.addEventListener('touchstart', e => e.preventDefault(), {
+    passive: false,
+  })
+  element.addEventListener('touchmove', e => e.preventDefault(), {
+    passive: false,
+  })
+  element.addEventListener('touchend', e => e.preventDefault(), {
+    passive: false,
+  })
 }
 
 /**
@@ -240,9 +249,12 @@ export function hasTouchSupport() {
  * @returns {boolean}
  */
 export function isMobile() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent
-  ) || (hasTouchSupport() && window.innerWidth < 768)
+  return (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    ) ||
+    (hasTouchSupport() && window.innerWidth < 768)
+  )
 }
 
 /**
@@ -252,12 +264,15 @@ export function isMobile() {
 export function getSafeAreaInsets() {
   const root = document.documentElement
   const style = getComputedStyle(root)
-  
+
   return {
-    top: parseInt(style.getPropertyValue('env(safe-area-inset-top)')) || 0,
-    right: parseInt(style.getPropertyValue('env(safe-area-inset-right)')) || 0,
-    bottom: parseInt(style.getPropertyValue('env(safe-area-inset-bottom)')) || 0,
-    left: parseInt(style.getPropertyValue('env(safe-area-inset-left)')) || 0,
+    top: parseInt(style.getPropertyValue('env(safe-area-inset-top)'), 10) || 0,
+    right:
+      parseInt(style.getPropertyValue('env(safe-area-inset-right)'), 10) || 0,
+    bottom:
+      parseInt(style.getPropertyValue('env(safe-area-inset-bottom)'), 10) || 0,
+    left:
+      parseInt(style.getPropertyValue('env(safe-area-inset-left)'), 10) || 0,
   }
 }
 
@@ -292,31 +307,35 @@ export class PullToRefresh {
       threshold: options.threshold || 80,
       onRefresh: options.onRefresh || null,
     }
-    
+
     this.startY = 0
     this.currentY = 0
     this.isPulling = false
-    
+
     // Bind handlers once and store references
     this.boundTouchStart = this.handleTouchStart.bind(this)
     this.boundTouchMove = this.handleTouchMove.bind(this)
     this.boundTouchEnd = this.handleTouchEnd.bind(this)
-    
+
     this.bind()
   }
-  
+
   bind() {
-    this.element.addEventListener('touchstart', this.boundTouchStart, {passive: true})
-    this.element.addEventListener('touchmove', this.boundTouchMove, {passive: false})
+    this.element.addEventListener('touchstart', this.boundTouchStart, {
+      passive: true,
+    })
+    this.element.addEventListener('touchmove', this.boundTouchMove, {
+      passive: false,
+    })
     this.element.addEventListener('touchend', this.boundTouchEnd)
   }
-  
+
   unbind() {
     this.element.removeEventListener('touchstart', this.boundTouchStart)
     this.element.removeEventListener('touchmove', this.boundTouchMove)
     this.element.removeEventListener('touchend', this.boundTouchEnd)
   }
-  
+
   handleTouchStart(e) {
     // Only start if at top of scrollable area
     if (this.element.scrollTop === 0) {
@@ -324,32 +343,32 @@ export class PullToRefresh {
       this.isPulling = true
     }
   }
-  
+
   handleTouchMove(e) {
     if (!this.isPulling) return
-    
+
     this.currentY = e.touches[0].clientY
     const deltaY = this.currentY - this.startY
-    
+
     if (deltaY > 0 && this.element.scrollTop === 0) {
       // Prevent default scroll
       e.preventDefault()
-      
+
       // Apply visual feedback
       const pullDistance = Math.min(deltaY, this.options.threshold * 1.5)
       this.element.style.transform = `translateY(${pullDistance}px)`
     }
   }
-  
+
   handleTouchEnd() {
     if (!this.isPulling) return
-    
+
     const deltaY = this.currentY - this.startY
-    
+
     if (deltaY > this.options.threshold && this.options.onRefresh) {
       this.options.onRefresh()
     }
-    
+
     // Reset
     this.element.style.transform = ''
     this.isPulling = false

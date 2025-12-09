@@ -204,7 +204,7 @@ export const LegendColorBar = (
           colorBarHeight
         })`
     )
-    .each(function () {
+    .each(function appendTick() {
       const tickGroup = select(this)
       tickGroup
         .append('line')

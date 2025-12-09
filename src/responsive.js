@@ -1,6 +1,7 @@
+/* eslint-disable max-classes-per-file */
 /**
  * Responsive Breakpoint Utilities
- * 
+ *
  * Provides utilities for working with responsive breakpoints,
  * matching the breakpoints used in Gramps Web's design system.
  */
@@ -20,16 +21,17 @@ export const Breakpoints = {
  */
 export function getCurrentBreakpoint() {
   const width = window.innerWidth
-  
+
   if (width < Breakpoints.mobile) {
     return 'mobile'
-  } if (width < Breakpoints.tablet) {
+  }
+  if (width < Breakpoints.tablet) {
     return 'tablet'
-  } if (width < Breakpoints.desktop) {
+  }
+  if (width < Breakpoints.desktop) {
     return 'large-tablet'
-  } 
-    return 'desktop'
-  
+  }
+  return 'desktop'
 }
 
 /**
@@ -39,7 +41,7 @@ export function getCurrentBreakpoint() {
  */
 export function matchesBreakpoint(breakpoint) {
   const current = getCurrentBreakpoint()
-  
+
   switch (breakpoint) {
     case 'mobile':
       return current === 'mobile'
@@ -85,19 +87,21 @@ export class ResponsiveWatcher {
     this.callback = callback
     this.mediaQuery = null
     this.handler = null
-    
+
     this.setup()
   }
-  
+
   setup() {
     let query = ''
-    
+
     switch (this.breakpoint) {
       case 'mobile':
         query = `(max-width: ${Breakpoints.mobile - 1}px)`
         break
       case 'tablet':
-        query = `(min-width: ${Breakpoints.mobile}px) and (max-width: ${Breakpoints.tablet - 1}px)`
+        query = `(min-width: ${Breakpoints.mobile}px) and (max-width: ${
+          Breakpoints.tablet - 1
+        }px)`
         break
       case 'desktop':
         query = `(min-width: ${Breakpoints.desktop}px)`
@@ -105,17 +109,17 @@ export class ResponsiveWatcher {
       default:
         query = this.breakpoint // Custom query
     }
-    
+
     this.mediaQuery = window.matchMedia(query)
     this.handler = e => this.callback(e.matches)
-    
+
     // Call immediately with current state
     this.callback(this.mediaQuery.matches)
-    
+
     // Listen for changes
     this.mediaQuery.addEventListener('change', this.handler)
   }
-  
+
   destroy() {
     if (this.mediaQuery && this.handler) {
       this.mediaQuery.removeEventListener('change', this.handler)
@@ -137,7 +141,7 @@ export function watchBreakpoint(breakpoint, callback) {
  * Apply different values based on breakpoint
  * @param {Object} values - Object with breakpoint keys and values
  * @returns {*} Value for current breakpoint
- * 
+ *
  * @example
  * const fontSize = responsive({
  *   mobile: '14px',
@@ -147,21 +151,21 @@ export function watchBreakpoint(breakpoint, callback) {
  */
 export function responsive(values) {
   const bp = getCurrentBreakpoint()
-  
+
   // Try exact match first
   if (values[bp]) {
     return values[bp]
   }
-  
+
   // Fall back to closest smaller breakpoint
   if (bp === 'large-tablet' && values.tablet) {
     return values.tablet
   }
-  
+
   if ((bp === 'tablet' || bp === 'large-tablet') && values.mobile) {
     return values.mobile
   }
-  
+
   // Default fallback
   return values.mobile || values.tablet || values.desktop || null
 }
@@ -170,7 +174,7 @@ export function responsive(values) {
  * Get grid columns based on breakpoint
  * @param {Object} columns - Column count per breakpoint
  * @returns {number}
- * 
+ *
  * @example
  * const cols = getGridColumns({
  *   mobile: 1,
@@ -206,13 +210,13 @@ export function watchOrientation(callback) {
   const handler = () => {
     callback(isLandscape() ? 'landscape' : 'portrait')
   }
-  
+
   window.addEventListener('orientationchange', handler)
   window.addEventListener('resize', handler)
-  
+
   // Call immediately
   handler()
-  
+
   return () => {
     window.removeEventListener('orientationchange', handler)
     window.removeEventListener('resize', handler)
@@ -227,17 +231,17 @@ export function watchOrientation(callback) {
  */
 export function onResize(callback, delay = 250) {
   let timeout = null
-  
+
   const handler = () => {
     clearTimeout(timeout)
     timeout = setTimeout(callback, delay)
   }
-  
+
   window.addEventListener('resize', handler)
-  
+
   // Call immediately
   callback()
-  
+
   return () => {
     window.removeEventListener('resize', handler)
     clearTimeout(timeout)
@@ -265,24 +269,26 @@ export function isInViewport(element, threshold = 0) {
   const rect = element.getBoundingClientRect()
   const windowHeight = window.innerHeight
   const windowWidth = window.innerWidth
-  
+
   const vertInView = rect.top <= windowHeight && rect.top + rect.height >= 0
   const horInView = rect.left <= windowWidth && rect.left + rect.width >= 0
-  
+
   if (!vertInView || !horInView) {
     return false
   }
-  
+
   if (threshold === 0) {
     return true
   }
-  
+
   // Calculate visible percentage
-  const visibleHeight = Math.min(rect.bottom, windowHeight) - Math.max(rect.top, 0)
-  const visibleWidth = Math.min(rect.right, windowWidth) - Math.max(rect.left, 0)
+  const visibleHeight =
+    Math.min(rect.bottom, windowHeight) - Math.max(rect.top, 0)
+  const visibleWidth =
+    Math.min(rect.right, windowWidth) - Math.max(rect.left, 0)
   const visibleArea = visibleHeight * visibleWidth
   const totalArea = rect.height * rect.width
-  
+
   return visibleArea / totalArea >= threshold
 }
 
@@ -296,7 +302,7 @@ export class ViewportObserver {
       threshold: options.threshold || 0.1,
       rootMargin: options.rootMargin || '50px',
     }
-    
+
     this.observer = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
@@ -309,15 +315,15 @@ export class ViewportObserver {
       }
     )
   }
-  
+
   observe(element) {
     this.observer.observe(element)
   }
-  
+
   unobserve(element) {
     this.observer.unobserve(element)
   }
-  
+
   disconnect() {
     this.observer.disconnect()
   }

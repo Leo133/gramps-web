@@ -1,6 +1,7 @@
+/* eslint-disable no-use-before-define */
 /**
  * Theme Management System for Gramps Web
- * 
+ *
  * Provides utilities for managing light, dark, and system themes with
  * smooth transitions and preference persistence.
  */
@@ -56,9 +57,11 @@ export function loadThemePreference() {
 export function setupSystemThemeListener() {
   // Remove existing listener if any
   if (systemThemeListener) {
-    window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', systemThemeListener)
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .removeEventListener('change', systemThemeListener)
   }
-  
+
   // Create new listener
   systemThemeListener = () => {
     const currentPreference = loadThemePreference()
@@ -67,9 +70,11 @@ export function setupSystemThemeListener() {
       applyTheme('system', true)
     }
   }
-  
+
   // Add listener
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', systemThemeListener)
+  window
+    .matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', systemThemeListener)
 }
 
 /**
@@ -80,28 +85,30 @@ export function setupSystemThemeListener() {
 export function applyTheme(theme, withTransition = true) {
   const resolvedTheme = getCurrentTheme(theme)
   const root = document.documentElement
-  
+
   // Add transition class for smooth theme switching
   if (withTransition) {
     root.classList.add('theme-transition')
   }
-  
+
   root.setAttribute('data-theme', resolvedTheme)
-  
+
   // Remove transition class after animation completes
   if (withTransition) {
     setTimeout(() => {
       root.classList.remove('theme-transition')
     }, 300)
   }
-  
+
   // Store preference in localStorage for persistence
   storeThemePreference(theme)
-  
+
   // Dispatch custom event for theme change
-  window.dispatchEvent(new CustomEvent('theme-changed', {
-    detail: {theme, resolvedTheme}
-  }))
+  window.dispatchEvent(
+    new CustomEvent('theme-changed', {
+      detail: {theme, resolvedTheme},
+    })
+  )
 }
 
 /**
@@ -111,13 +118,13 @@ export function applyTheme(theme, withTransition = true) {
 export function initializeTheme() {
   // Load stored preference or default to 'system'
   const storedTheme = loadThemePreference() || 'system'
-  
+
   // Apply theme without transition on initial load
   applyTheme(storedTheme, false)
-  
+
   // Listen for system theme changes when in 'system' mode
   setupSystemThemeListener()
-  
+
   return storedTheme
 }
 

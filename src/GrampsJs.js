@@ -535,7 +535,7 @@ export class GrampsJs extends LitElement {
     // Initialize Phase 10 features: PWA and Accessibility
     initializePWA()
     initializeAccessibility()
-    
+
     // Initialize theme system with preference detection
     const storedTheme = initializeTheme()
     if (storedTheme !== this.appState.settings.theme) {

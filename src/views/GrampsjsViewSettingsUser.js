@@ -137,7 +137,7 @@ export class GrampsjsViewSettingsUser extends GrampsjsView {
         .selected="${theme}"
         @theme-selected="${this._handleThemePreviewSelected}"
       ></grampsjs-theme-preview>
-      
+
       <mwc-select
         id="select-theme"
         label="${this._('Theme')}"

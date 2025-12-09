@@ -7,7 +7,7 @@ import {showInstallPrompt, isInstalledPWA, isInstallAvailable} from '../pwa.js'
 
 /**
  * PWA Install Banner Component
- * 
+ *
  * Shows a banner prompting users to install the app as a PWA
  * when the install prompt is available.
  */
@@ -141,7 +141,12 @@ export class GrampsjsPwaInstall extends LitElement {
     }
 
     return html`
-      <div class="install-banner" role="dialog" aria-labelledby="install-title" aria-describedby="install-desc">
+      <div
+        class="install-banner"
+        role="dialog"
+        aria-labelledby="install-title"
+        aria-describedby="install-desc"
+      >
         <mwc-icon>download</mwc-icon>
         <div class="banner-content">
           <div class="banner-title" id="install-title">Install Gramps Web</div>

@@ -1,6 +1,7 @@
+/* eslint-disable no-console, no-use-before-define, no-shadow */
 /**
  * PWA Utilities for Gramps Web
- * 
+ *
  * Handles service worker registration, PWA installation prompts,
  * and offline status detection.
  */
@@ -17,31 +18,37 @@ export async function registerServiceWorker() {
     console.warn('Service Workers not supported in this browser')
     return null
   }
-  
+
   try {
-    swRegistration = await navigator.serviceWorker.register('/service-worker.js', {
-      scope: '/'
-    })
-    
+    swRegistration = await navigator.serviceWorker.register(
+      '/service-worker.js',
+      {
+        scope: '/',
+      }
+    )
+
     console.log('[PWA] Service Worker registered:', swRegistration.scope)
-    
+
     // Check for updates periodically (every hour)
     setInterval(() => {
       swRegistration.update()
     }, 60 * 60 * 1000)
-    
+
     // Listen for updates
     swRegistration.addEventListener('updatefound', () => {
       const newWorker = swRegistration.installing
-      
+
       newWorker.addEventListener('statechange', () => {
-        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+        if (
+          newWorker.state === 'installed' &&
+          navigator.serviceWorker.controller
+        ) {
           // New service worker available
           notifyUpdate()
         }
       })
     })
-    
+
     return swRegistration
   } catch (error) {
     console.error('[PWA] Service Worker registration failed:', error)
@@ -57,7 +64,7 @@ export async function unregisterServiceWorker() {
   if (!swRegistration) {
     return false
   }
-  
+
   try {
     const success = await swRegistration.unregister()
     console.log('[PWA] Service Worker unregistered:', success)
@@ -95,11 +102,13 @@ export function sendMessageToSW(message) {
  * Notify user about update
  */
 function notifyUpdate() {
-  window.dispatchEvent(new CustomEvent('sw-update-available', {
-    detail: {
-      registration: swRegistration
-    }
-  }))
+  window.dispatchEvent(
+    new CustomEvent('sw-update-available', {
+      detail: {
+        registration: swRegistration,
+      },
+    })
+  )
 }
 
 /**
@@ -108,7 +117,7 @@ function notifyUpdate() {
 export function updateServiceWorker() {
   if (swRegistration && swRegistration.waiting) {
     swRegistration.waiting.postMessage({type: 'SKIP_WAITING'})
-    
+
     // Reload page after new SW takes control
     let refreshing = false
     navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -124,22 +133,22 @@ export function updateServiceWorker() {
  * Set up beforeinstallprompt listener for PWA installation
  */
 export function setupInstallPrompt() {
-  window.addEventListener('beforeinstallprompt', (e) => {
+  window.addEventListener('beforeinstallprompt', e => {
     // Prevent default browser install prompt
     e.preventDefault()
-    
+
     // Save the event for later use
     deferredPrompt = e
-    
+
     // Notify app that install is available
     window.dispatchEvent(new CustomEvent('pwa-install-available'))
   })
-  
+
   // Listen for successful installation
   window.addEventListener('appinstalled', () => {
     console.log('[PWA] App installed successfully')
     deferredPrompt = null
-    
+
     window.dispatchEvent(new CustomEvent('pwa-installed'))
   })
 }
@@ -153,18 +162,18 @@ export async function showInstallPrompt() {
     console.warn('[PWA] Install prompt not available')
     return false
   }
-  
+
   try {
     // Show the install prompt
     deferredPrompt.prompt()
-    
+
     // Wait for user response
     const {outcome} = await deferredPrompt.userChoice
     console.log('[PWA] Install prompt outcome:', outcome)
-    
+
     // Clear the prompt
     deferredPrompt = null
-    
+
     return outcome === 'accepted'
   } catch (error) {
     console.error('[PWA] Install prompt error:', error)
@@ -181,12 +190,12 @@ export function isInstalledPWA() {
   if (window.matchMedia('(display-mode: standalone)').matches) {
     return true
   }
-  
+
   // Check iOS
   if (window.navigator.standalone === true) {
     return true
   }
-  
+
   return false
 }
 
@@ -204,17 +213,19 @@ export function isInstallAvailable() {
 export function setupOnlineStatusDetection() {
   const updateOnlineStatus = () => {
     const isOnline = navigator.onLine
-    
-    window.dispatchEvent(new CustomEvent('online-status-changed', {
-      detail: {isOnline}
-    }))
-    
+
+    window.dispatchEvent(
+      new CustomEvent('online-status-changed', {
+        detail: {isOnline},
+      })
+    )
+
     document.documentElement.setAttribute('data-online', isOnline.toString())
   }
-  
+
   window.addEventListener('online', updateOnlineStatus)
   window.addEventListener('offline', updateOnlineStatus)
-  
+
   // Set initial status
   updateOnlineStatus()
 }
@@ -238,7 +249,7 @@ export async function getStorageInfo() {
       return {
         usage: estimate.usage,
         quota: estimate.quota,
-        usagePercent: (estimate.usage / estimate.quota * 100).toFixed(2),
+        usagePercent: ((estimate.usage / estimate.quota) * 100).toFixed(2),
         usageMB: (estimate.usage / 1024 / 1024).toFixed(2),
         quotaMB: (estimate.quota / 1024 / 1024).toFixed(2),
       }
@@ -246,7 +257,7 @@ export async function getStorageInfo() {
       console.error('[PWA] Storage estimation error:', error)
     }
   }
-  
+
   return null
 }
 
@@ -264,7 +275,7 @@ export async function requestPersistentStorage() {
       console.error('[PWA] Persistent storage request error:', error)
     }
   }
-  
+
   return false
 }
 
@@ -280,7 +291,7 @@ export async function isPersistentStorage() {
       console.error('[PWA] Persistent storage check error:', error)
     }
   }
-  
+
   return false
 }
 
@@ -289,24 +300,27 @@ export async function isPersistentStorage() {
  */
 export function initializePWA() {
   console.log('[PWA] Initializing...')
-  
+
   // Register service worker
   registerServiceWorker()
-  
+
   // Setup install prompt handling
   setupInstallPrompt()
-  
+
   // Setup online/offline detection
   setupOnlineStatusDetection()
-  
+
   // Log PWA status
   console.log('[PWA] Installed:', isInstalledPWA())
   console.log('[PWA] Online:', isOnline())
-  
+
   // Get storage info
   getStorageInfo().then(info => {
     if (info) {
-      console.log('[PWA] Storage:', `${info.usageMB}MB / ${info.quotaMB}MB (${info.usagePercent}%)`)
+      console.log(
+        '[PWA] Storage:',
+        `${info.usageMB}MB / ${info.quotaMB}MB (${info.usagePercent}%)`
+      )
     }
   })
 }
