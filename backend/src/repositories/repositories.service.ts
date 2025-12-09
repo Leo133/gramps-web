@@ -6,22 +6,30 @@ export class RepositoriesService {
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
-    throw new NotImplementedException('Repositories listing not yet implemented')
+    throw new NotImplementedException(
+      'Repositories listing not yet implemented',
+    )
   }
 
-  async findOne(handle: string) {
-    throw new NotImplementedException('Repositories retrieval not yet implemented')
+  async findOne(_handle: string) {
+    throw new NotImplementedException(
+      'Repositories retrieval not yet implemented',
+    )
   }
 
-  async create(data: any) {
-    throw new NotImplementedException('Repositories creation not yet implemented')
+  async create(_data: any) {
+    throw new NotImplementedException(
+      'Repositories creation not yet implemented',
+    )
   }
 
-  async update(handle: string, data: any) {
+  async update(_handle: string, _data: any) {
     throw new NotImplementedException('Repositories update not yet implemented')
   }
 
-  async remove(handle: string) {
-    throw new NotImplementedException('Repositories deletion not yet implemented')
+  async remove(_handle: string) {
+    throw new NotImplementedException(
+      'Repositories deletion not yet implemented',
+    )
   }
 }

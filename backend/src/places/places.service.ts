@@ -9,19 +9,19 @@ export class PlacesService {
     throw new NotImplementedException('Places listing not yet implemented')
   }
 
-  async findOne(handle: string) {
+  async findOne(_handle: string) {
     throw new NotImplementedException('Places retrieval not yet implemented')
   }
 
-  async create(data: any) {
+  async create(_data: any) {
     throw new NotImplementedException('Places creation not yet implemented')
   }
 
-  async update(handle: string, data: any) {
+  async update(_handle: string, _data: any) {
     throw new NotImplementedException('Places update not yet implemented')
   }
 
-  async remove(handle: string) {
+  async remove(_handle: string) {
     throw new NotImplementedException('Places deletion not yet implemented')
   }
 }

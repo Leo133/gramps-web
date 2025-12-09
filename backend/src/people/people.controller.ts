@@ -8,7 +8,6 @@ import {
   Param,
   Query,
   HttpCode,
-  Headers,
   Res,
 } from '@nestjs/common'
 import {
@@ -82,7 +81,10 @@ export class PeopleController {
   @ApiOperation({summary: 'Update person'})
   @ApiResponse({status: 200, description: 'Person updated successfully'})
   @ApiResponse({status: 404, description: 'Person not found'})
-  update(@Param('handle') handle: string, @Body() updatePersonDto: UpdatePersonDto) {
+  update(
+    @Param('handle') handle: string,
+    @Body() updatePersonDto: UpdatePersonDto,
+  ) {
     return this.peopleService.update(handle, updatePersonDto)
   }
 

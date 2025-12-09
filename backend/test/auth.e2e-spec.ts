@@ -53,7 +53,7 @@ describe('Authentication (e2e)', () => {
           password: 'testpass',
         })
         .expect(200)
-        .expect((res) => {
+        .expect(res => {
           expect(res.body).toHaveProperty('access_token')
           expect(res.body).toHaveProperty('refresh_token')
         })

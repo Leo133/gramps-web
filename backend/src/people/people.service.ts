@@ -28,7 +28,8 @@ export class PeopleService {
   async create(createPersonDto: CreatePersonDto) {
     const handle = createPersonDto.handle || uuidv4().replace(/-/g, '')
     const grampsId =
-      createPersonDto.grampsId || `I${String(await this.getNextId()).padStart(4, '0')}`
+      createPersonDto.grampsId ||
+      `I${String(await this.getNextId()).padStart(4, '0')}`
 
     const person = await this.prisma.person.create({
       data: {
@@ -49,7 +50,7 @@ export class PeopleService {
   }) {
     const {q, page = 1, pagesize = 25, gramps_id} = query || {}
 
-    let where: any = {}
+    const where: any = {}
 
     if (gramps_id) {
       where.grampsId = gramps_id
@@ -75,7 +76,7 @@ export class PeopleService {
     ])
 
     return {
-      data: people.map((p) => this.formatPerson(p)),
+      data: people.map(p => this.formatPerson(p)),
       total,
       page: Number(page),
       pagesize: Number(pagesize),

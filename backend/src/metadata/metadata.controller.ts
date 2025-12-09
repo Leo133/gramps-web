@@ -1,5 +1,5 @@
 import {Controller, Get} from '@nestjs/common'
-import {ApiTags, ApiBearerAuth} from '@nestjs/swagger'
+import {ApiTags} from '@nestjs/swagger'
 import {MetadataService} from './metadata.service'
 import {Public} from '../auth/decorators/auth.decorator'
 

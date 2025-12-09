@@ -21,7 +21,8 @@ export class UsersService {
         password: hashedPassword,
         role: createUserDto.role || 'member',
         emailVerified: createUserDto.emailVerified || false,
-        enabled: createUserDto.enabled !== undefined ? createUserDto.enabled : true,
+        enabled:
+          createUserDto.enabled !== undefined ? createUserDto.enabled : true,
       },
     })
 
