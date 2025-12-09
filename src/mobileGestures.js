@@ -24,17 +24,21 @@ export class SwipeDetector {
     this.startY = 0
     this.startTime = 0
     
+    // Bind handlers once and store references
+    this.boundTouchStart = this.handleTouchStart.bind(this)
+    this.boundTouchEnd = this.handleTouchEnd.bind(this)
+    
     this.bind()
   }
   
   bind() {
-    this.element.addEventListener('touchstart', this.handleTouchStart.bind(this), {passive: true})
-    this.element.addEventListener('touchend', this.handleTouchEnd.bind(this), {passive: false})
+    this.element.addEventListener('touchstart', this.boundTouchStart, {passive: true})
+    this.element.addEventListener('touchend', this.boundTouchEnd, {passive: false})
   }
   
   unbind() {
-    this.element.removeEventListener('touchstart', this.handleTouchStart.bind(this))
-    this.element.removeEventListener('touchend', this.handleTouchEnd.bind(this))
+    this.element.removeEventListener('touchstart', this.boundTouchStart)
+    this.element.removeEventListener('touchend', this.boundTouchEnd)
   }
   
   handleTouchStart(e) {
@@ -111,19 +115,24 @@ export class LongPressDetector {
     this.timer = null
     this.touchStarted = false
     
+    // Bind handlers once and store references
+    this.boundTouchStart = this.handleTouchStart.bind(this)
+    this.boundTouchEnd = this.handleTouchEnd.bind(this)
+    this.boundTouchMove = this.handleTouchMove.bind(this)
+    
     this.bind()
   }
   
   bind() {
-    this.element.addEventListener('touchstart', this.handleTouchStart.bind(this), {passive: true})
-    this.element.addEventListener('touchend', this.handleTouchEnd.bind(this))
-    this.element.addEventListener('touchmove', this.handleTouchMove.bind(this))
+    this.element.addEventListener('touchstart', this.boundTouchStart, {passive: true})
+    this.element.addEventListener('touchend', this.boundTouchEnd)
+    this.element.addEventListener('touchmove', this.boundTouchMove)
   }
   
   unbind() {
-    this.element.removeEventListener('touchstart', this.handleTouchStart.bind(this))
-    this.element.removeEventListener('touchend', this.handleTouchEnd.bind(this))
-    this.element.removeEventListener('touchmove', this.handleTouchMove.bind(this))
+    this.element.removeEventListener('touchstart', this.boundTouchStart)
+    this.element.removeEventListener('touchend', this.boundTouchEnd)
+    this.element.removeEventListener('touchmove', this.boundTouchMove)
   }
   
   handleTouchStart(e) {
@@ -288,19 +297,24 @@ export class PullToRefresh {
     this.currentY = 0
     this.isPulling = false
     
+    // Bind handlers once and store references
+    this.boundTouchStart = this.handleTouchStart.bind(this)
+    this.boundTouchMove = this.handleTouchMove.bind(this)
+    this.boundTouchEnd = this.handleTouchEnd.bind(this)
+    
     this.bind()
   }
   
   bind() {
-    this.element.addEventListener('touchstart', this.handleTouchStart.bind(this), {passive: true})
-    this.element.addEventListener('touchmove', this.handleTouchMove.bind(this), {passive: false})
-    this.element.addEventListener('touchend', this.handleTouchEnd.bind(this))
+    this.element.addEventListener('touchstart', this.boundTouchStart, {passive: true})
+    this.element.addEventListener('touchmove', this.boundTouchMove, {passive: false})
+    this.element.addEventListener('touchend', this.boundTouchEnd)
   }
   
   unbind() {
-    this.element.removeEventListener('touchstart', this.handleTouchStart.bind(this))
-    this.element.removeEventListener('touchmove', this.handleTouchMove.bind(this))
-    this.element.removeEventListener('touchend', this.handleTouchEnd.bind(this))
+    this.element.removeEventListener('touchstart', this.boundTouchStart)
+    this.element.removeEventListener('touchmove', this.boundTouchMove)
+    this.element.removeEventListener('touchend', this.boundTouchEnd)
   }
   
   handleTouchStart(e) {

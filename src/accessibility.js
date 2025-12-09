@@ -274,7 +274,8 @@ export function addKeyboardNavigation(listElement, options = {}) {
           nextIndex = items.length - 1
         }
       }
-    } else if (e.key === 'ArrowRight') {
+    } else if (orientation === 'horizontal') {
+      if (e.key === 'ArrowRight') {
         e.preventDefault()
         nextIndex = currentIndex + 1
         if (nextIndex >= items.length && loop) {
@@ -287,6 +288,7 @@ export function addKeyboardNavigation(listElement, options = {}) {
           nextIndex = items.length - 1
         }
       }
+    }
     
     if (e.key === 'Home') {
       e.preventDefault()
