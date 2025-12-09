@@ -1,4 +1,7 @@
 /* eslint-disable camelcase */
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-plusplus */
+/* eslint-disable no-continue */
 /**
  * CSV Parser for bulk import of people and events
  * Supports importing people with basic information from CSV files
@@ -22,7 +25,6 @@ export function parseCsv(csvContent) {
   const people = []
   const events = []
   const families = []
-  let eventCounter = 1
 
   // Parse data rows
   for (let i = 1; i < lines.length; i++) {
@@ -40,26 +42,46 @@ export function parseCsv(csvContent) {
 
       // Create birth event if data exists
       if (person.profile.birth?.date || person.profile.birth?.place_name) {
+        const eventHandle = generateHandle()
+        const eventId = `E${String(Math.floor(Math.random() * 10000)).padStart(
+          4,
+          '0'
+        )}`
+
         events.push({
-          handle: generateHandle(),
-          gramps_id: `E${String(eventCounter++).padStart(4, '0')}`,
+          handle: eventHandle,
+          gramps_id: eventId,
           type: {value: 'Birth'},
           date: {val: person.profile.birth.date || ''},
           place: person.profile.birth.place_name || '',
-          description: `Birth of ${person.primary_name.first_name} ${person.primary_name.surname_list[0]?.surname || ''}`,
+          description: `Birth of ${person.primary_name.first_name} ${
+            person.primary_name.surname_list[0]?.surname || ''
+          }`,
         })
+
+        person.event_ref_list.push({ref: eventHandle})
       }
 
       // Create death event if data exists
       if (person.profile.death?.date || person.profile.death?.place_name) {
+        const eventHandle = generateHandle()
+        const eventId = `E${String(Math.floor(Math.random() * 10000)).padStart(
+          4,
+          '0'
+        )}`
+
         events.push({
-          handle: generateHandle(),
-          gramps_id: `E${String(eventCounter++).padStart(4, '0')}`,
+          handle: eventHandle,
+          gramps_id: eventId,
           type: {value: 'Death'},
           date: {val: person.profile.death.date || ''},
           place: person.profile.death.place_name || '',
-          description: `Death of ${person.primary_name.first_name} ${person.primary_name.surname_list[0]?.surname || ''}`,
+          description: `Death of ${person.primary_name.first_name} ${
+            person.primary_name.surname_list[0]?.surname || ''
+          }`,
         })
+
+        person.event_ref_list.push({ref: eventHandle})
       }
     }
   }
@@ -122,10 +144,7 @@ function normalizeHeaders(headers) {
       map.lastName = idx
     } else if (normalized.includes('middle')) {
       map.middleName = idx
-    } else if (
-      normalized.includes('sex') ||
-      normalized.includes('gender')
-    ) {
+    } else if (normalized.includes('sex') || normalized.includes('gender')) {
       map.gender = idx
     } else if (
       normalized.includes('birth') &&
@@ -155,14 +174,22 @@ function createPersonFromRow(row, headerMap) {
   const values = Object.values(row)
 
   // Extract values using header map
-  const firstName = headerMap.firstName !== undefined ? values[headerMap.firstName] : ''
-  const lastName = headerMap.lastName !== undefined ? values[headerMap.lastName] : ''
-  const middleName = headerMap.middleName !== undefined ? values[headerMap.middleName] : ''
-  const genderStr = headerMap.gender !== undefined ? values[headerMap.gender] : ''
-  const birthDate = headerMap.birthDate !== undefined ? values[headerMap.birthDate] : ''
-  const birthPlace = headerMap.birthPlace !== undefined ? values[headerMap.birthPlace] : ''
-  const deathDate = headerMap.deathDate !== undefined ? values[headerMap.deathDate] : ''
-  const deathPlace = headerMap.deathPlace !== undefined ? values[headerMap.deathPlace] : ''
+  const firstName =
+    headerMap.firstName !== undefined ? values[headerMap.firstName] : ''
+  const lastName =
+    headerMap.lastName !== undefined ? values[headerMap.lastName] : ''
+  const middleName =
+    headerMap.middleName !== undefined ? values[headerMap.middleName] : ''
+  const genderStr =
+    headerMap.gender !== undefined ? values[headerMap.gender] : ''
+  const birthDate =
+    headerMap.birthDate !== undefined ? values[headerMap.birthDate] : ''
+  const birthPlace =
+    headerMap.birthPlace !== undefined ? values[headerMap.birthPlace] : ''
+  const deathDate =
+    headerMap.deathDate !== undefined ? values[headerMap.deathDate] : ''
+  const deathPlace =
+    headerMap.deathPlace !== undefined ? values[headerMap.deathPlace] : ''
   const id = headerMap.id !== undefined ? values[headerMap.id] : ''
 
   // Skip empty rows
@@ -185,7 +212,8 @@ function createPersonFromRow(row, headerMap) {
     : firstName
 
   const handle = generateHandle()
-  const grampsId = id || `I${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`
+  const grampsId =
+    id || `I${String(Math.floor(Math.random() * 10000)).padStart(4, '0')}`
 
   return {
     handle,
@@ -238,15 +266,7 @@ export function generateCsvTemplate() {
     'Death Date',
     'Death Place',
   ]
-  const sample = [
-    'John',
-    'Doe',
-    'M',
-    '1980-01-01',
-    'New York',
-    '',
-    '',
-  ]
+  const sample = ['John', 'Doe', 'M', '1980-01-01', 'New York', '', '']
 
   return `${headers.join(',')}\n${sample.join(',')}\n`
 }
