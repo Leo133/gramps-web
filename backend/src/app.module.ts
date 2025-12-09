@@ -20,6 +20,9 @@ import {QualityCheckModule} from './quality-check/quality-check.module'
 import {DuplicatesModule} from './duplicates/duplicates.module'
 import {ResearchPlannerModule} from './research-planner/research-planner.module'
 import {ShoeboxModule} from './shoebox/shoebox.module'
+import {ChatModule} from './chat/chat.module'
+import {CommentsModule} from './comments/comments.module'
+import {ActivityFeedModule} from './activity-feed/activity-feed.module'
 
 @Module({
   imports: [
@@ -46,6 +49,9 @@ import {ShoeboxModule} from './shoebox/shoebox.module'
     DuplicatesModule,
     ResearchPlannerModule,
     ShoeboxModule,
+    ChatModule,
+    CommentsModule,
+    ActivityFeedModule,
   ],
 })
 export class AppModule {}
