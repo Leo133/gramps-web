@@ -1,5 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
+/**
+ * @fileoverview Editable list component for managing collections
+ * Phase 10: Enhanced with design tokens and accessibility
+ * @author Gramps Web Contributors
+ */
+
 import {css, html, LitElement} from 'lit'
 
 import {fireEvent} from '../util.js'
@@ -8,26 +14,39 @@ import '@material/mwc-list'
 import '@material/mwc-list/mwc-list-item'
 
 import {sharedStyles} from '../SharedStyles.js'
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 import {GrampsjsAppStateMixin} from '../mixins/GrampsjsAppStateMixin.js'
 
 export class GrampsjsEditableList extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
+        /* Phase 10: Design token-based styling */
         mwc-list,
         mwc-list > * {
           --mdc-ripple-color: transparent;
         }
 
         mwc-list > * {
-          transition: background-color 0.1s, color 0.1s;
+          /* Phase 10: Smooth transitions using design tokens */
+          transition: var(--transition-color);
+          /* Phase 10: Touch-friendly list items */
+          min-height: var(--list-item-height-medium, 56px);
+          padding: var(--spacing-2, 8px) var(--spacing-4, 16px);
         }
 
         mwc-list[activatable] [selected] {
           background-color: var(
             --grampsjs-editable-list-selected-background-color
           );
+          /* Phase 10: Better border radius */
+          border-radius: var(--radius-sm, 4px);
         }
 
         mwc-list[activatable] [mwc-list-item]:not([selected]):hover,
@@ -35,12 +54,14 @@ export class GrampsjsEditableList extends GrampsjsAppStateMixin(LitElement) {
           background-color: var(
             --grampsjs-editable-list-hover-background-color
           );
+          border-radius: var(--radius-sm, 4px);
         }
 
         mwc-list[activatable] [mwc-list-item]:not([selected]):active {
           background-color: var(
             --grampsjs-editable-list-active-background-color
           );
+          border-radius: var(--radius-sm, 4px);
         }
 
         mwc-list[activatable] [mwc-list-item][selected]:hover,
@@ -49,25 +70,49 @@ export class GrampsjsEditableList extends GrampsjsAppStateMixin(LitElement) {
             --grampsjs-editable-list-selected-hover-background-color
           );
           color: var(--grampsjs-body-font-color-90);
+          border-radius: var(--radius-sm, 4px);
         }
 
         mwc-list[activatable] [mwc-list-item][selected]:active {
           background-color: var(
             --grampsjs-editable-list-selected-active-background-color
           );
+          border-radius: var(--radius-sm, 4px);
+        }
+
+        /* Phase 10: Enhanced focus states for accessibility */
+        mwc-list-item:focus-visible {
+          outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, var(--md-sys-color-primary));
+          outline-offset: -2px;
+          border-radius: var(--radius-sm, 4px);
         }
 
         mwc-icon-button {
           --mdc-theme-text-disabled-on-light: var(
             --grampsjs-body-font-color-25
           );
+          /* Phase 10: Touch-friendly icon buttons */
+          --mdc-icon-button-size: var(--touch-target-min-size, 48px);
         }
 
         mwc-icon.placeholder {
-          width: 40px;
-          height: 40px;
-          line-height: 40px;
-          border-radius: 50%;
+          /* Phase 10: Consistent sizing with design tokens */
+          width: var(--icon-size-lg, 40px);
+          height: var(--icon-size-lg, 40px);
+          line-height: var(--icon-size-lg, 40px);
+          border-radius: var(--radius-full, 50%);
+        }
+
+        /* Phase 10: Mobile optimization */
+        @media (max-width: 768px) {
+          mwc-list > * {
+            min-height: var(--touch-target-min-size, 48px);
+            padding: var(--spacing-3, 12px) var(--spacing-3, 12px);
+          }
+
+          mwc-icon-button {
+            --mdc-icon-button-size: var(--touch-target-min-size, 48px);
+          }
         }
       `,
     ]
