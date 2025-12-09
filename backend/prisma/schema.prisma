@@ -70,7 +70,8 @@ model Person {
   eventRefList String?  @map("event_ref_list") // JSON array
 
   // Relations
-  familiesAsParent Family[] @relation("ParentFamilies")
+  familiesAsParent Family[] @relation("FatherFamilies")
+  familiesAsMother Family[] @relation("MotherFamilies")
   familiesAsChild  Family[] @relation("ChildFamilies")
   events           Event[]
 
@@ -92,8 +93,8 @@ model Family {
   eventRefList String? @map("event_ref_list") // JSON array
 
   // Relations
-  father   Person?  @relation("ParentFamilies", fields: [fatherHandle], references: [handle])
-  mother   Person?  @relation("ParentFamilies", fields: [motherHandle], references: [handle])
+  father   Person?  @relation("FatherFamilies", fields: [fatherHandle], references: [handle])
+  mother   Person?  @relation("MotherFamilies", fields: [motherHandle], references: [handle])
   children Person[] @relation("ChildFamilies")
 
   @@map("families")

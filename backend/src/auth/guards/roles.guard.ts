@@ -2,7 +2,7 @@ import {Injectable, CanActivate, ExecutionContext} from '@nestjs/common'
 import {Reflector} from '@nestjs/core'
 import {ROLES_KEY} from '../decorators/auth.decorator'
 
-const ROLE_HIERARCHY = {
+const ROLE_HIERARCHY: Record<string, number> = {
   owner: 4,
   editor: 3,
   contributor: 2,
