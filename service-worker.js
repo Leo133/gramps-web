@@ -240,13 +240,16 @@ async function networkFirstWithCache(request, cacheName) {
 
 /**
  * Trim cache to max size
+ * Note: This is a simple FIFO approach. For production, consider adding
+ * cache metadata with timestamps for more accurate LRU eviction.
  */
 async function trimCache(cacheName, maxSize) {
   const cache = await caches.open(cacheName)
   const keys = await cache.keys()
   
   if (keys.length > maxSize) {
-    // Delete oldest entries (first in array)
+    // Delete excess entries (simple FIFO approach)
+    // Note: Cache order is not guaranteed, this is best-effort
     const toDelete = keys.slice(0, keys.length - maxSize)
     await Promise.all(toDelete.map(key => cache.delete(key)))
     console.log(`[SW] Trimmed ${cacheName} cache from ${keys.length} to ${maxSize} items`)

@@ -27,10 +27,12 @@ export async function registerServiceWorker() {
 
     console.log('Service worker registered:', registration.scope)
 
-    // Check for updates periodically
-    setInterval(() => {
-      registration.update()
-    }, 60 * 60 * 1000) // Check every hour
+    // Check for updates on page visibility change (more efficient than interval)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        registration.update()
+      }
+    })
 
     // Handle updates
     registration.addEventListener('updatefound', () => {

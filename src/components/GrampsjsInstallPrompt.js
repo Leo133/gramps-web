@@ -7,7 +7,7 @@
  */
 
 import {LitElement, css, html} from 'lit'
-import {showInstallPrompt} from './pwa.js'
+import {showInstallPrompt} from '../pwa.js'
 
 export class GrampsjsInstallPrompt extends LitElement {
   static get styles() {

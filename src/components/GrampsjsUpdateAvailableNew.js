@@ -8,7 +8,7 @@
  */
 
 import {LitElement, css, html} from 'lit'
-import {updateServiceWorker} from './pwa.js'
+import {updateServiceWorker} from '../pwa.js'
 
 export class GrampsjsUpdateAvailableNew extends LitElement {
   static get styles() {

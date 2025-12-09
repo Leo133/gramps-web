@@ -383,14 +383,26 @@ export function trapFocus(container) {
 /**
  * Get the contrast ratio between two colors
  * Used to ensure WCAG AA compliance (4.5:1 for normal text, 3:1 for large text)
- * @param {string} color1 - First color (hex or rgb)
- * @param {string} color2 - Second color (hex or rgb)
+ * @param {string} color1 - First color (hex format, e.g., #RRGGBB or #RGB)
+ * @param {string} color2 - Second color (hex format, e.g., #RRGGBB or #RGB)
  * @returns {number} Contrast ratio
+ * @throws {Error} If colors are not valid hex format
  */
 export function getContrastRatio(color1, color2) {
   function getLuminance(color) {
-    const rgb = color
-      .replace(/^#/, '')
+    // Validate hex color format
+    const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+    if (!hexPattern.test(color)) {
+      throw new Error(`Invalid hex color format: ${color}. Use #RRGGBB or #RGB format.`)
+    }
+    
+    // Normalize 3-digit hex to 6-digit
+    let hex = color.replace(/^#/, '')
+    if (hex.length === 3) {
+      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2]
+    }
+    
+    const rgb = hex
       .match(/.{2}/g)
       .map(x => parseInt(x, 16) / 255)
       .map(x => (x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)))
@@ -430,15 +442,25 @@ export function disableKeyboardNav() {
  * Initialize keyboard navigation detection
  */
 export function initKeyboardNavDetection() {
-  // Detect keyboard usage
+  let keydownTimeout = null
+  
+  // Detect keyboard usage (debounced)
   document.addEventListener('keydown', e => {
     if (e.key === 'Tab') {
-      enableKeyboardNav()
+      if (keydownTimeout) {
+        clearTimeout(keydownTimeout)
+      }
+      keydownTimeout = setTimeout(() => {
+        enableKeyboardNav()
+      }, 50)
     }
   })
 
   // Detect mouse usage
   document.addEventListener('mousedown', () => {
+    if (keydownTimeout) {
+      clearTimeout(keydownTimeout)
+    }
     disableKeyboardNav()
   })
 }
