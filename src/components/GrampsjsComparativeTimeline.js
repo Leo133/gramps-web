@@ -137,7 +137,7 @@ export class GrampsjsComparativeTimeline extends GrampsjsAppStateMixin(
     super()
     this.data = []
     this.minYear = 1800
-    this.maxYear = 2025
+    this.maxYear = new Date().getFullYear()
   }
 
   connectedCallback() {

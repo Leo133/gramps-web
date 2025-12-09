@@ -30,6 +30,9 @@ interface HistoricalEvent {
   category: string
 }
 
+// Constants
+const MAX_REASONABLE_LIFESPAN = 120
+
 @Injectable()
 export class TimelineService {
   constructor(
@@ -197,7 +200,7 @@ export class TimelineService {
           person.birthDate,
           person.deathDate,
         )
-        if (lifespan && lifespan > 0 && lifespan < 120) {
+        if (lifespan && lifespan > 0 && lifespan < MAX_REASONABLE_LIFESPAN) {
           lifespans.push(lifespan)
           analysis.with_lifespan++
 
