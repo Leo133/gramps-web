@@ -1,0 +1,100 @@
+# Gramps Web Evolution Roadmap
+
+This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into a modern, high-performance, and feature-rich genealogy platform. The goal is to move from a "Lite" mock server to a robust, production-grade Node.js backend with a cutting-edge frontend experience.
+
+## Phase 1: Foundation & Architecture Re-engineering
+**Goal:** Establish a scalable, type-safe, and performant backend infrastructure.
+- [ ] **Backend Migration:** Formalize the transition from the Python backend to a full TypeScript/Node.js (NestJS or Express) architecture.
+- [ ] **Database Layer:** Move from `lowdb` (JSON files) to a robust SQL database (PostgreSQL or SQLite) with an ORM (Prisma or TypeORM) for complex relationship queries.
+- [ ] **API Standardization:** Define a strict OpenAPI (Swagger) specification for all endpoints to ensure type safety between frontend and backend.
+- [ ] **Authentication & Security:** Implement robust JWT-based auth, role-based access control (RBAC), and secure session management.
+
+## Phase 2: Core Genealogy Data Management
+**Goal:** Perfect the CRUD operations for the fundamental building blocks of genealogy.
+- [x] **People:** Create, Read, Update, Delete (CRUD) for People.
+- [x] **Families:** Link people as parents/children/spouses.
+- [ ] **Events:** Full support for Birth, Death, Marriage, Census, etc., with dates and places.
+- [ ] **Places:** Hierarchical place management (Country -> State -> City) with coordinates.
+- [ ] **Sources & Citations:** Rigorous academic sourcing (Source -> Citation -> Event).
+- [ ] **Repositories:** Managing archives and libraries.
+- [ ] **Notes:** Rich text notes attached to any object.
+- [ ] **Validation Logic:** Implement strict genealogical consistency checks (e.g., birth must be before death, children cannot be older than parents).
+
+## Phase 3: Data Portability & Interoperability
+**Goal:** Ensure users can easily move data in and out of the system.
+- [ ] **GEDCOM 5.5.1 Import/Export:** Build a high-performance stream-based parser to import and export standard GEDCOM files.
+- [ ] **GEDCOM 7.0 Support:** Future-proof the platform with the latest standard (including Zip archives).
+- [ ] **Gramps XML Support:** Maintain compatibility with the desktop Gramps XML format for lossless data transfer.
+- [ ] **CSV Import:** Allow bulk import of people/events via simple spreadsheets.
+
+## Phase 4: Media Management & Digital Heritage
+**Goal:** Create a rich media experience for photos, documents, and audio.
+- [ ] **Media Gallery:** A modern grid layout with lazy loading, filtering, and sorting.
+- [ ] **Image Processing:** Automatic thumbnail generation, face detection, and tagging.
+- [ ] **Deep Zoom:** IIIF-compatible viewer for high-resolution document scans.
+- [ ] **Metadata Extraction:** Auto-extract EXIF/IPTC data (date taken, location) from uploaded photos to suggest Event details.
+
+## Phase 5: Interactive Visualizations & Charts
+**Goal:** Bring family history to life with dynamic, interactive graphics.
+- [ ] **Canvas/WebGL Charts:** Rewrite heavy SVG charts using Canvas or WebGL (PixiJS) for rendering thousands of nodes smoothly.
+- [ ] **Interactive Fan Chart:** A zoomable, clickable fan chart that acts as a navigation tool.
+- [ ] **Relationship Calculator:** Instant pathfinding algorithms to show exactly how two people are related (e.g., "3rd cousin twice removed").
+- [ ] **Fractal Tree:** A deep-zoom lineage view allowing users to explore generations seamlessly.
+- [ ] **DNA Visualization:** Charts for Y-DNA and mtDNA haplogroups and autosomal matches.
+
+## Phase 6: Geospatial Intelligence (Maps)
+**Goal:** Visualize the movement of ancestors across space and time.
+- [ ] **Clustered Map View:** A global map showing all events, clustered by region, expanding on zoom.
+- [ ] **Migration Flows:** Animated curved lines connecting Birth -> Marriage -> Death locations to visualize migration patterns.
+- [ ] **Historical Maps:** Overlay historical map tiles (e.g., 19th-century survey maps) over modern satellite imagery.
+- [ ] **Geocoding Service:** Auto-suggest coordinates for place names and standardize place hierarchies.
+
+## Phase 7: Temporal Analysis (Timelines)
+**Goal:** Contextualize family history within world history.
+- [ ] **Interactive Person Timeline:** A horizontal scrolling timeline showing a person's life events alongside historical context (wars, inventions, political changes).
+- [ ] **Comparative Timelines:** Compare the lifespans and major events of multiple ancestors side-by-side.
+- [ ] **Age Analysis:** Visualizations of life expectancy, age at marriage, and generation gaps over centuries.
+
+## Phase 8: Data Quality & Research Tools
+**Goal:** Assist the researcher in cleaning data and breaking through brick walls.
+- [ ] **Duplicate Detection:** Fuzzy matching algorithms to suggest potential duplicate people or places for merging.
+- [ ] **Consistency Checker:** Automated reports flagging issues (e.g., "Mother was 8 years old at birth of child").
+- [ ] **Research Planner:** A Kanban-style board for tracking research tasks, to-dos, and correspondence.
+- [ ] **Clipboard/Shoebox:** A temporary holding area for snippets of text or images found while researching.
+
+## Phase 9: Collaboration & Social Features
+**Goal:** Turn genealogy into a collaborative family activity.
+- [ ] **Real-time Chat:** Enhanced chat with context awareness (linking directly to people/records in the chat).
+- [ ] **Comments & Annotations:** Allow family members to comment on photos or stories without editing the core data.
+- [ ] **Activity Feed:** A social-media style feed showing recent additions ("John added a photo of Great-Grandma").
+- [ ] **Permissions System:** Granular privacy controls (e.g., "Private" records visible only to Editors, "Living" people hidden from Guests).
+
+## Phase 10: UI/UX Overhaul (Modern Design System)
+**Goal:** A beautiful, accessible, and mobile-first interface.
+- [ ] **Design System:** Create a unified design language (colors, typography, components) using Tailwind CSS or Material 3.
+- [ ] **Dark Mode:** First-class support for dark/light themes.
+- [ ] **Mobile Experience:** A PWA (Progressive Web App) implementation that feels native on iOS and Android.
+- [ ] **Accessibility:** WCAG 2.1 AA compliance to ensure the platform is usable by everyone, including elderly relatives.
+
+## Phase 11: Performance, DevOps & Deployment
+**Goal:** Enterprise-grade reliability and ease of deployment.
+- [ ] **Dockerization:** Optimized multi-stage Docker builds for tiny image sizes.
+- [ ] **Caching Strategy:** Redis caching for expensive queries (like relationship paths or large tree renders).
+- [ ] **CI/CD Pipelines:** Automated testing (Unit, E2E) and deployment workflows.
+- [ ] **Offline Mode:** Service Workers to allow viewing the tree even without an internet connection.
+
+## Phase 12: Artificial Intelligence & Automation ("Smart Genealogy")
+**Goal:** Leverage AI to automate tedious tasks and discover insights.
+- [ ] **AI Biographer:** Use LLMs (like GPT-4 or local Llama) to generate narrative biographies from structured fact data.
+- [ ] **Handwriting Recognition (OCR):** Automatically transcribe handwritten census records and letters uploaded to the media gallery.
+- [ ] **Smart Hints:** Algorithmic suggestions for potential parents, missing events, or inconsistencies based on statistical models.
+- [ ] **Face Recognition:** Automatically identify and tag family members across the entire photo library.
+- [ ] **DNA Painter Integration:** Visualize chromosome segments and triangulate matches directly within the profile view.
+
+## Phase 13: Advanced Administration & Governance
+**Goal:** Powerful tools for site owners to manage data, users, and system health.
+- [ ] **Audit Logs:** A tamper-proof history of every change made by every user (Who, What, When), with rollback capabilities.
+- [ ] **Backup Scheduler:** Automated, encrypted backups to external cloud storage (S3, Google Drive) with retention policies.
+- [ ] **Bulk Operations:** Tools for mass-tagging, find-and-replace, and merging duplicate places/sources.
+- [ ] **System Health Dashboard:** Real-time monitoring of server load, database size, and error rates.
+- [ ] **Approval Workflows:** A "Pull Request" system for genealogy—contributors submit changes, and editors review/approve them before they go live.

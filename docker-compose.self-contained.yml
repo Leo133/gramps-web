@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  gramps-proxy:
+    image: nginx
+    container_name: gramps-proxy-mock
+    volumes:
+      - ./dev/nginx.mock.conf:/etc/nginx/nginx.conf
+    ports:
+      - "5555:80"
+    depends_on:
+      - gramps-api
+      - gramps-frontend
+
+  gramps-api:
+    container_name: gramps-api-mock
+    build:
+      context: ./mock-server
+    environment:
+      - PORT=5000
+    expose:
+      - "5000"
+
+  gramps-frontend:
+    container_name: gramps-frontend-mock
+    build:
+      context: .
+      dockerfile: ./dev/Dockerfile.frontend
+    volumes:
+      - ./:/app
+      - node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "8001:8001"
+
+volumes:
+  node_modules:

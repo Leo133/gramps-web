@@ -1,0 +1,111 @@
+{
+  "users": [
+    {
+      "username": "owner",
+      "email": "owner@example.com",
+      "full_name": "Owner User",
+      "role": "owner",
+      "last_login": "2025-12-09T01:37:31.746Z",
+      "first_login": "2025-12-09T01:37:31.746Z",
+      "email_verified": true,
+      "enabled": true
+    }
+  ],
+  "people": [
+    {
+      "handle": "p0001",
+      "gramps_id": "I0001",
+      "gender": 1,
+      "private": false,
+      "primary_name": {
+        "first_name": "John",
+        "surname_list": [
+          {
+            "surname": "Doe"
+          }
+        ],
+        "call": "John"
+      },
+      "profile": {
+        "name_surname": "Doe",
+        "name_given": "John",
+        "birth": {
+          "date": "1980-01-01",
+          "place_name": "New York"
+        },
+        "death": {}
+      },
+      "media_list": [],
+      "event_ref_list": [],
+      "family_list": [
+        "f0001"
+      ]
+    },
+    {
+      "handle": "p0002",
+      "gramps_id": "I0002",
+      "gender": 0,
+      "private": false,
+      "primary_name": {
+        "first_name": "Jane",
+        "surname_list": [
+          {
+            "surname": "Smith"
+          }
+        ],
+        "call": "Jane"
+      },
+      "profile": {
+        "name_surname": "Smith",
+        "name_given": "Jane",
+        "birth": {
+          "date": "1982-05-15",
+          "place_name": "London"
+        },
+        "death": {}
+      },
+      "media_list": [],
+      "event_ref_list": [],
+      "family_list": [
+        "f0001"
+      ]
+    }
+  ],
+  "families": [
+    {
+      "handle": "f0001",
+      "gramps_id": "F0001",
+      "father_handle": "p0001",
+      "mother_handle": "p0002",
+      "child_ref_list": [],
+      "type": 1
+    }
+  ],
+  "events": [],
+  "places": [],
+  "media": [],
+  "repositories": [],
+  "sources": [],
+  "notes": [],
+  "metadata": {
+    "version": "1.0.0",
+    "title": "Gramps Web Lite",
+    "allow_registration": true,
+    "server": {
+      "chat": true
+    },
+    "gramps_webapi": {
+      "version": "3.3.0"
+    },
+    "database": {
+      "actual_schema": "1",
+      "schema": "1.0"
+    },
+    "locale": {
+      "language": "en"
+    }
+  },
+  "tree_settings": {
+    "min_role_ai": 0
+  }
+}
