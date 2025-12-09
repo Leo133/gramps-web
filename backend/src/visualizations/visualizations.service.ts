@@ -126,11 +126,19 @@ export class VisualizationsService {
 
   /**
    * Get all neighboring people (parents, children, spouses)
+   *
+   * PERFORMANCE NOTE: This method loads all families and filters in memory
+   * because Prisma doesn't support native JSON array querying for SQLite.
+   * For production with large datasets, consider:
+   * 1. Using PostgreSQL with native JSON support
+   * 2. Creating a separate child_family_members junction table
+   * 3. Using raw SQL with JSON_EXTRACT for SQLite
    */
   private async getNeighbors(personHandle: string): Promise<PathNode[]> {
     const neighbors: PathNode[] = []
 
     // Get person's families as child (query all families and filter in code)
+    // TODO: Optimize with proper JSON querying or junction table
     const allFamilies = await this.prisma.family.findMany({
       include: {
         father: true,
@@ -359,6 +367,10 @@ export class VisualizationsService {
     return prefix + base
   }
 
+  private getGreatPrefix(removal: number): string {
+    return removal > 1 ? `Great-${'Great-'.repeat(removal - 2)}` : ''
+  }
+
   private getCousinTerm(stepsUp: number, stepsDown: number): string {
     const degree = Math.min(stepsUp, stepsDown) - 1
     const removal = Math.abs(stepsUp - stepsDown)
@@ -369,14 +381,15 @@ export class VisualizationsService {
         // Sibling (should not reach here as it's handled earlier)
         return 'Sibling'
       }
-      // Determine if this person is older (aunt/uncle) or younger (niece/nephew)
+      // stepsUp = steps going up from person1 to common ancestor
+      // stepsDown = steps going down from common ancestor to person2
+      // When stepsUp > stepsDown, person2 is in an older generation relative to person1
+      const prefix = this.getGreatPrefix(removal)
       if (stepsUp > stepsDown) {
-        // Going up more = target person is in an older generation (aunt/uncle)
-        const prefix = removal > 1 ? `Great-${'Great-'.repeat(removal - 2)}` : ''
+        // Person2 is older generation (aunt/uncle)
         return `${prefix}Aunt/Uncle`
       }
-      // Going down more = target person is in a younger generation (niece/nephew)
-      const prefix = removal > 1 ? `Great-${'Great-'.repeat(removal - 2)}` : ''
+      // Person2 is younger generation (niece/nephew)
       return `${prefix}Niece/Nephew`
     }
 
@@ -462,6 +475,7 @@ export class VisualizationsService {
     }
 
     // Get parent family
+    // TODO: Performance optimization - same as getNeighbors, loads all families
     const allFamilies = await this.prisma.family.findMany()
     const childFamilies = allFamilies.filter(family => {
       if (!family.childRefList) return false

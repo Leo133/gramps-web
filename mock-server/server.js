@@ -1763,9 +1763,11 @@ function analyzeRelationship(path) {
         // Sibling (should not reach here as it's handled above)
         return {description: 'Sibling', type: 'sibling', commonAncestor}
       }
-      // Determine if this person is older (aunt/uncle) or younger (niece/nephew)
+      // stepsUp = steps going up from person1 to common ancestor
+      // stepsDown = steps going down from common ancestor to person2
+      // When stepsUp > stepsDown, person2 is in an older generation relative to person1
       if (stepsUp > stepsDown) {
-        // Going up more = this person is younger (niece/nephew)
+        // Person2 is older generation (aunt/uncle)
         const prefix = removal > 1 ? `Great-${'Great-'.repeat(removal - 2)}` : ''
         const term = getGenderTerm(
           path[path.length - 1].gender,
@@ -1775,7 +1777,7 @@ function analyzeRelationship(path) {
         )
         return {description: term, type: 'in-law', commonAncestor}
       }
-      // Going down more = this person is older (aunt/uncle)
+      // Person2 is younger generation (niece/nephew)
       const prefix = removal > 1 ? `Great-${'Great-'.repeat(removal - 2)}` : ''
       const term = getGenderTerm(
         path[path.length - 1].gender,
