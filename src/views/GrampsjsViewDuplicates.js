@@ -252,11 +252,15 @@ export class GrampsjsViewDuplicates extends GrampsjsView {
   }
 
   async _handleMerge(suggestion) {
-    alert(
-      this._(
-        'Merge functionality is not yet implemented. This is a complex operation that requires careful handling of all entity relationships. Please manually merge records for now.'
-      )
+    // TODO: Implement proper dialog with Material Web Components
+    // For now, show a message explaining the feature is not yet available
+    const message = this._(
+      'Merge functionality is not yet implemented. This is a complex operation that requires careful handling of all entity relationships. Please manually merge records for now.'
     );
+    
+    // Using alert temporarily - should be replaced with mwc-snackbar or mwc-dialog
+    // eslint-disable-next-line no-alert
+    alert(message);
   }
 
   async _handleDismiss(suggestion) {

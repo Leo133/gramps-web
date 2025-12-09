@@ -172,8 +172,8 @@ export class DuplicatesService {
    * 4. Preserving audit trail
    * 5. Deleting the duplicate record
    * 
-   * @deprecated This endpoint is planned for future implementation
-   * @returns Error message indicating feature is not yet available
+   * @throws Error indicating feature is not yet available
+   * @returns Never - always throws an error
    */
   async mergePeople(handle1: string, handle2: string, keepHandle: string): Promise<any> {
     throw new Error(
