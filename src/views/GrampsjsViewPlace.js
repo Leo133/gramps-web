@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Place detail view component
+ * @author Gramps.js Team
+ */
+
 import {html} from 'lit'
 
 import {GrampsjsViewObject} from './GrampsjsViewObject.js'

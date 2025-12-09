@@ -1,8 +1,16 @@
+/**
+ * @fileoverview Filter menu component for object lists
+ * @author Gramps.js Team
+ */
+
 import {LitElement, css, html} from 'lit'
 import {classMap} from 'lit/directives/class-map.js'
 import {mdiAlertCircleOutline} from '@mdi/js'
 
 import {sharedStyles} from '../SharedStyles.js'
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 import '@material/mwc-icon-button'
 import '@material/mwc-button'
 import '@material/web/textfield/outlined-text-field'
@@ -23,6 +31,9 @@ export class GrampsjsFilters extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
         .filtermenu {
           display: inline;
@@ -33,26 +44,28 @@ export class GrampsjsFilters extends GrampsjsAppStateMixin(LitElement) {
         }
 
         #filteroff {
-          --mdc-icon-size: 20px;
+          --mdc-icon-size: var(--icon-size-md, 20px);
           color: var(--mdc-theme-primary);
-          margin-left: 10px;
-          margin-right: 10px;
+          margin-left: var(--spacing-3, 12px);
+          margin-right: var(--spacing-3, 12px);
+          min-width: var(--touch-target-min-size, 48px);
+          min-height: var(--touch-target-min-size, 48px);
         }
 
         #input-gql-container {
           align-items: center;
-          margin: 20px 0 30px 0;
+          margin: var(--spacing-5, 20px) 0 var(--spacing-6, 24px) 0;
           width: 100%;
         }
 
         #input-gql {
           --md-outlined-text-field-input-text-font: 'Commit Mono';
-          --md-outlined-text-field-input-text-size: 15px;
-          --md-outlined-text-field-container-shape: 8px;
-          --md-outlined-text-field-top-space: 9px;
-          --md-outlined-text-field-bottom-space: 9px;
+          --md-outlined-text-field-input-text-size: var(--type-body-medium-size, 15px);
+          --md-outlined-text-field-container-shape: var(--radius-sm, 8px);
+          --md-outlined-text-field-top-space: var(--spacing-2, 9px);
+          --md-outlined-text-field-bottom-space: var(--spacing-2, 9px);
           flex: 1;
-          margin-right: 12px;
+          margin-right: var(--spacing-3, 12px);
         }
 
         #input-gql-container span {
@@ -62,7 +75,8 @@ export class GrampsjsFilters extends GrampsjsAppStateMixin(LitElement) {
         }
 
         #input-gql-container md-filled-button {
-          --md-filled-button-container-shape: 8px;
+          --md-filled-button-container-shape: var(--radius-sm, 8px);
+          min-height: var(--touch-target-min-size, 48px);
         }
 
         .hidden {
@@ -71,6 +85,17 @@ export class GrampsjsFilters extends GrampsjsAppStateMixin(LitElement) {
 
         .flex {
           display: flex;
+        }
+
+        @media (max-width: 768px) {
+          #input-gql-container {
+            margin: var(--spacing-4, 16px) 0 var(--spacing-5, 20px) 0;
+          }
+
+          #filteroff {
+            margin-left: var(--spacing-2, 8px);
+            margin-right: var(--spacing-2, 8px);
+          }
         }
       `,
     ]

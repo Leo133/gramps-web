@@ -1,31 +1,44 @@
+/**
+ * @fileoverview Pagination component for list views
+ * @author Gramps.js Team
+ */
+
 import {html, css, LitElement} from 'lit'
 
 import '@material/mwc-icon'
 import '@material/mwc-button'
 
 import {sharedStyles} from '../SharedStyles.js'
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 import {GrampsjsAppStateMixin} from '../mixins/GrampsjsAppStateMixin.js'
 
 class GrampsjsPagination extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
         .paging {
-          font-size: 14px;
-          font-size: 14px;
-          margin-top: 50px;
+          font-size: var(--type-body-medium-size, 14px);
+          margin-top: var(--spacing-6, 24px);
           text-align: center;
+          padding: var(--spacing-4, 16px) var(--spacing-2, 8px);
         }
 
         .span {
           color: var(--grampsjs-body-font-color-90);
-          padding: 0 0.5em;
+          padding: 0 var(--spacing-2, 8px);
         }
 
         mwc-button {
           --mdc-ripple-focus-opacity: 0;
           --mdc-theme-primary: var(--grampsjs-body-font-color-70);
+          min-height: var(--touch-target-min-size, 48px);
+          min-width: var(--touch-target-min-size, 48px);
         }
 
         .pagebtn {
@@ -36,6 +49,13 @@ class GrampsjsPagination extends GrampsjsAppStateMixin(LitElement) {
           color: var(--grampsjs-body-font-color-20);
           position: relative;
           top: 0.35em;
+        }
+
+        @media (max-width: 768px) {
+          .paging {
+            margin-top: var(--spacing-4, 16px);
+            padding: var(--spacing-2, 8px);
+          }
         }
       `,
     ]
