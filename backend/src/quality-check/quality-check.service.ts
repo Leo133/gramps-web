@@ -211,6 +211,19 @@ export class QualityCheckService {
       ? allMetrics.reduce((sum, m) => sum + m.score, 0) / allMetrics.length
       : 0;
 
+    // Calculate consistency score based on ratio of error-free records
+    const recordsWithErrors = allMetrics.filter(m => {
+      if (!m.issues) return false;
+      const issues = JSON.parse(m.issues) as QualityIssue[];
+      return issues.some(i => i.severity === 'error');
+    }).length;
+    const consistencyScore = allMetrics.length > 0
+      ? 1.0 - (recordsWithErrors / allMetrics.length)
+      : 0;
+
+    // Accuracy score (would need external validation in production)
+    const accuracyScore = 0.90; // Placeholder - requires external data validation
+
     // Count issues by severity
     let errors = 0;
     let warnings = 0;
@@ -240,9 +253,9 @@ export class QualityCheckService {
     return {
       overall: {
         completeness: avgCompleteness,
-        consistency: 0.85,
-        accuracy: 0.90,
-        overall: avgCompleteness,
+        consistency: consistencyScore,
+        accuracy: accuracyScore,
+        overall: (avgCompleteness + consistencyScore + accuracyScore) / 3,
       },
       issueCount: { errors, warnings, info },
       topIssues,

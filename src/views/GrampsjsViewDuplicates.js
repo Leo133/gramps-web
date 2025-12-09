@@ -252,38 +252,11 @@ export class GrampsjsViewDuplicates extends GrampsjsView {
   }
 
   async _handleMerge(suggestion) {
-    const keepHandle = prompt(
-      this._('Which handle do you want to keep? Enter 1 or 2:')
-    )
-
-    if (keepHandle !== '1' && keepHandle !== '2') return
-
-    const handle1 = suggestion.entity1Handle
-    const handle2 = suggestion.entity2Handle
-    const keep = keepHandle === '1' ? handle1 : handle2
-
-    try {
-      const response = await fetch('/api/duplicates/merge', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.appState.auth.token}`,
-        },
-        body: JSON.stringify({
-          handle1,
-          handle2,
-          keepHandle: keep,
-        }),
-      })
-
-      if (response.ok) {
-        // Update suggestion status
-        await this._updateSuggestionStatus(suggestion.id, 'merged')
-        await this._loadSuggestions()
-      }
-    } catch (error) {
-      console.error('Error merging:', error)
-    }
+    alert(
+      this._(
+        'Merge functionality is not yet implemented. This is a complex operation that requires careful handling of all entity relationships. Please manually merge records for now.'
+      )
+    );
   }
 
   async _handleDismiss(suggestion) {

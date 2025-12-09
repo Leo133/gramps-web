@@ -163,20 +163,23 @@ export class DuplicatesService {
   }
 
   /**
-   * Merge two people (placeholder - would need full implementation)
+   * Merge two people (not yet implemented)
+   * 
+   * This is a complex operation that requires:
+   * 1. Combining all data from both records
+   * 2. Updating all references (families, events, media, etc.)
+   * 3. Handling conflicts in data
+   * 4. Preserving audit trail
+   * 5. Deleting the duplicate record
+   * 
+   * @deprecated This endpoint is planned for future implementation
+   * @returns Error message indicating feature is not yet available
    */
   async mergePeople(handle1: string, handle2: string, keepHandle: string): Promise<any> {
-    // This is a complex operation that would need to:
-    // 1. Combine all data from both records
-    // 2. Update all references (families, events, etc.)
-    // 3. Delete the duplicate record
-    // For now, just return a placeholder
-    
-    return {
-      success: false,
-      message: 'Merge functionality not yet fully implemented',
-      keepHandle,
-      mergedHandle: handle1 === keepHandle ? handle2 : handle1,
-    };
+    throw new Error(
+      'Merge functionality is not yet implemented. ' +
+      'This is a complex operation that requires careful handling of all ' +
+      'entity relationships. Please manually merge records for now.'
+    );
   }
 }
