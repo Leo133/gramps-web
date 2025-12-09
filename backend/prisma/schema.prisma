@@ -26,8 +26,10 @@ model User {
   lastLogin     DateTime? @map("last_login")
 
   // Relations
-  refreshTokens RefreshToken[]
-  auditLogs     AuditLog[]
+  refreshTokens   RefreshToken[]
+  auditLogs       AuditLog[]
+  researchTasks   ResearchTask[]
+  shoeboxItems    ShoeboxItem[]
 
   @@map("users")
 }
@@ -221,4 +223,105 @@ model AuditLog {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("audit_logs")
+}
+
+// Phase 8: Data Quality & Research Tools
+
+// Search Index for advanced search
+model SearchIndex {
+  id           String   @id @default(uuid())
+  entityType   String   @map("entity_type") // Person, Family, Place, etc.
+  entityId     String   @map("entity_id")
+  entityHandle String   @map("entity_handle")
+  content      String   // Full-text searchable content
+  soundex      String?  // Soundex phonetic code
+  metaphone    String?  // Metaphone phonetic code
+  dmetaphone   String?  // Double Metaphone phonetic code
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@unique([entityType, entityId])
+  @@index([soundex])
+  @@index([metaphone])
+  @@index([dmetaphone])
+  @@map("search_index")
+}
+
+// Data Quality Metrics
+model DataQualityMetric {
+  id              String   @id @default(uuid())
+  metricType      String   @map("metric_type") // completeness, consistency, accuracy
+  entityType      String?  @map("entity_type") // Person, Family, etc. (null for global)
+  entityId        String?  @map("entity_id")
+  entityHandle    String?  @map("entity_handle")
+  score           Float    // 0.0 to 1.0
+  issues          String?  // JSON array of issues
+  lastCalculated  DateTime @default(now()) @map("last_calculated")
+
+  @@unique([metricType, entityType, entityId])
+  @@index([metricType])
+  @@map("data_quality_metrics")
+}
+
+// Duplicate Detection
+model DuplicateSuggestion {
+  id              String   @id @default(uuid())
+  entityType      String   @map("entity_type")
+  entity1Handle   String   @map("entity1_handle")
+  entity2Handle   String   @map("entity2_handle")
+  similarityScore Float    @map("similarity_score") // 0.0 to 1.0
+  matchReasons    String   @map("match_reasons") // JSON array
+  status          String   @default("pending") // pending, merged, dismissed
+  reviewedBy      String?  @map("reviewed_by")
+  reviewedAt      DateTime? @map("reviewed_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([entityType, status])
+  @@index([entity1Handle])
+  @@index([entity2Handle])
+  @@map("duplicate_suggestions")
+}
+
+// Research Planner / Tasks
+model ResearchTask {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  title       String
+  description String?
+  status      String   @default("todo") // todo, in_progress, done, blocked
+  priority    String   @default("medium") // low, medium, high, urgent
+  category    String?  // research, verification, documentation, etc.
+  relatedTo   String?  @map("related_to") // JSON: entity references
+  tags        String?  // JSON array
+  dueDate     DateTime? @map("due_date")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([status])
+  @@index([priority])
+  @@map("research_tasks")
+}
+
+// Shoebox / Clipboard for temporary research items
+model ShoeboxItem {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  itemType    String   @map("item_type") // text, image, url, file
+  title       String?
+  content     String   // Text content or file path
+  metadata    String?  // JSON: source, date found, etc.
+  tags        String?  // JSON array
+  attachedTo  String?  @map("attached_to") // JSON: entity references if attached
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([itemType])
+  @@map("shoebox_items")
 }

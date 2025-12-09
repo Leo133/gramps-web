@@ -13,6 +13,11 @@ import {SourcesModule} from './sources/sources.module'
 import {NotesModule} from './notes/notes.module'
 import {MetadataModule} from './metadata/metadata.module'
 import {TreeSettingsModule} from './tree-settings/tree-settings.module'
+import {SearchModule} from './search/search.module'
+import {QualityCheckModule} from './quality-check/quality-check.module'
+import {DuplicatesModule} from './duplicates/duplicates.module'
+import {ResearchPlannerModule} from './research-planner/research-planner.module'
+import {ShoeboxModule} from './shoebox/shoebox.module'
 
 @Module({
   imports: [
@@ -32,6 +37,11 @@ import {TreeSettingsModule} from './tree-settings/tree-settings.module'
     NotesModule,
     MetadataModule,
     TreeSettingsModule,
+    SearchModule,
+    QualityCheckModule,
+    DuplicatesModule,
+    ResearchPlannerModule,
+    ShoeboxModule,
   ],
 })
 export class AppModule {}
