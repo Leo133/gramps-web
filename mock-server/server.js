@@ -23,7 +23,6 @@ import {
 } from './csv-parser.js'
 import {
   processMediaFile,
-  extractMetadata,
   detectFaces,
   generateIIIFManifest,
 } from './media-processor.js'

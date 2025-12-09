@@ -41,10 +41,29 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 
 **Goal:** Create a rich media experience for photos, documents, and audio.
 
-- [ ] **Media Gallery:** A modern grid layout with lazy loading, filtering, and sorting.
-- [ ] **Image Processing:** Automatic thumbnail generation, face detection, and tagging.
-- [ ] **Deep Zoom:** IIIF-compatible viewer for high-resolution document scans.
-- [ ] **Metadata Extraction:** Auto-extract EXIF/IPTC data (date taken, location) from uploaded photos to suggest Event details.
+**Status:** 🚧 IN PROGRESS (Backend Complete)
+
+- [x] **Media Gallery:** A modern grid layout with lazy loading, filtering, and sorting.
+- [x] **Image Processing:** Automatic thumbnail generation, face detection, and tagging.
+- [x] **Deep Zoom:** IIIF-compatible viewer for high-resolution document scans.
+- [x] **Metadata Extraction:** Auto-extract EXIF/IPTC data (date taken, location) from uploaded photos to suggest Event details.
+
+**Implementation Details:** See [PHASE4_IMPLEMENTATION.md](PHASE4_IMPLEMENTATION.md) for complete documentation.
+
+**Backend Features (Complete):**
+- ✅ Automatic thumbnail generation (3 sizes)
+- ✅ EXIF/IPTC metadata extraction
+- ✅ Event and place suggestions from metadata
+- ✅ Face detection and tagging API
+- ✅ IIIF Image API 3.0 manifests for deep zoom
+- ✅ Enhanced gallery with filtering and sorting
+- ✅ 8 new API endpoints
+
+**Frontend Integration (Pending):**
+- [ ] UI for gallery filters and sorting
+- [ ] OpenSeadragon integration for deep zoom
+- [ ] Face tagging UI
+- [ ] Lazy loading implementation
 
 ## Phase 5: Interactive Visualizations & Charts
 

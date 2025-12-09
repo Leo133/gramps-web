@@ -221,7 +221,8 @@ export function suggestEventFromMetadata(metadata) {
 
   // Extract date from EXIF
   if (metadata.exif?.dateTimeOriginal) {
-    suggestions.date = metadata.exif.dateTimeOriginal.split('T')[0]
+    const [date] = metadata.exif.dateTimeOriginal.split('T')
+    suggestions.date = date
   }
 
   // Build place from IPTC and EXIF
@@ -300,10 +301,9 @@ export async function processMediaFile(fileBuffer, filename, mimeType) {
  * Detect faces in image
  * In production, this would use face-api.js or similar
  * 
- * @param {Buffer} fileBuffer - The image file buffer
  * @returns {Promise<Array>} Array of face regions
  */
-export async function detectFaces(fileBuffer) {
+export async function detectFaces() {
   // Mock face detection
   // In production, you would use face-api.js or AWS Rekognition
   
@@ -311,7 +311,7 @@ export async function detectFaces(fileBuffer) {
   const numFaces = Math.floor(Math.random() * 4)
   const faces = []
 
-  for (let i = 0; i < numFaces; i++) {
+  for (let i = 0; i < numFaces; i += 1) {
     faces.push({
       id: crypto.randomBytes(4).toString('hex'),
       region: {
