@@ -54,10 +54,32 @@ export class PlacesController {
     @Query('latitude') latitude: string,
     @Query('longitude') longitude: string
   ) {
-    return this.service.reverseGeocode(
-      parseFloat(latitude),
-      parseFloat(longitude)
-    )
+    const lat = parseFloat(latitude)
+    const lng = parseFloat(longitude)
+
+    // Validate coordinates
+    if (Number.isNaN(lat) || Number.isNaN(lng)) {
+      return {
+        error: 'Invalid coordinates',
+        message: 'Latitude and longitude must be valid numbers',
+      }
+    }
+
+    if (lat < -90 || lat > 90) {
+      return {
+        error: 'Invalid latitude',
+        message: 'Latitude must be between -90 and 90',
+      }
+    }
+
+    if (lng < -180 || lng > 180) {
+      return {
+        error: 'Invalid longitude',
+        message: 'Longitude must be between -180 and 180',
+      }
+    }
+
+    return this.service.reverseGeocode(lat, lng)
   }
 
   @Get(':handle')

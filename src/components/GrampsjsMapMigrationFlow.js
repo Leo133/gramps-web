@@ -85,19 +85,8 @@ class GrampsjsMapMigrationFlow extends LitElement {
       },
     })
 
-    // Add arrow heads layer
-    this._map.addLayer({
-      id: `${this._layerId}-arrows`,
-      type: 'symbol',
-      source: this._sourceId,
-      layout: {
-        'symbol-placement': 'line',
-        'symbol-spacing': 100,
-        'icon-image': 'arrow',
-        'icon-size': 0.5,
-        'icon-allow-overlap': true,
-      },
-    })
+    // Note: Arrow heads layer removed as 'arrow' icon may not be available in default MapLibre styles
+    // To add arrows, you would need to load a custom sprite sheet with arrow icons
   }
 
   createGeoJSON() {
@@ -188,22 +177,12 @@ class GrampsjsMapMigrationFlow extends LitElement {
     if (this._map.getLayer(this._layerId)) {
       this._map.setLayoutProperty(this._layerId, 'visibility', visibility)
     }
-    if (this._map.getLayer(`${this._layerId}-arrows`)) {
-      this._map.setLayoutProperty(
-        `${this._layerId}-arrows`,
-        'visibility',
-        visibility
-      )
-    }
   }
 
   disconnectedCallback() {
     if (this._map) {
       if (this._map.getLayer(this._layerId)) {
         this._map.removeLayer(this._layerId)
-      }
-      if (this._map.getLayer(`${this._layerId}-arrows`)) {
-        this._map.removeLayer(`${this._layerId}-arrows`)
       }
       if (this._map.getSource(this._sourceId)) {
         this._map.removeSource(this._sourceId)

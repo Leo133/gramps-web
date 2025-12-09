@@ -179,17 +179,25 @@ class GrampsjsMapClusters extends LitElement {
           place?.longitude &&
           (place.latitude !== 0 || place.longitude !== 0)
       )
-      .map(place => ({
-        type: 'Feature',
-        properties: {
-          handle: place.handle || place.profile?.gramps_id || '',
-          name: place.name || place.profile?.name || '',
-        },
-        geometry: {
-          type: 'Point',
-          coordinates: [place.longitude, place.latitude],
-        },
-      }))
+      .map(place => {
+        // Standardize place data - handle both API formats
+        const lat = place.latitude || place.profile?.lat
+        const lng = place.longitude || place.profile?.long
+        const handle = place.handle || place.gramps_id
+        const name = place.name || place.profile?.name || 'Unknown'
+
+        return {
+          type: 'Feature',
+          properties: {
+            handle,
+            name,
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: [lng, lat],
+          },
+        }
+      })
 
     return {
       type: 'FeatureCollection',
