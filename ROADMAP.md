@@ -108,10 +108,32 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 
 **Goal:** Turn genealogy into a collaborative family activity.
 
-- [ ] **Real-time Chat:** Enhanced chat with context awareness and full editing/drafting capabilities (linking directly to people/records in the chat).
-- [ ] **Comments & Annotations:** Allow family members to comment on photos or stories without editing the core data.
-- [ ] **Activity Feed:** A social-media style feed showing recent additions ("John added a photo of Great-Grandma").
-- [ ] **Permissions System:** Granular privacy controls (e.g., "Private" records visible only to Editors, "Living" people hidden from Guests).
+**Status:** ✅ COMPLETE (Backend)
+
+- [x] **Real-time Chat:** Enhanced chat with context awareness and full editing/drafting capabilities (linking directly to people/records in the chat).
+- [x] **Comments & Annotations:** Allow family members to comment on photos or stories without editing the core data.
+- [x] **Activity Feed:** A social-media style feed showing recent additions ("John added a photo of Great-Grandma").
+- [x] **Permissions System:** Granular privacy controls (e.g., "Private" records visible only to Editors, "Living" people hidden from Guests).
+
+**Implementation Details:** See [PHASE9_IMPLEMENTATION.md](PHASE9_IMPLEMENTATION.md) for complete documentation.
+
+**Backend Features (Complete):**
+- ✅ Real-time chat with context awareness
+- ✅ Full editing and drafting capabilities for messages
+- ✅ Comments and annotations on any record
+- ✅ Threaded comment support
+- ✅ Activity feed with social-media style display
+- ✅ Granular privacy controls via visibility levels
+- ✅ Role-based permissions (owner, editor, contributor, member)
+- ✅ 12 new API endpoints
+- ✅ Database migration
+
+**Frontend Integration (Pending):**
+- [ ] Chat UI components
+- [ ] Comment widgets on record pages
+- [ ] Activity feed dashboard
+- [ ] Real-time updates (WebSocket or polling)
+- [ ] Notification system
 
 ## Phase 10: UI/UX Overhaul (Modern Design System)
 

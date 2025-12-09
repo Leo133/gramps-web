@@ -13,6 +13,9 @@ import {SourcesModule} from './sources/sources.module'
 import {NotesModule} from './notes/notes.module'
 import {MetadataModule} from './metadata/metadata.module'
 import {TreeSettingsModule} from './tree-settings/tree-settings.module'
+import {ChatModule} from './chat/chat.module'
+import {CommentsModule} from './comments/comments.module'
+import {ActivityFeedModule} from './activity-feed/activity-feed.module'
 
 @Module({
   imports: [
@@ -32,6 +35,9 @@ import {TreeSettingsModule} from './tree-settings/tree-settings.module'
     NotesModule,
     MetadataModule,
     TreeSettingsModule,
+    ChatModule,
+    CommentsModule,
+    ActivityFeedModule,
   ],
 })
 export class AppModule {}
