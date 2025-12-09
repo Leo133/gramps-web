@@ -83,11 +83,12 @@ export async function extractExifMetadata(fileBuffer) {
   }
 
   // Simulate finding some EXIF data based on file characteristics
+  const ONE_YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000
   if (fileBuffer.length > 1000) {
     // Mock some realistic data
     const now = new Date()
     mockExifData.dateTimeOriginal = new Date(
-      now.getTime() - Math.random() * 365 * 24 * 60 * 60 * 1000
+      now.getTime() - Math.random() * ONE_YEAR_IN_MS
     ).toISOString()
     mockExifData.dateTime = mockExifData.dateTimeOriginal
     mockExifData.dateTimeDigitized = mockExifData.dateTimeOriginal
@@ -301,11 +302,14 @@ export async function processMediaFile(fileBuffer, filename, mimeType) {
  * Detect faces in image
  * In production, this would use face-api.js or similar
  * 
+ * @param {Buffer} fileBuffer - The image file buffer (unused in mock implementation)
  * @returns {Promise<Array>} Array of face regions
  */
-export async function detectFaces() {
+// eslint-disable-next-line no-unused-vars
+export async function detectFaces(fileBuffer) {
   // Mock face detection
   // In production, you would use face-api.js or AWS Rekognition
+  // The fileBuffer parameter would be used to analyze the actual image
   
   // Randomly generate 0-3 faces
   const numFaces = Math.floor(Math.random() * 4)

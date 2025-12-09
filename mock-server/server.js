@@ -625,10 +625,22 @@ app.post('/api/media/upload', upload.single('file'), async (req, res) => {
     // Process the media file
     const processingResult = await processMediaFile(buffer, originalname, mimetype)
 
+    // Generate unique gramps_id by finding max existing ID
+    let maxId = 0
+    if (db.data.media && db.data.media.length > 0) {
+      db.data.media.forEach(m => {
+        const match = m.gramps_id?.match(/^M(\d+)$/)
+        if (match) {
+          maxId = Math.max(maxId, parseInt(match[1], 10))
+        }
+      })
+    }
+    const newGrampsId = `M${String(maxId + 1).padStart(4, '0')}`
+
     // Create media object in database
     const mediaObject = {
       handle: processingResult.handle,
-      gramps_id: `M${(db.data.media?.length || 0) + 1}`.padStart(5, '0'),
+      gramps_id: newGrampsId,
       desc: originalname.replace(/\.[^/.]+$/, ''), // filename without extension
       path: `/uploads/${processingResult.handle}_${originalname}`,
       mime: mimetype,
@@ -882,8 +894,10 @@ app.get('/api/media/gallery', async (req, res) => {
   })
 
   const totalCount = results.length
-  const start = (parseInt(page, 10) - 1) * parseInt(pagesize, 10)
-  const end = start + parseInt(pagesize, 10)
+  const pageNum = parseInt(page, 10)
+  const pageSizeNum = parseInt(pagesize, 10)
+  const start = (pageNum - 1) * pageSizeNum
+  const end = start + pageSizeNum
   const paginatedResults = results.slice(start, end)
 
   res.setHeader('X-Total-Count', totalCount)
@@ -892,8 +906,8 @@ app.get('/api/media/gallery', async (req, res) => {
   return res.json({
     data: paginatedResults,
     total: totalCount,
-    page: parseInt(page, 10),
-    pagesize: parseInt(pagesize, 10),
+    page: pageNum,
+    pagesize: pageSizeNum,
   })
 })
 
