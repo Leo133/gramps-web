@@ -268,6 +268,22 @@ class GrampsjsMapSearchbox extends GrampsjsAppStateMixin(LitElement) {
               ?selected="${!!this.placeFilters.hasEvent}"
             ></md-switch>
           </label>
+          <br /><br />
+          <label>
+            ${this._('Show clustered markers')}
+            <md-switch
+              @change="${e => this.toggleFilter(e, 'showClusters')}"
+              ?selected="${!!this.placeFilters.showClusters}"
+            ></md-switch>
+          </label>
+          <br /><br />
+          <label>
+            ${this._('Show migration flows')}
+            <md-switch
+              @change="${e => this.toggleFilter(e, 'showMigrationFlows')}"
+              ?selected="${!!this.placeFilters.showMigrationFlows}"
+            ></md-switch>
+          </label>
         </form>
 
         <div slot="actions">

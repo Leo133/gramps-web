@@ -133,6 +133,9 @@ model Place {
   placeType String? @map("place_type") // JSON
   hierarchy String? // JSON array
 
+  @@index([latitude])
+  @@index([longitude])
+  @@index([latitude, longitude])
   @@map("places")
 }
 

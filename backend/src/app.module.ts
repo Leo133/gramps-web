@@ -14,6 +14,7 @@ import {NotesModule} from './notes/notes.module'
 import {MetadataModule} from './metadata/metadata.module'
 import {TreeSettingsModule} from './tree-settings/tree-settings.module'
 import {VisualizationsModule} from './visualizations/visualizations.module'
+import {GeospatialModule} from './geospatial/geospatial.module'
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import {VisualizationsModule} from './visualizations/visualizations.module'
     MetadataModule,
     TreeSettingsModule,
     VisualizationsModule,
+    GeospatialModule,
   ],
 })
 export class AppModule {}

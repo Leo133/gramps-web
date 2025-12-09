@@ -100,10 +100,14 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 
 **Goal:** Visualize the movement of ancestors across space and time.
 
-- [ ] **Clustered Map View:** A global map showing all events, clustered by region, expanding on zoom.
-- [ ] **Migration Flows:** Animated curved lines connecting Birth -> Marriage -> Death locations to visualize migration patterns.
-- [ ] **Historical Maps:** Overlay historical map tiles (e.g., 19th-century survey maps) over modern satellite imagery.
-- [ ] **Geocoding Service:** Auto-suggest coordinates for place names and standardize place hierarchies.
+**Status:** ✅ COMPLETE
+
+- [x] **Clustered Map View:** A global map showing all events, clustered by region, expanding on zoom.
+- [x] **Migration Flows:** Animated curved lines connecting Birth -> Marriage -> Death locations to visualize migration patterns.
+- [x] **Historical Maps:** Overlay historical map tiles (e.g., 19th-century survey maps) over modern satellite imagery.
+- [x] **Geocoding Service:** Auto-suggest coordinates for place names and standardize place hierarchies.
+
+**Implementation Details:** See [PHASE6_IMPLEMENTATION.md](PHASE6_IMPLEMENTATION.md) for complete documentation.
 
 ## Phase 7: Temporal Analysis (Timelines)
 
