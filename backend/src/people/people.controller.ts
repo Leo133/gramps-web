@@ -19,6 +19,7 @@ import {
 } from '@nestjs/swagger'
 import {Response} from 'express'
 import {PeopleService} from './people.service'
+import {TimelineService} from './timeline.service'
 import {CreatePersonDto, UpdatePersonDto} from './dto/person.dto'
 import {Roles} from '../auth/decorators/auth.decorator'
 
@@ -26,7 +27,10 @@ import {Roles} from '../auth/decorators/auth.decorator'
 @ApiBearerAuth('JWT-auth')
 @Controller('api/people')
 export class PeopleController {
-  constructor(private readonly peopleService: PeopleService) {}
+  constructor(
+    private readonly peopleService: PeopleService,
+    private readonly timelineService: TimelineService,
+  ) {}
 
   @Post()
   @Roles('contributor', 'editor', 'owner')
@@ -96,5 +100,17 @@ export class PeopleController {
   @ApiResponse({status: 404, description: 'Person not found'})
   remove(@Param('handle') handle: string) {
     return this.peopleService.remove(handle)
+  }
+
+  @Get(':handle/timeline')
+  @ApiOperation({summary: 'Get timeline for a person'})
+  @ApiResponse({status: 200, description: 'Person timeline with events and historical context'})
+  @ApiResponse({status: 404, description: 'Person not found'})
+  @ApiQuery({name: 'locale', required: false, description: 'Locale for date formatting (default: en)'})
+  getTimeline(
+    @Param('handle') handle: string,
+    @Query('locale') locale?: string,
+  ) {
+    return this.timelineService.getPersonTimeline(handle, locale || 'en')
   }
 }

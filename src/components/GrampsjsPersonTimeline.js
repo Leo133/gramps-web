@@ -27,6 +27,17 @@ export class GrampsjsPersonTimeline extends GrampsjsAppStateMixin(LitElement) {
           border-radius: 6px;
         }
 
+        .timeline-event.historical {
+          background-color: var(--md-sys-color-surface-variant);
+          border-left: 4px solid var(--md-sys-color-tertiary);
+          opacity: 0.85;
+        }
+
+        .timeline-event.historical.highlighted {
+          background-color: var(--grampsjs-color-shade-200);
+          opacity: 1;
+        }
+
         .timeline-date-age {
           text-align: right;
           opacity: 0.75;
@@ -52,6 +63,10 @@ export class GrampsjsPersonTimeline extends GrampsjsAppStateMixin(LitElement) {
           font-size: 18px;
           color: var(--grampsjs-body-font-color);
           margin-bottom: 0.4em;
+        }
+
+        .timeline-label.historical {
+          color: var(--md-sys-color-tertiary);
         }
 
         .timeline-place,
@@ -84,6 +99,16 @@ export class GrampsjsPersonTimeline extends GrampsjsAppStateMixin(LitElement) {
 
         .timeline-event.highlighted .timeline-button {
           visibility: visible;
+        }
+
+        .timeline-category {
+          display: inline-block;
+          padding: 0.2em 0.6em;
+          border-radius: 12px;
+          font-size: 14px;
+          background-color: var(--md-sys-color-secondary-container);
+          color: var(--md-sys-color-on-secondary-container);
+          margin-top: 0.3em;
         }
 
         #timeline {
@@ -196,12 +221,14 @@ export class GrampsjsPersonTimeline extends GrampsjsAppStateMixin(LitElement) {
 
   // eslint-disable-next-line class-methods-use-this
   renderEvent(obj) {
+    const isHistorical = obj.historical === true
     return html`
       <div
         id="event-${obj.gramps_id}"
         class=${classMap({
           'timeline-event': true,
           highlighted: obj.gramps_id === this.highlightedId,
+          historical: isHistorical,
         })}
         @mouseover="${() => this._handleMouseOver(obj)}"
         @focus="${() => this._handleMouseOver(obj)}"
@@ -209,15 +236,22 @@ export class GrampsjsPersonTimeline extends GrampsjsAppStateMixin(LitElement) {
       >
         <div class="timeline-date-age">
           <span class="timeline-date">${obj.date}</span>
-          <span class="timeline-age">${obj.age}</span>
+          ${!isHistorical
+            ? html`<span class="timeline-age">${obj.age}</span>`
+            : ''}
         </div>
         <div class="timeline-detail">
-          <span class="timeline-label"
-            >${obj.label}
+          <span class="timeline-label ${isHistorical ? 'historical' : ''}"
+            >${isHistorical
+              ? html`<mwc-icon style="font-size: 1em; vertical-align: middle;"
+                  >public</mwc-icon
+                > `
+              : ''}${obj.label}
             ${
               // if role is not primary/family, show role
               obj.role &&
-              ![this._('Family'), this._('Primary')].includes(obj.role)
+              ![this._('Family'), this._('Primary')].includes(obj.role) &&
+              !isHistorical
                 ? html`(${obj.role})`
                 : ''
             }
@@ -226,6 +260,9 @@ export class GrampsjsPersonTimeline extends GrampsjsAppStateMixin(LitElement) {
             ? html`
                 <span class="timeline-description">${obj.description}</span>
               `
+            : ''}
+          ${isHistorical && obj.role
+            ? html` <span class="timeline-category">${obj.role}</span> `
             : ''}
           ${obj.place?.name
             ? html`
@@ -244,16 +281,19 @@ export class GrampsjsPersonTimeline extends GrampsjsAppStateMixin(LitElement) {
                 >
               `
             : ''}
-
-          <span class="timeline-button">
-            <mwc-button
-              dense
-              outlined
-              label="${this._('Details')}"
-              @click="${() => this._handleButtonClick(obj.gramps_id)}"
-            >
-            </mwc-button>
-          </span>
+          ${!isHistorical
+            ? html`
+                <span class="timeline-button">
+                  <mwc-button
+                    dense
+                    outlined
+                    label="${this._('Details')}"
+                    @click="${() => this._handleButtonClick(obj.gramps_id)}"
+                  >
+                  </mwc-button>
+                </span>
+              `
+            : ''}
         </div>
       </div>
     `
