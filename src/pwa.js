@@ -475,3 +475,22 @@ export async function getStorageEstimate() {
     quotaMB: Math.round(estimate.quota / (1024 * 1024)),
   }
 }
+
+/**
+ * Check if PWA install is available
+ * @returns {boolean}
+ */
+export function isInstallAvailable() {
+  return !!deferredInstallPrompt
+}
+
+/**
+ * Check if app is running as installed PWA
+ * @returns {boolean}
+ */
+export function isInstalledPWA() {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true
+  )
+}

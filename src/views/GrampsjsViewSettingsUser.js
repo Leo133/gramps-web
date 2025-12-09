@@ -12,6 +12,7 @@ import '../components/GrampsjsSysinfo.js'
 import '../components/GrampsjsTaskProgressIndicator.js'
 import '../components/GrampsjsTreeQuotas.js'
 import '../components/GrampsjsUsers.js'
+import '../components/GrampsjsThemePreview.js'
 import {GrampsjsView} from './GrampsjsView.js'
 
 import {fireEvent} from '../util.js'
@@ -132,10 +133,16 @@ export class GrampsjsViewSettingsUser extends GrampsjsView {
   renderThemeSelect() {
     const theme = this.appState.settings.theme ?? 'system'
     return html`
+      <grampsjs-theme-preview
+        .selected="${theme}"
+        @theme-selected="${this._handleThemePreviewSelected}"
+      ></grampsjs-theme-preview>
+
       <mwc-select
         id="select-theme"
         label="${this._('Theme')}"
         @selected="${this._handleThemeSelected}"
+        style="margin-top: 16px;"
       >
         <mwc-list-item value="system" ?selected="${theme === 'system'}"
           >${this._('System')}</mwc-list-item
@@ -148,6 +155,12 @@ export class GrampsjsViewSettingsUser extends GrampsjsView {
         >
       </mwc-select>
     `
+  }
+
+  _handleThemePreviewSelected(event) {
+    const {theme} = event.detail
+    this.appState.updateSettings({theme})
+    applyTheme(theme)
   }
 
   _handleThemeSelected(event) {

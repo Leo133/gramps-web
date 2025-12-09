@@ -1,3 +1,4 @@
+/* eslint-env serviceworker */
 /* eslint-disable no-restricted-globals, no-console, no-undef, no-use-before-define */
 /**
  * Service Worker for Gramps Web PWA
@@ -7,7 +8,7 @@
  * This service worker provides:
  * - Offline support with caching strategies
  * - Background sync
- * - Push notifications (future)
+ * - Push notifications
  * - App updates with automatic refresh
  */
 
@@ -44,6 +45,7 @@ const STATIC_ASSETS = [
 ]
 
 // Maximum cache sizes
+const MAX_DYNAMIC_CACHE_SIZE = 50
 const MAX_IMAGE_CACHE_SIZE = 100
 
 /**
@@ -117,7 +119,7 @@ self.addEventListener('fetch', event => {
   if (isStaticAsset(url)) {
     // Static assets: Cache-first
     event.respondWith(cacheFirst(request, STATIC_CACHE))
-  } else if (isImage(url)) {
+  } else if (isImage(url) || request.destination === 'image') {
     // Images: Cache-first with size limit
     event.respondWith(
       cacheFirstWithLimit(request, IMAGE_CACHE, MAX_IMAGE_CACHE_SIZE)
@@ -151,6 +153,10 @@ async function cacheFirst(request, cacheName) {
     return response
   } catch (error) {
     console.error('[SW] Network request failed:', error)
+    // Return offline page for navigation requests
+    if (request.mode === 'navigate') {
+      return cache.match('/index.html')
+    }
     return new Response('Offline - resource not cached', {
       status: 503,
       statusText: 'Service Unavailable',
@@ -202,6 +208,11 @@ async function networkFirstWithCache(request, cacheName) {
     if (response.ok) {
       // Update cache with fresh response
       cache.put(request, response.clone())
+
+      // Limit cache size for dynamic cache
+      if (cacheName === DYNAMIC_CACHE) {
+        trimCache(cacheName, MAX_DYNAMIC_CACHE_SIZE)
+      }
     }
 
     return response
@@ -291,7 +302,7 @@ function isAPIRequest(url) {
 }
 
 /**
- * Background sync event (for future use)
+ * Background sync event
  */
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-data') {
@@ -305,20 +316,24 @@ self.addEventListener('sync', event => {
 async function syncData() {
   console.log('[SW] Background sync initiated')
   // Future: Sync offline changes to server
+  return Promise.resolve()
 }
 
 /**
- * Push notification event (for future use)
+ * Push notification event
  */
 self.addEventListener('push', event => {
+  const data = event.data ? event.data.json() : {}
+  const title = data.title || 'Gramps Web'
   const options = {
-    body: event.data ? event.data.text() : 'New update available',
+    body: data.body || 'New update available',
     icon: '/images/icon192.png',
     badge: '/images/icon192.png',
     vibrate: [200, 100, 200],
+    ...data.options,
   }
 
-  event.waitUntil(self.registration.showNotification('Gramps Web', options))
+  event.waitUntil(self.registration.showNotification(title, options))
 })
 
 /**
@@ -327,7 +342,7 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close()
 
-  event.waitUntil(clients.openWindow('/'))
+  event.waitUntil(clients.openWindow(event.notification.data?.url || '/'))
 })
 
 /**

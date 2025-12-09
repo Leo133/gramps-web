@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 /**
  * Responsive Design Utilities for Gramps Web
  *
@@ -577,8 +578,16 @@ export const responsiveStyles = css`
   }
 `
 
+/* eslint-disable max-classes-per-file */
 /**
- * Breakpoint utilities
+ * Responsive Breakpoint Utilities
+ *
+ * Provides utilities for working with responsive breakpoints,
+ * matching the breakpoints used in Gramps Web's design system.
+ */
+
+/**
+ * Breakpoint utilities (Tailwind style)
  */
 export const BREAKPOINTS = {
   xs: 320,
@@ -590,21 +599,38 @@ export const BREAKPOINTS = {
 }
 
 /**
- * Check if current viewport matches a breakpoint
- * @param {string} breakpoint - Breakpoint name (xs, sm, md, lg, xl, 2xl)
- * @returns {boolean}
+ * Standard breakpoints (Phase 10 style)
  */
-export function matchesBreakpoint(breakpoint) {
-  const width = BREAKPOINTS[breakpoint]
-  if (!width) return false
-  return window.matchMedia(`(min-width: ${width}px)`).matches
+export const Breakpoints = {
+  mobile: 768,
+  tablet: 992,
+  desktop: 1200,
 }
 
 /**
- * Get current active breakpoint
- * @returns {string} Current breakpoint name
+ * Get current breakpoint (Phase 10)
+ * @returns {string} 'mobile', 'tablet', or 'desktop'
  */
 export function getCurrentBreakpoint() {
+  const width = window.innerWidth
+
+  if (width < Breakpoints.mobile) {
+    return 'mobile'
+  }
+  if (width < Breakpoints.tablet) {
+    return 'tablet'
+  }
+  if (width < Breakpoints.desktop) {
+    return 'large-tablet'
+  }
+  return 'desktop'
+}
+
+/**
+ * Get current active screen size (Tailwind style)
+ * @returns {string} Current breakpoint name (xs, sm, md, lg, xl, 2xl)
+ */
+export function getScreenSize() {
   const width = window.innerWidth
   if (width >= BREAKPOINTS['2xl']) return '2xl'
   if (width >= BREAKPOINTS.xl) return 'xl'
@@ -615,7 +641,38 @@ export function getCurrentBreakpoint() {
 }
 
 /**
- * Check if device is mobile
+ * Check if current viewport matches a breakpoint (Tailwind style)
+ * @param {string} breakpoint - Breakpoint name (xs, sm, md, lg, xl, 2xl)
+ * @returns {boolean}
+ */
+export function matchesScreenSize(breakpoint) {
+  const width = BREAKPOINTS[breakpoint]
+  if (!width) return false
+  return window.matchMedia(`(min-width: ${width}px)`).matches
+}
+
+/**
+ * Check if current viewport matches a breakpoint (Phase 10)
+ * @param {string} breakpoint - 'mobile', 'tablet', or 'desktop'
+ * @returns {boolean}
+ */
+export function matchesBreakpoint(breakpoint) {
+  const current = getCurrentBreakpoint()
+
+  switch (breakpoint) {
+    case 'mobile':
+      return current === 'mobile'
+    case 'tablet':
+      return current === 'tablet' || current === 'large-tablet'
+    case 'desktop':
+      return current === 'desktop'
+    default:
+      return false
+  }
+}
+
+/**
+ * Check if device is mobile (Tailwind style)
  * @returns {boolean}
  */
 export function isMobile() {
@@ -623,7 +680,7 @@ export function isMobile() {
 }
 
 /**
- * Check if device is tablet
+ * Check if device is tablet (Tailwind style)
  * @returns {boolean}
  */
 export function isTablet() {
@@ -632,11 +689,35 @@ export function isTablet() {
 }
 
 /**
- * Check if device is desktop
+ * Check if device is desktop (Tailwind style)
  * @returns {boolean}
  */
 export function isDesktop() {
   return window.innerWidth >= BREAKPOINTS.lg
+}
+
+/**
+ * Check if viewport is mobile or smaller (Phase 10)
+ * @returns {boolean}
+ */
+export function isMobileViewport() {
+  return window.innerWidth < Breakpoints.mobile
+}
+
+/**
+ * Check if viewport is tablet or smaller (Phase 10)
+ * @returns {boolean}
+ */
+export function isTabletViewport() {
+  return window.innerWidth < Breakpoints.tablet
+}
+
+/**
+ * Check if viewport is desktop or larger (Phase 10)
+ * @returns {boolean}
+ */
+export function isDesktopViewport() {
+  return window.innerWidth >= Breakpoints.desktop
 }
 
 /**
@@ -663,6 +744,114 @@ export function getViewportSize() {
 }
 
 /**
+ * Media query matcher with callback
+ */
+export class ResponsiveWatcher {
+  constructor(breakpoint, callback) {
+    this.breakpoint = breakpoint
+    this.callback = callback
+    this.mediaQuery = null
+    this.handler = null
+
+    this.setup()
+  }
+
+  setup() {
+    let query = ''
+
+    switch (this.breakpoint) {
+      case 'mobile':
+        query = `(max-width: ${Breakpoints.mobile - 1}px)`
+        break
+      case 'tablet':
+        query = `(min-width: ${Breakpoints.mobile}px) and (max-width: ${
+          Breakpoints.tablet - 1
+        }px)`
+        break
+      case 'desktop':
+        query = `(min-width: ${Breakpoints.desktop}px)`
+        break
+      default:
+        query = this.breakpoint // Custom query
+    }
+
+    this.mediaQuery = window.matchMedia(query)
+    this.handler = e => this.callback(e.matches)
+
+    // Call immediately with current state
+    this.callback(this.mediaQuery.matches)
+
+    // Listen for changes
+    this.mediaQuery.addEventListener('change', this.handler)
+  }
+
+  destroy() {
+    if (this.mediaQuery && this.handler) {
+      this.mediaQuery.removeEventListener('change', this.handler)
+    }
+  }
+}
+
+/**
+ * Watch for breakpoint changes (Phase 10)
+ * @param {string} breakpoint - Breakpoint name or custom media query
+ * @param {Function} callback - Called when breakpoint matches
+ * @returns {ResponsiveWatcher}
+ */
+export function watchBreakpoint(breakpoint, callback) {
+  return new ResponsiveWatcher(breakpoint, callback)
+}
+
+/**
+ * Apply different values based on breakpoint
+ * @param {Object} values - Object with breakpoint keys and values
+ * @returns {*} Value for current breakpoint
+ *
+ * @example
+ * const fontSize = responsive({
+ *   mobile: '14px',
+ *   tablet: '16px',
+ *   desktop: '18px'
+ * })
+ */
+export function responsive(values) {
+  const bp = getCurrentBreakpoint()
+
+  // Try exact match first
+  if (values[bp]) {
+    return values[bp]
+  }
+
+  // Fall back to closest smaller breakpoint
+  if (bp === 'large-tablet' && values.tablet) {
+    return values.tablet
+  }
+
+  if ((bp === 'tablet' || bp === 'large-tablet') && values.mobile) {
+    return values.mobile
+  }
+
+  // Default fallback
+  return values.mobile || values.tablet || values.desktop || null
+}
+
+/**
+ * Get grid columns based on breakpoint
+ * @param {Object} columns - Column count per breakpoint
+ * @returns {number}
+ *
+ * @example
+ * const cols = getGridColumns({
+ *   mobile: 1,
+ *   tablet: 2,
+ *   desktop: 3
+ * })
+ */
+export function getGridColumns(columns) {
+  return responsive(columns)
+}
+
+/**
  * Check if device is in landscape orientation
  * @returns {boolean}
  */
@@ -675,7 +864,7 @@ export function isLandscape() {
  * @returns {boolean}
  */
 export function isPortrait() {
-  return window.innerHeight > window.innerWidth
+  return window.innerWidth <= window.innerHeight
 }
 
 /**
@@ -703,15 +892,15 @@ export function onMediaQuery(query, callback) {
 }
 
 /**
- * Watch for breakpoint changes
+ * Watch for screen size changes (Tailwind style)
  * @param {Function} callback - Called with breakpoint name when it changes
  * @returns {Function} Cleanup function
  */
-export function watchBreakpoint(callback) {
-  let currentBreakpoint = getCurrentBreakpoint()
+export function watchScreenSize(callback) {
+  let currentBreakpoint = getScreenSize()
 
   function checkBreakpoint() {
-    const newBreakpoint = getCurrentBreakpoint()
+    const newBreakpoint = getScreenSize()
     if (newBreakpoint !== currentBreakpoint) {
       currentBreakpoint = newBreakpoint
       callback(newBreakpoint)
@@ -724,6 +913,27 @@ export function watchBreakpoint(callback) {
   callback(currentBreakpoint)
 
   return () => window.removeEventListener('resize', checkBreakpoint)
+}
+
+/**
+ * Watch for orientation changes
+ * @param {Function} callback - Called with 'landscape' or 'portrait'
+ */
+export function watchOrientation(callback) {
+  const handler = () => {
+    callback(isLandscape() ? 'landscape' : 'portrait')
+  }
+
+  window.addEventListener('orientationchange', handler)
+  window.addEventListener('resize', handler)
+
+  // Call immediately
+  handler()
+
+  return () => {
+    window.removeEventListener('orientationchange', handler)
+    window.removeEventListener('resize', handler)
+  }
 }
 
 /**
@@ -741,6 +951,31 @@ export function debounce(func, wait = 250) {
     }
     clearTimeout(timeout)
     timeout = setTimeout(later, wait)
+  }
+}
+
+/**
+ * Debounced resize handler
+ * @param {Function} callback
+ * @param {number} delay - Debounce delay in ms
+ * @returns {Function} Cleanup function
+ */
+export function onResize(callback, delay = 250) {
+  let timeout = null
+
+  const handler = () => {
+    clearTimeout(timeout)
+    timeout = setTimeout(callback, delay)
+  }
+
+  window.addEventListener('resize', handler)
+
+  // Call immediately
+  callback()
+
+  return () => {
+    window.removeEventListener('resize', handler)
+    clearTimeout(timeout)
   }
 }
 
@@ -814,19 +1049,81 @@ export function getScrollPosition() {
 }
 
 /**
- * Check if element is in viewport
- * @param {HTMLElement} element - Element to check
- * @param {number} offset - Offset in pixels
+ * Check if element is visible in viewport
+ * @param {HTMLElement} element
+ * @param {number} threshold - Percentage of element that must be visible (0-1)
  * @returns {boolean}
  */
-export function isInViewport(element, offset = 0) {
+export function isInViewport(element, threshold = 0) {
   const rect = element.getBoundingClientRect()
-  return (
-    rect.top >= -offset &&
-    rect.left >= -offset &&
-    rect.bottom <=
-      (window.innerHeight || document.documentElement.clientHeight) + offset &&
-    rect.right <=
-      (window.innerWidth || document.documentElement.clientWidth) + offset
-  )
+  const windowHeight = window.innerHeight
+  const windowWidth = window.innerWidth
+
+  const vertInView = rect.top <= windowHeight && rect.top + rect.height >= 0
+  const horInView = rect.left <= windowWidth && rect.left + rect.width >= 0
+
+  if (!vertInView || !horInView) {
+    return false
+  }
+
+  if (threshold === 0) {
+    return true
+  }
+
+  // Calculate visible percentage
+  const visibleHeight =
+    Math.min(rect.bottom, windowHeight) - Math.max(rect.top, 0)
+  const visibleWidth =
+    Math.min(rect.right, windowWidth) - Math.max(rect.left, 0)
+  const visibleArea = visibleHeight * visibleWidth
+  const totalArea = rect.height * rect.width
+
+  return visibleArea / totalArea >= threshold
+}
+
+/**
+ * Viewport observer for lazy loading
+ */
+export class ViewportObserver {
+  constructor(callback, options = {}) {
+    this.callback = callback
+    this.options = {
+      threshold: options.threshold || 0.1,
+      rootMargin: options.rootMargin || '50px',
+    }
+
+    this.observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          this.callback(entry.target, entry.isIntersecting, entry)
+        })
+      },
+      {
+        threshold: this.options.threshold,
+        rootMargin: this.options.rootMargin,
+      }
+    )
+  }
+
+  observe(element) {
+    this.observer.observe(element)
+  }
+
+  unobserve(element) {
+    this.observer.unobserve(element)
+  }
+
+  disconnect() {
+    this.observer.disconnect()
+  }
+}
+
+/**
+ * Create viewport observer for lazy loading
+ * @param {Function} callback
+ * @param {Object} options
+ * @returns {ViewportObserver}
+ */
+export function createViewportObserver(callback, options) {
+  return new ViewportObserver(callback, options)
 }

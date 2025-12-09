@@ -38,7 +38,7 @@ import './components/GrampsjsUpdateAvailableNew.js'
 import './components/GrampsjsInstallPrompt.js'
 import './components/GrampsjsOfflineIndicator.js'
 import {sharedStyles} from './SharedStyles.js'
-import {applyTheme} from './theme.js'
+import {applyTheme, initializeTheme} from './theme.js'
 import {handleOIDCCallback, handleOIDCComplete} from './oidc.js'
 import {initPWA} from './pwa.js'
 import {initAccessibility} from './accessibility.js'
@@ -488,7 +488,7 @@ export class GrampsJs extends LitElement {
           <mwc-linear-progress indeterminate ?closed="${!this.progress}">
           </mwc-linear-progress>
 
-          <main>
+          <main id="main-content" tabindex="-1">
             <grampsjs-tab-bar .appState="${this.appState}"></grampsjs-tab-bar>
             <grampsjs-dna-tab-bar
               .appState="${this.appState}"
@@ -536,6 +536,16 @@ export class GrampsJs extends LitElement {
   connectedCallback() {
     super.connectedCallback()
 
+    // Initialize Phase 10 features: PWA and Accessibility
+    initPWA()
+    initAccessibility()
+
+    // Initialize theme system with preference detection
+    const storedTheme = initializeTheme()
+    if (storedTheme !== this.appState.settings.theme) {
+      this.appState.updateSettings({theme: storedTheme})
+    }
+
     window.addEventListener('storage', () => this._handleStorage())
     window.addEventListener('settings:changed', () => this._handleSettings())
     window.addEventListener('db:changed', () => this._loadDbInfo(false))
@@ -564,7 +574,8 @@ export class GrampsJs extends LitElement {
       this._loadFrontendStrings(this.appState.settings.lang)
     }
 
-    applyTheme(this.appState.settings.theme)
+    // Note: applyTheme is now called by initializeTheme()
+    // but we keep the system theme listener for runtime changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     mediaQuery.addEventListener('change', () =>
       applyTheme(this.appState.settings.theme)

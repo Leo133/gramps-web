@@ -53,6 +53,7 @@ export const a11yStyles = css`
     z-index: var(--z-index-top, 9999);
     border-radius: 0 0 var(--radius-sm, 4px) 0;
     font-weight: var(--font-weight-medium, 500);
+    transition: top 0.2s;
   }
 
   .skip-link:focus {
@@ -327,58 +328,430 @@ export const a11yStyles = css`
 `
 
 /**
- * Announce a message to screen readers
- * @param {string} message - The message to announce
- * @param {string} priority - 'polite' or 'assertive'
+ * Live region for screen reader announcements
+ */
+let liveRegion = null
+
+/**
+ * Create or get the live region for announcements
+ * @returns {HTMLElement}
+ */
+function getLiveRegion() {
+  if (!liveRegion) {
+    liveRegion = document.getElementById('a11y-live-region')
+
+    if (!liveRegion) {
+      liveRegion = document.createElement('div')
+      liveRegion.id = 'a11y-live-region'
+      liveRegion.setAttribute('role', 'status')
+      liveRegion.setAttribute('aria-live', 'polite')
+      liveRegion.setAttribute('aria-atomic', 'true')
+      liveRegion.style.cssText = `
+        position: absolute;
+        left: -10000px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+      `
+      document.body.appendChild(liveRegion)
+    }
+  }
+
+  return liveRegion
+}
+
+/**
+ * Announce message to screen readers
+ * @param {string} message - Message to announce
+ * @param {string} priority - 'polite' or 'assertive' (default: 'polite')
  */
 export function announceToScreenReader(message, priority = 'polite') {
-  const liveRegion = document.querySelector(`[aria-live="${priority}"]`)
-  if (liveRegion) {
-    liveRegion.textContent = message
-    // Clear after announcement
-    setTimeout(() => {
-      liveRegion.textContent = ''
-    }, 1000)
+  const region = getLiveRegion()
+  region.setAttribute('aria-live', priority)
+
+  // Clear and set message (triggering announcement)
+  region.textContent = ''
+  setTimeout(() => {
+    region.textContent = message
+  }, 100)
+}
+
+/**
+ * Create skip navigation link
+ * @param {string} targetId - ID of main content area
+ * @param {string} label - Link text (default: 'Skip to main content')
+ */
+export function createSkipLink(
+  targetId = 'main-content',
+  label = 'Skip to main content'
+) {
+  const skipLink = document.createElement('a')
+  skipLink.href = `#${targetId}`
+  skipLink.className = 'skip-link'
+  skipLink.textContent = label
+  skipLink.setAttribute('tabindex', '0')
+
+  // Style the skip link (hidden until focused)
+  // Note: We also have .skip-link in a11yStyles, but this ensures it works standalone
+  skipLink.style.cssText = `
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    padding: 8px 16px;
+    text-decoration: none;
+    z-index: 10000;
+    transition: top 0.2s;
+  `
+
+  skipLink.addEventListener('focus', () => {
+    skipLink.style.top = '0'
+  })
+
+  skipLink.addEventListener('blur', () => {
+    skipLink.style.top = '-40px'
+  })
+
+  skipLink.addEventListener('click', e => {
+    e.preventDefault()
+    const target = document.getElementById(targetId)
+    if (target) {
+      target.focus()
+      target.scrollIntoView({behavior: 'smooth'})
+    }
+  })
+
+  // Insert at the beginning of body
+  if (document.body.firstChild) {
+    document.body.insertBefore(skipLink, document.body.firstChild)
+  } else {
+    document.body.appendChild(skipLink)
+  }
+
+  return skipLink
+}
+
+/**
+ * Set up live region for announcements (Alias for getLiveRegion for backward compatibility)
+ * @param {string} priority - 'polite' or 'assertive'
+ * @returns {HTMLElement}
+ */
+export function createLiveRegion(priority = 'polite') {
+  const region = getLiveRegion()
+  region.setAttribute('aria-live', priority)
+  return region
+}
+
+/**
+ * Focus trap for modals and dialogs
+ */
+export class FocusTrap {
+  constructor(element) {
+    this.element = element
+    this.focusableElements = []
+    this.previouslyFocused = null
+  }
+
+  /**
+   * Get all focusable elements within container
+   */
+  getFocusableElements() {
+    const focusableSelectors = [
+      'a[href]',
+      'button:not([disabled])',
+      'textarea:not([disabled])',
+      'input:not([disabled])',
+      'select:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])',
+      'mwc-button:not([disabled])',
+      'mwc-icon-button:not([disabled])',
+      'md-filled-button:not([disabled])',
+      'md-outlined-button:not([disabled])',
+      'md-text-button:not([disabled])',
+    ].join(',')
+
+    return Array.from(this.element.querySelectorAll(focusableSelectors)).filter(
+      el => el.offsetParent !== null
+    ) // Exclude hidden elements
+  }
+
+  /**
+   * Activate focus trap
+   */
+  activate() {
+    this.previouslyFocused = document.activeElement
+    this.focusableElements = this.getFocusableElements()
+
+    if (this.focusableElements.length > 0) {
+      this.focusableElements[0].focus()
+    }
+
+    this.element.addEventListener('keydown', this.handleKeyDown)
+  }
+
+  /**
+   * Deactivate focus trap
+   */
+  deactivate() {
+    this.element.removeEventListener('keydown', this.handleKeyDown)
+
+    if (this.previouslyFocused && this.previouslyFocused.focus) {
+      this.previouslyFocused.focus()
+    }
+  }
+
+  /**
+   * Handle Tab key navigation
+   */
+  handleKeyDown = e => {
+    if (e.key !== 'Tab') return
+
+    const firstElement = this.focusableElements[0]
+    const lastElement =
+      this.focusableElements[this.focusableElements.length - 1]
+
+    if (e.shiftKey) {
+      // Shift + Tab
+      if (document.activeElement === firstElement) {
+        e.preventDefault()
+        lastElement.focus()
+      }
+    } else if (document.activeElement === lastElement) {
+      // Tab
+      e.preventDefault()
+      firstElement.focus()
+    }
   }
 }
 
 /**
- * Trap focus within a container (for modals/dialogs)
+ * Create focus trap for an element
+ * @param {HTMLElement} element - Container element
+ * @returns {FocusTrap}
+ */
+export function createFocusTrap(element) {
+  return new FocusTrap(element)
+}
+
+/**
+ * Trap focus within a container (Legacy wrapper)
  * @param {HTMLElement} container - The container element
  * @returns {Function} Cleanup function to remove listeners
  */
 export function trapFocus(container) {
-  const focusableElements = container.querySelectorAll(
-    'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-  )
-  const firstFocusable = focusableElements[0]
-  const lastFocusable = focusableElements[focusableElements.length - 1]
+  const trap = new FocusTrap(container)
+  trap.activate()
+  return () => trap.deactivate()
+}
 
-  function handleTab(e) {
-    if (e.key !== 'Tab') return
+/**
+ * Manage focus for single-page app navigation
+ * @param {HTMLElement} element - Element to focus after navigation
+ * @param {string} message - Optional announcement message
+ */
+export function manageFocus(element, message) {
+  if (!element) return
 
-    if (e.shiftKey) {
-      // Shift + Tab
-      if (document.activeElement === firstFocusable) {
-        e.preventDefault()
-        lastFocusable.focus()
-      }
-    } else if (document.activeElement === lastFocusable) {
-      // Tab
-      e.preventDefault()
-      firstFocusable.focus()
+  // Make element focusable if needed
+  if (!element.hasAttribute('tabindex')) {
+    element.setAttribute('tabindex', '-1')
+  }
+
+  // Focus element
+  element.focus()
+
+  // Announce navigation if message provided
+  if (message) {
+    announceToScreenReader(message)
+  }
+}
+
+/**
+ * Add keyboard navigation to a list
+ * @param {HTMLElement} listElement - List container
+ * @param {Object} options - Navigation options
+ */
+export function addKeyboardNavigation(listElement, options = {}) {
+  const {
+    itemSelector = 'li',
+    onSelect = null,
+    loop = true,
+    orientation = 'vertical', // 'vertical' or 'horizontal'
+  } = options
+
+  const getItems = () =>
+    Array.from(listElement.querySelectorAll(itemSelector)).filter(
+      el => el.offsetParent !== null
+    )
+
+  const getCurrentIndex = () => {
+    const items = getItems()
+    const focused = document.activeElement
+    return items.indexOf(focused)
+  }
+
+  const focusItem = index => {
+    const items = getItems()
+    if (items[index]) {
+      items[index].focus()
     }
   }
 
-  container.addEventListener('keydown', handleTab)
+  listElement.addEventListener('keydown', e => {
+    const items = getItems()
+    const currentIndex = getCurrentIndex()
 
-  // Focus first element
-  firstFocusable?.focus()
+    if (currentIndex === -1) return
 
-  // Return cleanup function
-  return () => {
-    container.removeEventListener('keydown', handleTab)
+    let nextIndex = currentIndex
+
+    if (orientation === 'vertical') {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        nextIndex = currentIndex + 1
+        if (nextIndex >= items.length && loop) {
+          nextIndex = 0
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        nextIndex = currentIndex - 1
+        if (nextIndex < 0 && loop) {
+          nextIndex = items.length - 1
+        }
+      }
+    } else if (orientation === 'horizontal') {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        nextIndex = currentIndex + 1
+        if (nextIndex >= items.length && loop) {
+          nextIndex = 0
+        }
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        nextIndex = currentIndex - 1
+        if (nextIndex < 0 && loop) {
+          nextIndex = items.length - 1
+        }
+      }
+    }
+
+    if (e.key === 'Home') {
+      e.preventDefault()
+      nextIndex = 0
+    } else if (e.key === 'End') {
+      e.preventDefault()
+      nextIndex = items.length - 1
+    }
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (onSelect) {
+        e.preventDefault()
+        onSelect(items[currentIndex], currentIndex)
+      }
+    }
+
+    if (
+      nextIndex !== currentIndex &&
+      nextIndex >= 0 &&
+      nextIndex < items.length
+    ) {
+      focusItem(nextIndex)
+    }
+  })
+}
+
+/**
+ * Check if an element is visible to screen readers
+ * @param {HTMLElement} element
+ * @returns {boolean}
+ */
+export function isVisibleToScreenReader(element) {
+  if (!element) return false
+
+  // Check aria-hidden
+  if (element.getAttribute('aria-hidden') === 'true') return false
+
+  // Check display and visibility
+  const style = getComputedStyle(element)
+  if (style.display === 'none' || style.visibility === 'hidden') return false
+
+  // Check parent elements
+  let parent = element.parentElement
+  while (parent) {
+    if (parent.getAttribute('aria-hidden') === 'true') return false
+    const parentStyle = getComputedStyle(parent)
+    if (parentStyle.display === 'none' || parentStyle.visibility === 'hidden')
+      return false
+    parent = parent.parentElement
   }
+
+  return true
+}
+
+/**
+ * Set accessible label for an element
+ * @param {HTMLElement} element
+ * @param {string} label
+ * @param {string} type - 'label', 'labelledby', or 'describedby'
+ */
+export function setAccessibleLabel(element, label, type = 'label') {
+  if (type === 'label') {
+    element.setAttribute('aria-label', label)
+  } else if (type === 'labelledby') {
+    element.setAttribute('aria-labelledby', label)
+  } else if (type === 'describedby') {
+    element.setAttribute('aria-describedby', label)
+  }
+}
+
+/**
+ * Create accessible tooltip
+ * @param {HTMLElement} trigger - Element that triggers tooltip
+ * @param {string} text - Tooltip text
+ * @returns {HTMLElement} Tooltip element
+ */
+export function createAccessibleTooltip(trigger, text) {
+  const tooltipId = `tooltip-${Math.random().toString(36).substr(2, 9)}`
+
+  const tooltip = document.createElement('div')
+  tooltip.id = tooltipId
+  tooltip.setAttribute('role', 'tooltip')
+  tooltip.textContent = text
+  tooltip.style.cssText = `
+    position: absolute;
+    z-index: 10000;
+    background: var(--md-sys-color-inverse-surface);
+    color: var(--md-sys-color-inverse-on-surface);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  `
+
+  document.body.appendChild(tooltip)
+
+  trigger.setAttribute('aria-describedby', tooltipId)
+
+  const show = () => {
+    const rect = trigger.getBoundingClientRect()
+    tooltip.style.top = `${rect.bottom + 8}px`
+    tooltip.style.left = `${rect.left}px`
+    tooltip.style.opacity = '1'
+  }
+
+  const hide = () => {
+    tooltip.style.opacity = '0'
+  }
+
+  trigger.addEventListener('mouseenter', show)
+  trigger.addEventListener('mouseleave', hide)
+  trigger.addEventListener('focus', show)
+  trigger.addEventListener('blur', hide)
+
+  return tooltip
 }
 
 /**
@@ -466,65 +839,6 @@ export function initKeyboardNavDetection() {
     }
     disableKeyboardNav()
   })
-}
-
-/**
- * Create a skip navigation link
- * @param {string} targetId - The ID of the main content
- * @param {string} text - The text for the skip link
- * @returns {HTMLElement}
- */
-export function createSkipLink(targetId, text = 'Skip to main content') {
-  const skipLink = document.createElement('a')
-  skipLink.href = `#${targetId}`
-  skipLink.className = 'skip-link'
-  skipLink.textContent = text
-  skipLink.addEventListener('click', e => {
-    e.preventDefault()
-    const target = document.getElementById(targetId)
-    if (target) {
-      target.focus()
-      target.scrollIntoView({behavior: 'smooth'})
-    }
-  })
-  return skipLink
-}
-
-/**
- * Set up live region for announcements
- * @param {string} priority - 'polite' or 'assertive'
- * @returns {HTMLElement}
- */
-export function createLiveRegion(priority = 'polite') {
-  const existing = document.querySelector(`[aria-live="${priority}"]`)
-  if (existing) return existing
-
-  const liveRegion = document.createElement('div')
-  liveRegion.setAttribute('aria-live', priority)
-  liveRegion.setAttribute('aria-atomic', 'true')
-  liveRegion.className = 'sr-only'
-  document.body.appendChild(liveRegion)
-  return liveRegion
-}
-
-/**
- * Initialize accessibility features
- * Call this on app startup
- */
-export function initAccessibility() {
-  // Set up keyboard navigation detection
-  initKeyboardNavDetection()
-
-  // Create live regions
-  createLiveRegion('polite')
-  createLiveRegion('assertive')
-
-  // Add skip link to main content
-  const skipLink = createSkipLink('main-content')
-  document.body.insertBefore(skipLink, document.body.firstChild)
-
-  // Announce page loads to screen readers
-  announceToScreenReader('Page loaded', 'polite')
 }
 
 /**
@@ -618,3 +932,29 @@ export function checkColorContrast(element) {
     isLargeText,
   }
 }
+
+/**
+ * Initialize accessibility features
+ * Call this on app startup
+ */
+export function initAccessibility() {
+  // Set up keyboard navigation detection
+  initKeyboardNavDetection()
+
+  // Create live regions (using getLiveRegion implicitly via createLiveRegion or just calling it)
+  getLiveRegion()
+
+  // Add skip link to main content (createSkipLink already appends it)
+  // But we should check if it exists first to avoid duplicates if called multiple times
+  if (!document.querySelector('.skip-link')) {
+    createSkipLink('main-content')
+  }
+
+  // Announce page loads to screen readers
+  announceToScreenReader('Page loaded', 'polite')
+}
+
+/**
+ * Alias for initAccessibility (for backward compatibility with Incoming branch)
+ */
+export const initializeAccessibility = initAccessibility
