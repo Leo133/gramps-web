@@ -1740,7 +1740,7 @@ function analyzeRelationship(path) {
     return {description: term, type: 'descendant', commonAncestor}
   }
 
-  // Cousins
+  // Cousins and aunts/uncles/nieces/nephews
   if (stepsUp > 0 && stepsDown > 0) {
     const degree = Math.min(stepsUp, stepsDown) - 1
     const removal = Math.abs(stepsUp - stepsDown)
@@ -1757,11 +1757,36 @@ function analyzeRelationship(path) {
       '9th',
     ]
 
+    // Aunt/Uncle or Niece/Nephew relationships (degree = 0)
     if (degree === 0) {
-      const term = removal === 0 ? 'Sibling' : `${ordinals[removal]} cousin`
-      return {description: term, type: 'cousin', commonAncestor}
+      if (removal === 0) {
+        // Sibling (should not reach here as it's handled above)
+        return {description: 'Sibling', type: 'sibling', commonAncestor}
+      }
+      // Determine if this person is older (aunt/uncle) or younger (niece/nephew)
+      if (stepsUp > stepsDown) {
+        // Going up more = this person is younger (niece/nephew)
+        const prefix = removal > 1 ? `Great-${'Great-'.repeat(removal - 2)}` : ''
+        const term = getGenderTerm(
+          path[path.length - 1].gender,
+          `${prefix}Uncle`,
+          `${prefix}Aunt`,
+          `${prefix}Aunt/Uncle`
+        )
+        return {description: term, type: 'in-law', commonAncestor}
+      }
+      // Going down more = this person is older (aunt/uncle)
+      const prefix = removal > 1 ? `Great-${'Great-'.repeat(removal - 2)}` : ''
+      const term = getGenderTerm(
+        path[path.length - 1].gender,
+        `${prefix}Nephew`,
+        `${prefix}Niece`,
+        `${prefix}Niece/Nephew`
+      )
+      return {description: term, type: 'in-law', commonAncestor}
     }
 
+    // Cousin relationships (degree > 0)
     const cousinType = `${ordinals[degree]} cousin`
     const term =
       removal === 0

@@ -363,10 +363,24 @@ export class VisualizationsService {
     const degree = Math.min(stepsUp, stepsDown) - 1
     const removal = Math.abs(stepsUp - stepsDown)
 
+    // Aunt/Uncle or Niece/Nephew relationships (degree = 0)
     if (degree === 0) {
-      return removal === 0 ? 'Sibling' : `${this.getOrdinal(removal)} cousin`
+      if (removal === 0) {
+        // Sibling (should not reach here as it's handled earlier)
+        return 'Sibling'
+      }
+      // Determine if this person is older (aunt/uncle) or younger (niece/nephew)
+      if (stepsUp > stepsDown) {
+        // Going up more = target person is in an older generation (aunt/uncle)
+        const prefix = removal > 1 ? `Great-${'Great-'.repeat(removal - 2)}` : ''
+        return `${prefix}Aunt/Uncle`
+      }
+      // Going down more = target person is in a younger generation (niece/nephew)
+      const prefix = removal > 1 ? `Great-${'Great-'.repeat(removal - 2)}` : ''
+      return `${prefix}Niece/Nephew`
     }
 
+    // Cousin relationships (degree > 0)
     const cousinType = `${this.getOrdinal(degree)} cousin`
     if (removal === 0) {
       return cousinType
