@@ -1,7 +1,8 @@
-/*
-The app bar component for Gramps Web
-Phase 10: Enhanced with design tokens and accessibility
-*/
+/**
+ * @fileoverview App bar component for Gramps Web
+ * Phase 10: Enhanced with design tokens and accessibility
+ * @author Gramps Web Contributors
+ */
 
 import {html, css, LitElement} from 'lit'
 import {classMap} from 'lit/directives/class-map.js'
