@@ -1528,7 +1528,9 @@ app.post('/api/exporters/:format/file', async (req, res) => {
 // Helper functions for relationship calculation
 function getPathNode(person, relationship = '') {
   const name = person?.primary_name
-    ? `${person.primary_name.first_name || ''} ${person.primary_name.surname_list?.[0]?.surname || ''}`.trim()
+    ? `${person.primary_name.first_name || ''} ${
+        person.primary_name.surname_list?.[0]?.surname || ''
+      }`.trim()
     : 'Unknown'
 
   return {
@@ -1768,7 +1770,8 @@ function analyzeRelationship(path) {
       // When stepsUp > stepsDown, person2 is in an older generation relative to person1
       if (stepsUp > stepsDown) {
         // Person2 is older generation (aunt/uncle)
-        const prefix = removal > 1 ? `Great-${'Great-'.repeat(removal - 2)}` : ''
+        const prefix =
+          removal > 1 ? `Great-${'Great-'.repeat(removal - 2)}` : ''
         const term = getGenderTerm(
           path[path.length - 1].gender,
           `${prefix}Uncle`,
@@ -1825,10 +1828,20 @@ function buildAncestorTree(handle, generation, maxGenerations, dbData) {
   if (childFamilies.length > 0) {
     const family = childFamilies[0]
     if (family.father_handle) {
-      father = buildAncestorTree(family.father_handle, generation + 1, maxGenerations, dbData)
+      father = buildAncestorTree(
+        family.father_handle,
+        generation + 1,
+        maxGenerations,
+        dbData
+      )
     }
     if (family.mother_handle) {
-      mother = buildAncestorTree(family.mother_handle, generation + 1, maxGenerations, dbData)
+      mother = buildAncestorTree(
+        family.mother_handle,
+        generation + 1,
+        maxGenerations,
+        dbData
+      )
     }
   }
 
@@ -1975,7 +1988,9 @@ app.get('/api/visualizations/fan-chart/:handle', async (req, res) => {
     return res.json(chartData)
   } catch (error) {
     console.error('Fan chart error:', error)
-    return res.status(500).json({error: error.message || 'Failed to get fan chart data'})
+    return res
+      .status(500)
+      .json({error: error.message || 'Failed to get fan chart data'})
   }
 })
 
@@ -1999,7 +2014,9 @@ app.get('/api/visualizations/tree-chart/:handle', async (req, res) => {
     })
   } catch (error) {
     console.error('Tree chart error:', error)
-    return res.status(500).json({error: error.message || 'Failed to get tree chart data'})
+    return res
+      .status(500)
+      .json({error: error.message || 'Failed to get tree chart data'})
   }
 })
 
