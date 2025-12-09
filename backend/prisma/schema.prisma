@@ -1,0 +1,201 @@
+// Gramps Web Database Schema
+// This schema represents the core genealogy data model
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User Management & Authentication
+model User {
+  id            String   @id @default(uuid())
+  username      String   @unique
+  email         String   @unique
+  password      String
+  fullName      String?  @map("full_name")
+  role          Role     @default(MEMBER)
+  enabled       Boolean  @default(true)
+  emailVerified Boolean  @default(false) @map("email_verified")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  lastLogin     DateTime? @map("last_login")
+  
+  @@map("users")
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  CONTRIBUTOR
+  MEMBER
+  GUEST
+}
+
+// Core Genealogy Models
+model Person {
+  id              String          @id @default(uuid())
+  handle          String          @unique
+  grampsId        String          @unique @map("gramps_id")
+  gender          Int             @default(2)
+  private         Boolean         @default(false)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  
+  firstName       String?         @map("first_name")
+  surname         String?
+  callName        String?         @map("call_name")
+  namePrefix      String?         @map("name_prefix")
+  nameSuffix      String?         @map("name_suffix")
+  title           String?
+  
+  birthDate       String?         @map("birth_date")
+  birthPlace      String?         @map("birth_place")
+  deathDate       String?         @map("death_date")
+  deathPlace      String?         @map("death_place")
+  
+  @@map("people")
+  @@index([grampsId])
+  @@index([surname])
+  @@index([firstName])
+}
+
+model Family {
+  id              String          @id @default(uuid())
+  handle          String          @unique
+  grampsId        String          @unique @map("gramps_id")
+  fatherHandle    String?         @map("father_handle")
+  motherHandle    String?         @map("mother_handle")
+  familyType      Int             @default(0) @map("family_type")
+  private         Boolean         @default(false)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  
+  @@map("families")
+  @@index([grampsId])
+}
+
+model Event {
+  id              String          @id @default(uuid())
+  handle          String          @unique
+  grampsId        String          @unique @map("gramps_id")
+  eventType       String          @map("event_type")
+  description     String?
+  date            String?
+  place           String?
+  private         Boolean         @default(false)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  
+  @@map("events")
+  @@index([grampsId])
+  @@index([eventType])
+}
+
+model Place {
+  id              String          @id @default(uuid())
+  handle          String          @unique
+  grampsId        String          @unique @map("gramps_id")
+  name            String
+  title           String?
+  placeType       String?         @map("place_type")
+  latitude        Float?
+  longitude       Float?
+  private         Boolean         @default(false)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  
+  @@map("places")
+  @@index([grampsId])
+  @@index([name])
+}
+
+model Source {
+  id              String          @id @default(uuid())
+  handle          String          @unique
+  grampsId        String          @unique @map("gramps_id")
+  title           String
+  author          String?
+  pubInfo         String?         @map("pub_info")
+  abbrev          String?
+  private         Boolean         @default(false)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  
+  @@map("sources")
+  @@index([grampsId])
+  @@index([title])
+}
+
+model Citation {
+  id              String          @id @default(uuid())
+  handle          String          @unique
+  grampsId        String          @unique @map("gramps_id")
+  sourceHandle    String          @map("source_handle")
+  page            String?
+  confidence      Int             @default(0)
+  private         Boolean         @default(false)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  
+  @@map("citations")
+  @@index([grampsId])
+  @@index([sourceHandle])
+}
+
+model Repository {
+  id              String          @id @default(uuid())
+  handle          String          @unique
+  grampsId        String          @unique @map("gramps_id")
+  name            String
+  repositoryType  String?         @map("repository_type")
+  private         Boolean         @default(false)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  
+  @@map("repositories")
+  @@index([grampsId])
+  @@index([name])
+}
+
+model Media {
+  id              String          @id @default(uuid())
+  handle          String          @unique
+  grampsId        String          @unique @map("gramps_id")
+  path            String
+  mimeType        String          @map("mime_type")
+  description     String?
+  checksum        String?
+  private         Boolean         @default(false)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  
+  @@map("media")
+  @@index([grampsId])
+}
+
+model Note {
+  id              String          @id @default(uuid())
+  handle          String          @unique
+  grampsId        String          @unique @map("gramps_id")
+  noteType        String          @map("note_type")
+  content         String
+  private         Boolean         @default(false)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  
+  @@map("notes")
+  @@index([grampsId])
+}
+
+model TreeSettings {
+  id              String   @id @default(uuid())
+  key             String   @unique
+  value           String
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  @@map("tree_settings")
+}
