@@ -12,7 +12,7 @@ import crypto from 'crypto'
  * Generate thumbnails of different sizes
  * In a real implementation, this would use Sharp library
  * For the mock server, we'll return size metadata
- * 
+ *
  * @param {Buffer} fileBuffer - The image file buffer
  * @param {string} mimeType - The mime type of the image
  * @returns {Promise<Object>} Thumbnail information
@@ -22,7 +22,7 @@ export async function generateThumbnails(fileBuffer, mimeType) {
   // In production, you would use Sharp:
   // const sharp = require('sharp');
   // const thumbnail = await sharp(fileBuffer).resize(200, 200).toBuffer();
-  
+
   const thumbnails = {
     small: {
       width: 100,
@@ -57,7 +57,7 @@ export async function generateThumbnails(fileBuffer, mimeType) {
 /**
  * Extract EXIF metadata from image
  * In a real implementation, this would use exif-parser or exifr
- * 
+ *
  * @param {Buffer} fileBuffer - The image file buffer
  * @returns {Promise<Object>} EXIF metadata
  */
@@ -119,14 +119,14 @@ export async function extractExifMetadata(fileBuffer) {
 
 /**
  * Extract IPTC metadata from image
- * 
+ *
  * @param {Buffer} fileBuffer - The image file buffer
  * @returns {Promise<Object>} IPTC metadata
  */
 export async function extractIptcMetadata(fileBuffer) {
   // Mock IPTC extraction
   // In production, you would use iptc-parser or similar
-  
+
   const mockIptcData = {
     keywords: [],
     caption: null,
@@ -147,7 +147,7 @@ export async function extractIptcMetadata(fileBuffer) {
   if (fileBuffer.length > 500) {
     const cities = ['New York', 'London', 'Paris', 'Tokyo', 'Sydney']
     const countries = ['USA', 'UK', 'France', 'Japan', 'Australia']
-    
+
     const index = Math.floor(Math.random() * cities.length)
     if (Math.random() > 0.6) {
       mockIptcData.city = cities[index]
@@ -175,7 +175,7 @@ export async function extractIptcMetadata(fileBuffer) {
 
 /**
  * Extract all metadata from an image
- * 
+ *
  * @param {Buffer} fileBuffer - The image file buffer
  * @param {string} mimeType - The mime type of the image
  * @returns {Promise<Object>} Complete metadata
@@ -209,7 +209,7 @@ export async function extractMetadata(fileBuffer, mimeType) {
 
 /**
  * Suggest event details from metadata
- * 
+ *
  * @param {Object} metadata - Extracted metadata
  * @returns {Object} Suggested event details
  */
@@ -244,7 +244,9 @@ export function suggestEventFromMetadata(metadata) {
 
   // Build description from keywords
   if (metadata.iptc?.keywords && metadata.iptc.keywords.length > 0) {
-    suggestions.description = `Photo tagged with: ${metadata.iptc.keywords.join(', ')}`
+    suggestions.description = `Photo tagged with: ${metadata.iptc.keywords.join(
+      ', '
+    )}`
   }
 
   // Add GPS coordinates if available
@@ -261,7 +263,7 @@ export function suggestEventFromMetadata(metadata) {
 /**
  * Process uploaded media file
  * Generates thumbnails and extracts metadata
- * 
+ *
  * @param {Buffer} fileBuffer - The file buffer
  * @param {string} filename - Original filename
  * @param {string} mimeType - File MIME type
@@ -301,7 +303,7 @@ export async function processMediaFile(fileBuffer, filename, mimeType) {
 /**
  * Detect faces in image
  * In production, this would use face-api.js or similar
- * 
+ *
  * @param {Buffer} fileBuffer - The image file buffer (unused in mock implementation)
  * @returns {Promise<Array>} Array of face regions
  */
@@ -310,7 +312,7 @@ export async function detectFaces(fileBuffer) {
   // Mock face detection
   // In production, you would use face-api.js or AWS Rekognition
   // The fileBuffer parameter would be used to analyze the actual image
-  
+
   // Randomly generate 0-3 faces
   const numFaces = Math.floor(Math.random() * 4)
   const faces = []
@@ -334,7 +336,7 @@ export async function detectFaces(fileBuffer) {
 
 /**
  * Generate IIIF manifest for deep zoom viewer
- * 
+ *
  * @param {string} mediaHandle - Media object handle
  * @param {Object} imageInfo - Image dimensions and metadata
  * @returns {Object} IIIF manifest

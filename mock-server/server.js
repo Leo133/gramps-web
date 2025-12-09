@@ -623,7 +623,11 @@ app.post('/api/media/upload', upload.single('file'), async (req, res) => {
     )
 
     // Process the media file
-    const processingResult = await processMediaFile(buffer, originalname, mimetype)
+    const processingResult = await processMediaFile(
+      buffer,
+      originalname,
+      mimetype
+    )
 
     // Generate unique gramps_id by finding max existing ID
     let maxId = 0
@@ -696,7 +700,9 @@ app.get('/api/media/:handle/thumbnail', async (req, res) => {
   }
 
   if (!mediaItem.thumbnails) {
-    return res.status(404).json({error: 'No thumbnails available for this media'})
+    return res
+      .status(404)
+      .json({error: 'No thumbnails available for this media'})
   }
 
   const thumbnail = mediaItem.thumbnails[size]
@@ -768,7 +774,9 @@ app.post('/api/media/:handle/detect-faces', async (req, res) => {
     })
   } catch (error) {
     console.error('Face detection error:', error)
-    return res.status(500).json({error: error.message || 'Face detection failed'})
+    return res
+      .status(500)
+      .json({error: error.message || 'Face detection failed'})
   }
 })
 
@@ -830,7 +838,9 @@ app.get('/api/media/:handle/iiif', async (req, res) => {
   }
 
   if (!mediaItem.mime?.startsWith('image/')) {
-    return res.status(400).json({error: 'IIIF manifest only available for images'})
+    return res
+      .status(400)
+      .json({error: 'IIIF manifest only available for images'})
   }
 
   const imageInfo = {
