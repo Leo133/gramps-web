@@ -337,11 +337,12 @@ function parseDate(dateStr) {
   if (typeof dateStr === 'object' && dateStr.val) {
     dateString = dateStr.val
   }
-  try {
-    return new Date(dateString)
-  } catch (e) {
+  const date = new Date(dateString)
+  // Check if date is valid
+  if (Number.isNaN(date.getTime())) {
     return null
   }
+  return date
 }
 
 function validatePerson(person) {
