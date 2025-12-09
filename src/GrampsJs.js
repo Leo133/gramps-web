@@ -34,6 +34,7 @@ import './components/GrampsjsTabBar.js'
 import './components/GrampsjsUndoTransaction.js'
 import './components/GrampsjsUpdateAvailable.js'
 import './components/GrampsjsUpgradeDb.js'
+import './components/GrampsjsPwaInstall.js'
 import {sharedStyles} from './SharedStyles.js'
 import {applyTheme, initializeTheme} from './theme.js'
 import {handleOIDCCallback, handleOIDCComplete} from './oidc.js'
@@ -245,6 +246,7 @@ export class GrampsJs extends LitElement {
           >
         </mwc-snackbar>
       </grampsjs-update-available>
+      <grampsjs-pwa-install></grampsjs-pwa-install>
     `
   }
 
@@ -482,7 +484,7 @@ export class GrampsJs extends LitElement {
           <mwc-linear-progress indeterminate ?closed="${!this.progress}">
           </mwc-linear-progress>
 
-          <main>
+          <main id="main-content" tabindex="-1">
             <grampsjs-tab-bar .appState="${this.appState}"></grampsjs-tab-bar>
             <grampsjs-dna-tab-bar
               .appState="${this.appState}"
