@@ -1,6 +1,8 @@
-/*
-The dropdown menu for adding objects in the top app bar
-*/
+/**
+ * @fileoverview App bar component for Gramps Web
+ * Phase 10: Enhanced with design tokens and accessibility
+ * @author Gramps Web Contributors
+ */
 
 import {html, css, LitElement} from 'lit'
 import {classMap} from 'lit/directives/class-map.js'
@@ -15,19 +17,26 @@ import './GrampsjsTooltip.js'
 
 import {fireEvent} from '../util.js'
 import {sharedStyles} from '../SharedStyles.js'
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
 import {GrampsjsAppStateMixin} from '../mixins/GrampsjsAppStateMixin.js'
 
 class GrampsjsAppBar extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
       css`
         mwc-top-app-bar {
           --mdc-typography-headline6-font-family: var(
             --grampsjs-heading-font-family
           );
           --mdc-typography-headline6-font-weight: 550;
-          --mdc-typography-headline6-font-size: 17px;
+          --mdc-typography-headline6-font-size: var(
+            --type-body-large-size,
+            17px
+          );
           --mdc-theme-primary: var(--grampsjs-top-app-bar-background-color);
           --mdc-theme-on-primary: var(--grampsjs-top-app-bar-font-color);
         }
@@ -35,6 +44,26 @@ class GrampsjsAppBar extends GrampsjsAppStateMixin(LitElement) {
         mwc-top-app-bar.edit {
           --mdc-theme-primary: var(--mdc-theme-secondary);
           --mdc-theme-on-primary: var(--mdc-theme-on-secondary);
+        }
+
+        /* Phase 10: Improved touch targets for mobile */
+        mwc-icon-button {
+          --mdc-icon-button-size: var(--touch-target-min-size, 48px);
+        }
+
+        /* Phase 10: Better title typography */
+        #app-title {
+          font-size: var(--type-title-large-size, 22px);
+          font-weight: var(--font-weight-medium, 500);
+          letter-spacing: var(--type-title-large-tracking, 0);
+        }
+
+        /* Phase 10: Safe area insets for notched devices */
+        @supports (padding: max(0px)) {
+          mwc-top-app-bar {
+            padding-left: max(0px, var(--safe-area-inset-left, 0));
+            padding-right: max(0px, var(--safe-area-inset-right, 0));
+          }
         }
       `,
     ]

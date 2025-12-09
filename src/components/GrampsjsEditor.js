@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Rich text editor component with design tokens and accessibility
+ * @author Gramps.js
+ */
 import {html, css, LitElement} from 'lit'
 import {live} from 'lit/directives/live.js'
 
@@ -11,6 +15,10 @@ import {sharedStyles} from '../SharedStyles.js'
 import {fireEvent, stripHtml} from '../util.js'
 import {GrampsjsAppStateMixin} from '../mixins/GrampsjsAppStateMixin.js'
 import './GrampsjsFormSelectObject.js'
+
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 
 function capitalize(string) {
   return `${string.charAt(0).toUpperCase()}${string.slice(1)}`
@@ -112,13 +120,19 @@ class GrampsjsEditor extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
         .note {
           font-family: var(
             --grampsjs-note-font-family,
             var(--grampsjs-body-font-family)
           );
-          font-size: var(--grampsjs-note-font-size, 17px);
+          font-size: var(
+            --grampsjs-note-font-size,
+            var(--type-body-large-size, 17px)
+          );
           line-height: var(--grampsjs-note-line-height, 1.5em);
           color: var(--grampsjs-note-color);
           white-space: pre-wrap;
@@ -126,16 +140,18 @@ class GrampsjsEditor extends GrampsjsAppStateMixin(LitElement) {
 
         .framed {
           border: 1px solid var(--mdc-theme-secondary);
-          border-radius: 8px;
-          padding: 20px 25px;
+          border-radius: var(--radius-md, 8px);
+          padding: var(--spacing-5, 20px) var(--spacing-6, 25px);
         }
 
         mwc-icon-button {
           color: var(--grampsjs-body-font-color-50);
+          width: var(--touch-target-min-size, 48px);
+          height: var(--touch-target-min-size, 48px);
         }
 
         #controls {
-          margin: 0.7em 0;
+          margin: var(--spacing-3, 0.7em) 0;
         }
 
         a {

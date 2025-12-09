@@ -1,8 +1,16 @@
+/**
+ * @fileoverview User registration form component
+ * @author Gramps.js Team
+ */
+
 /* eslint-disable lit-a11y/click-events-have-key-events */
 import {html, css, LitElement} from 'lit'
 import '@material/web/textfield/outlined-text-field'
 
 import {sharedStyles} from '../SharedStyles.js'
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 import {apiRegisterUser} from '../api.js'
 import {fireEvent} from '../util.js'
 
@@ -12,11 +20,15 @@ class GrampsjsFormRegister extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
         #register-container {
           margin: auto;
           height: 100%;
           max-width: 20em;
+          padding: var(--spacing-4, 16px);
         }
 
         #register-form {
@@ -24,28 +36,61 @@ class GrampsjsFormRegister extends GrampsjsAppStateMixin(LitElement) {
           top: 20vh;
         }
 
+        #register-form h2 {
+          font-size: var(--type-headline-small-size, 24px);
+          font-weight: var(--type-headline-small-weight, 400);
+          margin-bottom: var(--spacing-4, 16px);
+        }
+
         #register-form md-outlined-text-field {
           width: 100%;
-          margin-bottom: 0.7em;
+          margin-bottom: var(--spacing-3, 12px);
+        }
+
+        mwc-button {
+          min-height: var(--touch-target-min-size, 48px);
+          width: 100%;
+          margin-top: var(--spacing-2, 8px);
         }
 
         p.reset-link {
-          padding-top: 1em;
-          font-size: 0.9em;
+          padding-top: var(--spacing-4, 16px);
+          font-size: var(--type-body-medium-size, 14px);
         }
 
         p.success {
-          padding-top: 1em;
+          padding-top: var(--spacing-4, 16px);
           color: var(--grampsjs-alert-success-font-color);
-          font-size: 1.2em;
+          font-size: var(--type-title-medium-size, 16px);
           font-weight: 400;
           --mdc-icon-size: 1.6em;
           line-height: 1.4em;
           text-align: center;
         }
 
+        .link {
+          cursor: pointer;
+          text-decoration: underline;
+        }
+
+        .link:focus-visible {
+          outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color);
+          outline-offset: var(--focus-ring-offset, 2px);
+          border-radius: var(--radius-xs, 2px);
+        }
+
         mwc-circular-progress {
           --mdc-theme-primary: var(--mdc-theme-on-primary);
+        }
+
+        @media (max-width: 768px) {
+          #register-container {
+            padding: var(--spacing-2, 8px);
+          }
+
+          #register-form h2 {
+            font-size: var(--type-title-large-size, 22px);
+          }
         }
       `,
     ]

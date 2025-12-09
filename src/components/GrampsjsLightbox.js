@@ -1,12 +1,23 @@
+/**
+ * @fileoverview Lightbox component with design tokens and accessibility
+ * @author Gramps.js
+ */
 import {html, css, LitElement} from 'lit'
 
 import {sharedStyles} from '../SharedStyles.js'
 import {chevronLeftIcon, chevronRightIcon, closeIcon} from '../icons.js'
 
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
+
 class GrampsjsLightbox extends LitElement {
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
         #lightbox-container {
           background-color: var(--grampsjs-lightbox-background-color);
@@ -16,7 +27,7 @@ class GrampsjsLightbox extends LitElement {
           right: 0;
           min-height: 100vh;
           width: 100vw;
-          z-index: 10000;
+          z-index: var(--z-lightbox, 10000);
           overflow: auto;
         }
 

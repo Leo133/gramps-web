@@ -1,6 +1,8 @@
-/*
-The dropdown menu for adding objects in the top app bar
-*/
+/**
+ * @fileoverview Main navigation menu component for Gramps Web
+ * Phase 10: Enhanced with design tokens and accessibility
+ * @author Gramps Web Contributors
+ */
 
 import {html, css, LitElement} from 'lit'
 import '@material/mwc-list'
@@ -9,6 +11,9 @@ import './GrampsJsListItem.js'
 
 import {mdiFamilyTree, mdiChat, mdiDna} from '@mdi/js'
 import {sharedStyles} from '../SharedStyles.js'
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 import {GrampsjsAppStateMixin} from '../mixins/GrampsjsAppStateMixin.js'
 import {renderIcon} from '../icons.js'
 
@@ -17,31 +22,77 @@ const BASE_DIR = ''
 const selectedColor = 'var(--grampsjs-color-icon-selected)'
 const defaultColor = 'var(--grampsjs-color-icon-default)'
 
-class GrampsjsAppBar extends GrampsjsAppStateMixin(LitElement) {
+class GrampsjsMainMenu extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
+        /* Phase 10: Enhanced menu styling with design tokens */
+        mwc-list {
+          padding: var(--spacing-2, 8px) 0;
+        }
+
+        grampsjs-list-item {
+          /* Phase 10: Touch-friendly list items */
+          min-height: var(--touch-target-min-size, 48px);
+          padding: var(--spacing-2, 8px) var(--spacing-4, 16px);
+        }
+
         grampsjs-list-item span {
           color: var(--grampsjs-color-drawer-text);
+          font-size: var(--type-body-large-size, 16px);
+          font-weight: var(--font-weight-regular, 400);
+          letter-spacing: var(--type-body-large-tracking, 0.5px);
         }
 
         grampsjs-list-item mwc-icon {
           color: var(--grampsjs-body-font-color-38);
+          /* Phase 10: Consistent icon sizing */
+          --mdc-icon-size: var(--icon-size-md, 24px);
         }
 
         grampsjs-list-item[selected] span {
           color: var(--grampsjs-color-icon-selected);
-          font-weight: 500;
+          font-weight: var(--font-weight-medium, 500);
         }
 
         grampsjs-list-item[selected] mwc-icon {
           color: var(--grampsjs-color-icon-selected);
         }
 
+        /* Phase 10: Improved focus states */
+        grampsjs-list-item:focus-visible {
+          outline: var(--focus-ring-width, 2px) solid
+            var(--focus-ring-color, var(--md-sys-color-primary));
+          outline-offset: -2px;
+          border-radius: var(--radius-sm, 4px);
+        }
+
+        /* Phase 10: Better hover states on devices with hover capability */
+        @media (hover: hover) and (pointer: fine) {
+          grampsjs-list-item:hover {
+            background-color: var(--md-sys-color-surface-container-low);
+            border-radius: var(--radius-sm, 4px);
+          }
+        }
+
         span.raise {
           position: relative;
           top: -2px;
+        }
+
+        /* Phase 10: Mobile optimization */
+        @media (max-width: 768px) {
+          grampsjs-list-item {
+            padding: var(--spacing-3, 12px) var(--spacing-3, 12px);
+          }
+
+          grampsjs-list-item span {
+            font-size: var(--type-body-medium-size, 14px);
+          }
         }
       `,
     ]
@@ -226,4 +277,4 @@ class GrampsjsAppBar extends GrampsjsAppStateMixin(LitElement) {
   }
 }
 
-window.customElements.define('grampsjs-main-menu', GrampsjsAppBar)
+window.customElements.define('grampsjs-main-menu', GrampsjsMainMenu)

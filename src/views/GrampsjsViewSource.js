@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Source detail view component
+ * @author Gramps Web contributors
+ */
+
 import {html} from 'lit'
 
 import {GrampsjsViewObject} from './GrampsjsViewObject.js'

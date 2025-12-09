@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Search result list component
+ * Phase 10: Enhanced with design tokens and accessibility
+ * @author Gramps Web Contributors
+ */
+
 import {LitElement, css, html} from 'lit'
 import {classMap} from 'lit/directives/class-map.js'
 
@@ -15,6 +21,9 @@ import {
 import {GrampsjsAppStateMixin} from '../mixins/GrampsjsAppStateMixin.js'
 import './GrampsJsImage.js'
 import {sharedStyles} from '../SharedStyles.js'
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 
 export class GrampsjsSearchResultList extends GrampsjsAppStateMixin(
   LitElement
@@ -22,12 +31,24 @@ export class GrampsjsSearchResultList extends GrampsjsAppStateMixin(
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
+        /* Phase 10: Enhanced search result styling */
+        mwc-list-item {
+          /* Phase 10: Touch-friendly list items */
+          min-height: var(--list-item-height-medium, 56px);
+          padding: var(--spacing-2, 8px) var(--spacing-4, 16px);
+        }
+
         mwc-icon-button {
           position: relative;
           top: -14px;
           left: -16px;
-          --mdc-icon-size: 20px;
+          /* Phase 10: Touch-friendly icon button */
+          --mdc-icon-button-size: var(--touch-target-min-size, 48px);
+          --mdc-icon-size: var(--icon-size-sm, 20px);
         }
 
         mwc-icon {
@@ -36,10 +57,27 @@ export class GrampsjsSearchResultList extends GrampsjsAppStateMixin(
         }
 
         mwc-icon.placeholder {
-          width: 40px;
-          height: 40px;
-          line-height: 40px;
-          border-radius: 50%;
+          /* Phase 10: Consistent icon sizing */
+          width: var(--icon-size-lg, 40px);
+          height: var(--icon-size-lg, 40px);
+          line-height: var(--icon-size-lg, 40px);
+          border-radius: var(--radius-full, 50%);
+        }
+
+        /* Phase 10: Enhanced focus states for accessibility */
+        mwc-list-item:focus-visible {
+          outline: var(--focus-ring-width, 2px) solid
+            var(--focus-ring-color, var(--md-sys-color-primary));
+          outline-offset: -2px;
+          border-radius: var(--radius-sm, 4px);
+        }
+
+        /* Phase 10: Mobile optimization */
+        @media (max-width: 768px) {
+          mwc-list-item {
+            min-height: var(--touch-target-min-size, 48px);
+            padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
+          }
         }
       `,
     ]

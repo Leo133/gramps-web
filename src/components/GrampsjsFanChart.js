@@ -1,13 +1,24 @@
+/**
+ * @fileoverview Fan chart component for displaying ancestor relationships in a circular layout
+ * @author Gramps Web contributors
+ */
+
 import {html, css} from 'lit'
 
 import {FanChart} from '../charts/FanChart.js'
 import {GrampsjsChartBase} from './GrampsjsChartBase.js'
 import {getPersonByGrampsId, getTree} from '../charts/util.js'
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 
 class GrampsjsFanChart extends GrampsjsChartBase {
   static get styles() {
     return [
       super.styles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
         svg a {
           text-decoration: none !important;

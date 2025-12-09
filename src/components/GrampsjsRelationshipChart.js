@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Relationship chart component for displaying connections between people
+ * @author Gramps Web contributors
+ */
+
 import {html, css} from 'lit'
 
 import '@material/mwc-menu'
@@ -6,11 +11,17 @@ import '@material/mwc-list/mwc-list-item'
 import {GrampsjsChartBase} from './GrampsjsChartBase.js'
 import {RelationshipChart} from '../charts/RelationshipChart.js'
 import {getImageUrl} from '../charts/util.js'
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 
 class GrampsjsRelationshipChart extends GrampsjsChartBase {
   static get styles() {
     return [
       super.styles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
         svg a {
           text-decoration: none !important;
@@ -19,8 +30,11 @@ class GrampsjsRelationshipChart extends GrampsjsChartBase {
           fill: var(--grampsjs-color-shade-230);
         }
         mwc-menu {
-          --mdc-typography-subtitle1-font-size: 13px;
-          --mdc-menu-item-height: 36px;
+          --mdc-typography-subtitle1-font-size: var(
+            --type-label-large-size,
+            14px
+          );
+          --mdc-menu-item-height: var(--touch-target-min-size, 48px);
         }
       `,
     ]

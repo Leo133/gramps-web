@@ -1,6 +1,7 @@
-/*
-Element for selecting a Gramps type
-*/
+/**
+ * @fileoverview String input form component with design tokens and accessibility
+ * @author Gramps.js
+ */
 
 import {html, css, LitElement} from 'lit'
 import '@material/mwc-textfield'
@@ -9,13 +10,24 @@ import {sharedStyles} from '../SharedStyles.js'
 import {fireEvent} from '../util.js'
 import {GrampsjsAppStateMixin} from '../mixins/GrampsjsAppStateMixin.js'
 
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
+
 class GrampsjsFormString extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
         mwc-textfield.fullwidth {
           width: 100%;
+        }
+
+        mwc-textfield {
+          min-height: var(--touch-target-min-size, 48px);
         }
       `,
     ]

@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Tab bar component for navigation between different sections
+ * Phase 10: Enhanced with design tokens and accessibility
+ * @author Gramps Web Contributors
+ */
+
 import {html, css, LitElement} from 'lit'
 
 import '@material/web/tabs/tabs'
@@ -5,6 +11,9 @@ import '@material/web/tabs/primary-tab'
 
 import {fireEvent} from '../util.js'
 import {sharedStyles} from '../SharedStyles.js'
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 import {GrampsjsAppStateMixin} from '../mixins/GrampsjsAppStateMixin.js'
 
 const tabs = {
@@ -30,16 +39,79 @@ class GrampsjsTabBar extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
     return [
       sharedStyles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
+        /* Phase 10: Enhanced tab styling with design tokens */
         md-tabs {
-          margin: 20px;
+          margin: var(--spacing-5, 20px);
           width: max-content;
           max-width: 100%;
+          /* Phase 10: Better spacing */
+          gap: var(--spacing-2, 8px);
         }
 
         md-primary-tab {
           flex: 0 0 auto;
           width: auto;
+          /* Phase 10: Touch-friendly tabs */
+          min-height: var(--touch-target-min-size, 48px);
+          padding: var(--spacing-3, 12px) var(--spacing-4, 16px);
+          /* Phase 10: Typography */
+          font-size: var(--type-title-medium-size, 16px);
+          font-weight: var(--font-weight-medium, 500);
+          letter-spacing: var(--type-title-medium-tracking, 0.15px);
+        }
+
+        /* Phase 10: Improved focus states for accessibility */
+        md-primary-tab:focus-visible {
+          outline: var(--focus-ring-width, 2px) solid
+            var(--focus-ring-color, var(--md-sys-color-primary));
+          outline-offset: 2px;
+          border-radius: var(--radius-sm, 4px);
+        }
+
+        /* Phase 10: Better hover states */
+        @media (hover: hover) and (pointer: fine) {
+          md-primary-tab:hover {
+            background-color: var(--md-sys-color-surface-container-low);
+            border-radius: var(--radius-sm, 4px);
+            transition: background-color var(--duration-short-2, 100ms)
+              var(--easing-standard);
+          }
+        }
+
+        /* Phase 10: Mobile optimization */
+        @media (max-width: 768px) {
+          md-tabs {
+            margin: var(--spacing-3, 12px) var(--spacing-2, 8px);
+            width: 100%;
+            overflow-x: auto;
+            /* Phase 10: Smooth scrolling on mobile */
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+          }
+
+          md-primary-tab {
+            min-height: var(--touch-target-min-size, 48px);
+            padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
+            font-size: var(--type-label-large-size, 14px);
+          }
+        }
+
+        /* Phase 10: Safe area insets for notched devices */
+        @supports (padding: max(0px)) {
+          md-tabs {
+            padding-left: max(
+              var(--spacing-5, 20px),
+              var(--safe-area-inset-left, 0)
+            );
+            padding-right: max(
+              var(--spacing-5, 20px),
+              var(--safe-area-inset-right, 0)
+            );
+          }
         }
       `,
     ]

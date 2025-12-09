@@ -1,9 +1,18 @@
+/**
+ * @fileoverview Dashboard view component showing home person and statistics
+ * Phase 10: Enhanced with design tokens and responsive layout
+ * @author Gramps Web Contributors
+ */
+
 import {html, css} from 'lit'
 
 import '@material/web/button/text-button'
 import '@material/web/button/outlined-button'
 
 import {GrampsjsView} from './GrampsjsView.js'
+import {designTokens} from '../design-tokens.js'
+import {a11yStyles} from '../accessibility.js'
+import {responsiveStyles} from '../responsive.js'
 import './GrampsjsViewRecentlyChanged.js'
 import './GrampsjsViewRecentBlogPosts.js'
 import './GrampsjsViewAnniversaries.js'
@@ -29,34 +38,96 @@ export class GrampsjsViewDashboard extends GrampsjsView {
   static get styles() {
     return [
       super.styles,
+      designTokens,
+      a11yStyles,
+      responsiveStyles,
       css`
+        /* Phase 10: Enhanced layout with design tokens */
         .column {
           float: left;
           width: 50%;
           overflow-x: hidden;
+          /* Phase 10: Better spacing */
+          padding: var(--spacing-2, 8px);
         }
 
         .column:first-child {
-          width: calc(50% - 2em);
-          padding-right: 2em;
+          width: calc(50% - var(--spacing-6, 32px));
+          padding-right: var(--spacing-6, 32px);
         }
 
         .column > div {
-          margin-bottom: 1.5em;
+          /* Phase 10: Token-based spacing */
+          margin-bottom: var(--spacing-5, 24px);
+          /* Phase 10: Card styling */
+          border-radius: var(--radius-card, 12px);
         }
 
         .buttons {
           display: flex;
-          gap: 1em;
-          margin-top: 1em;
+          gap: var(--spacing-4, 16px);
+          margin-top: var(--spacing-4, 16px);
           flex-wrap: wrap;
         }
 
+        /* Phase 10: Touch-friendly buttons */
+        md-outlined-button,
+        md-text-button {
+          min-height: var(--touch-target-min-size, 48px);
+          padding: var(--button-padding-horizontal, 24px);
+        }
+
+        /* Phase 10: Typography enhancements */
+        h3 {
+          font-size: var(--type-headline-small-size, 24px);
+          font-weight: var(--font-weight-regular, 400);
+          letter-spacing: var(--type-headline-small-tracking, 0);
+          margin-bottom: var(--spacing-4, 16px);
+        }
+
+        p {
+          font-size: var(--type-body-large-size, 16px);
+          line-height: var(--type-body-large-line-height, 24px);
+          letter-spacing: var(--type-body-large-tracking, 0.5px);
+        }
+
+        /* Phase 10: Mobile optimization */
         @media screen and (max-width: 768px) {
           .column,
           .column:first-child {
             width: 100%;
             padding-right: 0;
+            /* Phase 10: Mobile spacing */
+            padding: var(--spacing-2, 8px) 0;
+          }
+
+          .column > div {
+            margin-bottom: var(--spacing-4, 16px);
+          }
+
+          .buttons {
+            gap: var(--spacing-3, 12px);
+          }
+
+          h3 {
+            font-size: var(--type-headline-small-size, 22px);
+          }
+        }
+
+        /* Phase 10: Safe area insets for notched devices */
+        @supports (padding: max(0px)) {
+          .column:first-child {
+            padding-left: max(
+              var(--spacing-2, 8px),
+              var(--safe-area-inset-left, 0)
+            );
+          }
+
+          .column:last-child {
+            padding-right: max(
+              var(--spacing-2, 8px),
+              var(--safe-area-inset-right, 0)
+            );
           }
         }
       `,
