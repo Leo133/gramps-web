@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Media object detail view component
+ * @author Gramps Web contributors
+ */
+
 import {html} from 'lit'
 
 import {GrampsjsViewObject} from './GrampsjsViewObject.js'
