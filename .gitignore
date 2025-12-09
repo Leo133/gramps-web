@@ -20,3 +20,10 @@
 /_site/
 /dist/
 /out-tsc/
+
+# Backend
+/backend/node_modules/
+/backend/dist/
+/backend/*.db
+/backend/*.db-journal
+/backend/.env

@@ -1,0 +1,223 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id            String    @id @default(uuid())
+  username      String    @unique
+  email         String    @unique
+  password      String    // bcrypt hashed
+  fullName      String?   @map("full_name")
+  role          String    @default("member") // owner, editor, contributor, member
+  emailVerified Boolean   @default(false) @map("email_verified")
+  enabled       Boolean   @default(true)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  firstLogin    DateTime? @map("first_login")
+  lastLogin     DateTime? @map("last_login")
+
+  // Relations
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+// JWT Refresh Tokens
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  revoked   Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// Genealogy Core Models
+model Person {
+  id           String   @id @default(uuid())
+  handle       String   @unique
+  grampsId     String   @unique @map("gramps_id")
+  gender       Int      @default(2) // 0=Female, 1=Male, 2=Unknown
+  private      Boolean  @default(false)
+  firstName    String?  @map("first_name")
+  surname      String?
+  callName     String?  @map("call_name")
+  birthDate    String?  @map("birth_date")
+  birthPlace   String?  @map("birth_place")
+  deathDate    String?  @map("death_date")
+  deathPlace   String?  @map("death_place")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // JSON fields for complex nested data
+  primaryName  String?  @map("primary_name") // JSON
+  profile      String?  // JSON
+  mediaList    String?  @map("media_list") // JSON array
+  eventRefList String?  @map("event_ref_list") // JSON array
+
+  // Relations
+  familiesAsParent Family[] @relation("ParentFamilies")
+  familiesAsChild  Family[] @relation("ChildFamilies")
+  events           Event[]
+
+  @@map("people")
+}
+
+model Family {
+  id           String   @id @default(uuid())
+  handle       String   @unique
+  grampsId     String   @unique @map("gramps_id")
+  fatherHandle String?  @map("father_handle")
+  motherHandle String?  @map("mother_handle")
+  type         Int      @default(0) // 0=Unknown, 1=Married, 2=Unmarried, etc.
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // JSON fields
+  childRefList String? @map("child_ref_list") // JSON array
+  eventRefList String? @map("event_ref_list") // JSON array
+
+  // Relations
+  father   Person?  @relation("ParentFamilies", fields: [fatherHandle], references: [handle])
+  mother   Person?  @relation("ParentFamilies", fields: [motherHandle], references: [handle])
+  children Person[] @relation("ChildFamilies")
+
+  @@map("families")
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  handle      String   @unique
+  grampsId    String   @unique @map("gramps_id")
+  type        String   // Birth, Death, Marriage, etc.
+  date        String?
+  place       String?
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  personHandle String? @map("person_handle")
+  person       Person? @relation(fields: [personHandle], references: [handle])
+
+  @@map("events")
+}
+
+model Place {
+  id        String   @id @default(uuid())
+  handle    String   @unique
+  grampsId  String   @unique @map("gramps_id")
+  name      String
+  title     String?
+  latitude  Float?
+  longitude Float?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // JSON fields
+  placeType String? @map("place_type") // JSON
+  hierarchy String? // JSON array
+
+  @@map("places")
+}
+
+model Media {
+  id        String   @id @default(uuid())
+  handle    String   @unique
+  grampsId  String   @unique @map("gramps_id")
+  path      String
+  mimeType  String?  @map("mime_type")
+  desc      String?
+  checksum  String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("media")
+}
+
+model Repository {
+  id        String   @id @default(uuid())
+  handle    String   @unique
+  grampsId  String   @unique @map("gramps_id")
+  name      String
+  type      String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("repositories")
+}
+
+model Source {
+  id        String   @id @default(uuid())
+  handle    String   @unique
+  grampsId  String   @unique @map("gramps_id")
+  title     String
+  author    String?
+  pubInfo   String?  @map("pub_info")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("sources")
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  handle    String   @unique
+  grampsId  String   @unique @map("gramps_id")
+  content   String
+  type      String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("notes")
+}
+
+// System Models
+model Metadata {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   // JSON
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("metadata")
+}
+
+model TreeSettings {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   // JSON
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("tree_settings")
+}
+
+// Audit Log for tracking changes
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  action     String   // CREATE, UPDATE, DELETE
+  entityType String   @map("entity_type") // Person, Family, etc.
+  entityId   String   @map("entity_id")
+  changes    String?  // JSON of changes
+  timestamp  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}

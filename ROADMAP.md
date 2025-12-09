@@ -6,10 +6,10 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 
 **Goal:** Establish a scalable, type-safe, and performant backend infrastructure.
 
-- [ ] **Backend Migration:** Formalize the transition from the Python backend to a full TypeScript/Node.js (NestJS or Express) architecture.
-- [ ] **Database Layer:** Move from `lowdb` (JSON files) to a robust SQL database (PostgreSQL or SQLite) with an ORM (Prisma or TypeORM) for complex relationship queries.
-- [ ] **API Standardization:** Define a strict OpenAPI (Swagger) specification for all endpoints to ensure type safety between frontend and backend.
-- [ ] **Authentication & Security:** Implement robust JWT-based auth, role-based access control (RBAC), and secure session management.
+- [x] **Backend Migration:** Formalize the transition from the Python backend to a full TypeScript/Node.js (NestJS or Express) architecture.
+- [x] **Database Layer:** Move from `lowdb` (JSON files) to a robust SQL database (PostgreSQL or SQLite) with an ORM (Prisma or TypeORM) for complex relationship queries.
+- [x] **API Standardization:** Define a strict OpenAPI (Swagger) specification for all endpoints to ensure type safety between frontend and backend.
+- [x] **Authentication & Security:** Implement robust JWT-based auth, role-based access control (RBAC), and secure session management.
 
 ## Phase 2: Core Genealogy Data Management
 
