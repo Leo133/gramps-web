@@ -471,7 +471,93 @@
       "handle": "3aa3488ff33e98fe"
     }
   ],
-  "media": [],
+  "media": [
+    {
+      "handle": "ma44e23884670668f",
+      "gramps_id": "000M1",
+      "desc": "test-image",
+      "path": "/uploads/ma44e23884670668f_test-image.jpg",
+      "mime": "image/jpeg",
+      "checksum": "8d83e2e3d93e75d28b9bc289f4be863c",
+      "date": {
+        "modifier": 0,
+        "dateval": [
+          0,
+          0,
+          0,
+          false
+        ],
+        "sortval": 0
+      },
+      "attribute_list": [],
+      "citation_list": [],
+      "note_list": [],
+      "tag_list": [],
+      "private": false,
+      "change": 1765253165649,
+      "size": 26,
+      "thumbnails": {
+        "small": {
+          "width": 100,
+          "height": 100,
+          "size": 2,
+          "generated": "2025-12-09T04:06:05.649Z"
+        },
+        "medium": {
+          "width": 300,
+          "height": 300,
+          "size": 7,
+          "generated": "2025-12-09T04:06:05.649Z"
+        },
+        "large": {
+          "width": 800,
+          "height": 800,
+          "size": 15,
+          "generated": "2025-12-09T04:06:05.649Z"
+        }
+      },
+      "metadata": {
+        "exif": {
+          "dateTime": null,
+          "dateTimeOriginal": null,
+          "dateTimeDigitized": null,
+          "make": null,
+          "model": null,
+          "gps": null,
+          "orientation": 1,
+          "width": null,
+          "height": null,
+          "software": null,
+          "artist": null,
+          "copyright": null
+        },
+        "iptc": {
+          "keywords": [],
+          "caption": null,
+          "headline": null,
+          "credit": null,
+          "source": null,
+          "copyright": null,
+          "byline": null,
+          "bylineTitle": null,
+          "city": null,
+          "state": null,
+          "country": null,
+          "countryCode": null,
+          "date": null
+        },
+        "extracted": "2025-12-09T04:06:05.649Z",
+        "fileSize": 26,
+        "mimeType": "image/jpeg"
+      },
+      "suggestions": {
+        "date": null,
+        "place": null,
+        "description": null
+      },
+      "faces": []
+    }
+  ],
   "repositories": [
     {
       "handle": "r0001",
