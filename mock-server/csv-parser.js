@@ -22,6 +22,7 @@ export function parseCsv(csvContent) {
   const people = []
   const events = []
   const families = []
+  let eventCounter = 1
 
   // Parse data rows
   for (let i = 1; i < lines.length; i++) {
@@ -41,7 +42,7 @@ export function parseCsv(csvContent) {
       if (person.profile.birth?.date || person.profile.birth?.place_name) {
         events.push({
           handle: generateHandle(),
-          gramps_id: `E${String(events.length + 1).padStart(4, '0')}`,
+          gramps_id: `E${String(eventCounter++).padStart(4, '0')}`,
           type: {value: 'Birth'},
           date: {val: person.profile.birth.date || ''},
           place: person.profile.birth.place_name || '',
@@ -53,7 +54,7 @@ export function parseCsv(csvContent) {
       if (person.profile.death?.date || person.profile.death?.place_name) {
         events.push({
           handle: generateHandle(),
-          gramps_id: `E${String(events.length + 1).padStart(4, '0')}`,
+          gramps_id: `E${String(eventCounter++).padStart(4, '0')}`,
           type: {value: 'Death'},
           date: {val: person.profile.death.date || ''},
           place: person.profile.death.place_name || '',

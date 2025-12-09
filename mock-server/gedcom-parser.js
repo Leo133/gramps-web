@@ -376,8 +376,8 @@ function extractGrampsId(record, prefix) {
   if (uidNode) {
     return uidNode.value
   }
-  // Extract number from GEDCOM ID like @I123@
-  const match = record.id?.match(/@[A-Z](\d+)@/)
+  // Extract number from GEDCOM ID like @I123@ or @I0001@
+  const match = record.id?.match(/@[A-Z]+(\d+)@/)
   if (match) {
     return `${prefix}${match[1].padStart(4, '0')}`
   }

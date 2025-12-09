@@ -196,7 +196,10 @@ export function generateGedcom(data, version = '5.5.1') {
       const noteLines = note.text.string.split('\n')
       noteLines.forEach((line, idx) => {
         if (idx === 0) {
-          lines.push(`1 CONT ${line}`)
+          // First line is inline with NOTE tag, no need to add CONT
+          if (line) {
+            lines[lines.length - 1] = `0 ${xref} NOTE ${line}`
+          }
         } else {
           lines.push(`1 CONT ${line}`)
         }
