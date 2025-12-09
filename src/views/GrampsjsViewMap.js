@@ -7,6 +7,8 @@ import '../components/GrampsjsMap.js'
 import '../components/GrampsjsMapMarker.js'
 import '../components/GrampsjsMapSearchbox.js'
 import '../components/GrampsjsMapTimeSlider.js'
+import '../components/GrampsjsMapClusters.js'
+import '../components/GrampsjsMapMigrationFlow.js'
 import '../components/GrampsjsPlaceBox.js'
 import {getMediaUrl} from '../api.js'
 import {isDateBetweenYears, getGregorianYears} from '../util.js'
@@ -87,6 +89,9 @@ export class GrampsjsViewMap extends GrampsjsStaleDataMixin(GrampsjsView) {
       _currentLayer: {type: String},
       _minYear: {type: Number},
       _hiddenOverlaysHandles: {type: Array},
+      _migrationFlows: {type: Array},
+      _showClusters: {type: Boolean},
+      _showMigrationFlows: {type: Boolean},
     }
   }
 
@@ -107,6 +112,9 @@ export class GrampsjsViewMap extends GrampsjsStaleDataMixin(GrampsjsView) {
     this._yearSpan = -1
     this._currentLayer = ''
     this._minYear = 1500
+    this._migrationFlows = []
+    this._showClusters = false
+    this._showMigrationFlows = false
   }
 
   renderContent() {
@@ -128,7 +136,7 @@ export class GrampsjsViewMap extends GrampsjsStaleDataMixin(GrampsjsView) {
         @map:overlay-toggle="${this._handleOverlayToggle}"
         id="map"
         zoom="6"
-        >${this._renderMarkers()}${this._renderLayers()}</grampsjs-map
+        >${this._renderMapContent()}${this._renderLayers()}</grampsjs-map
       >
       <grampsjs-map-searchbox
         @mapsearch:input="${this._handleSearchInput}"
@@ -166,6 +174,39 @@ export class GrampsjsViewMap extends GrampsjsStaleDataMixin(GrampsjsView) {
         .appState="${this.appState}"
       ></grampsjs-place-box>
     `
+  }
+
+  _renderMapContent() {
+    // Render either clusters or individual markers
+    if (this._showClusters) {
+      return html`
+        <grampsjs-map-clusters
+          .places="${this._filteredPlaces}"
+          @cluster:place-clicked="${this._handleClusterPlaceClick}"
+        ></grampsjs-map-clusters>
+        ${this._showMigrationFlows
+          ? html`<grampsjs-map-migration-flow
+              .flows="${this._migrationFlows}"
+              .visible="${this._showMigrationFlows}"
+            ></grampsjs-map-migration-flow>`
+          : ''}
+      `
+    }
+    return html`${this._renderMarkers()}
+      ${this._showMigrationFlows
+        ? html`<grampsjs-map-migration-flow
+            .flows="${this._migrationFlows}"
+            .visible="${this._showMigrationFlows}"
+          ></grampsjs-map-migration-flow>`
+        : ''}`
+  }
+
+  _handleClusterPlaceClick(event) {
+    const {handle} = event.detail
+    const object = this._dataPlaces.find(p => p.handle === handle)
+    if (object) {
+      this._handlePlaceSelected(object)
+    }
   }
 
   _handleLayerChange(e) {
@@ -213,6 +254,9 @@ export class GrampsjsViewMap extends GrampsjsStaleDataMixin(GrampsjsView) {
 
   _handlePlaceFilterChanged(event) {
     this._placeFilters = {...event.detail}
+    // Update clustering and migration flows visibility
+    this._showClusters = !!this._placeFilters.showClusters
+    this._showMigrationFlows = !!this._placeFilters.showMigrationFlows
     this._applyPlaceFilter()
   }
 
@@ -401,12 +445,26 @@ export class GrampsjsViewMap extends GrampsjsStaleDataMixin(GrampsjsView) {
     this._fetchPlaces()
     this._fetchDataLayers()
     this._fetchEvents()
+    this._fetchMigrationFlows()
   }
 
   _fetchDataAll() {
     this._fetchPlaces()
     this._fetchDataLayers()
     this._fetchEvents()
+    this._fetchMigrationFlows()
+  }
+
+  async _fetchMigrationFlows() {
+    const data = await this.appState.apiGet('/api/geospatial/migration-flows')
+    if ('data' in data) {
+      this._migrationFlows = data.data || data
+    } else if (Array.isArray(data)) {
+      this._migrationFlows = data
+    } else {
+      // Fallback if the endpoint doesn't exist yet
+      this._migrationFlows = []
+    }
   }
 
   async _fetchDataSearch(value) {
