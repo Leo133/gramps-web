@@ -1525,6 +1525,340 @@ app.post('/api/exporters/:format/file', async (req, res) => {
 
 // ========== VISUALIZATIONS API (Phase 5) ==========
 
+// Helper functions for relationship calculation
+function getPathNode(person, relationship = '') {
+  const name = person?.primary_name
+    ? `${person.primary_name.first_name || ''} ${person.primary_name.surname_list?.[0]?.surname || ''}`.trim()
+    : 'Unknown'
+
+  return {
+    handle: person?.handle || '',
+    gramps_id: person?.gramps_id || '',
+    name,
+    gender: person?.gender ?? 2,
+    relationship,
+  }
+}
+
+function getNeighbors(personHandle, dbData) {
+  const neighbors = []
+
+  // Get families where person is a child
+  const childFamilies = dbData.families.filter(
+    f => f.child_ref_list && f.child_ref_list.includes(personHandle)
+  )
+
+  for (const family of childFamilies) {
+    if (family.father_handle) {
+      const father = dbData.people.find(p => p.handle === family.father_handle)
+      if (father) neighbors.push(getPathNode(father, 'parent'))
+    }
+    if (family.mother_handle) {
+      const mother = dbData.people.find(p => p.handle === family.mother_handle)
+      if (mother) neighbors.push(getPathNode(mother, 'parent'))
+    }
+  }
+
+  // Get families where person is a parent
+  const parentFamilies = dbData.families.filter(
+    f => f.father_handle === personHandle || f.mother_handle === personHandle
+  )
+
+  for (const family of parentFamilies) {
+    // Add spouse
+    if (family.father_handle === personHandle && family.mother_handle) {
+      const spouse = dbData.people.find(p => p.handle === family.mother_handle)
+      if (spouse) neighbors.push(getPathNode(spouse, 'spouse'))
+    } else if (family.mother_handle === personHandle && family.father_handle) {
+      const spouse = dbData.people.find(p => p.handle === family.father_handle)
+      if (spouse) neighbors.push(getPathNode(spouse, 'spouse'))
+    }
+
+    // Add children
+    if (family.child_ref_list) {
+      for (const childHandle of family.child_ref_list) {
+        const child = dbData.people.find(p => p.handle === childHandle)
+        if (child) neighbors.push(getPathNode(child, 'child'))
+      }
+    }
+  }
+
+  return neighbors
+}
+
+function findShortestPath(startHandle, endHandle, dbData) {
+  const visited = new Map()
+  const queue = []
+
+  const startPerson = dbData.people.find(p => p.handle === startHandle)
+  const startNode = getPathNode(startPerson)
+
+  queue.push({handle: startHandle, path: [startNode]})
+  visited.set(startHandle, true)
+
+  while (queue.length > 0) {
+    const {handle, path} = queue.shift()
+
+    if (handle === endHandle) {
+      return path
+    }
+
+    const neighbors = getNeighbors(handle, dbData)
+
+    for (const neighbor of neighbors) {
+      if (!visited.has(neighbor.handle)) {
+        visited.set(neighbor.handle, true)
+        queue.push({
+          handle: neighbor.handle,
+          path: [...path, neighbor],
+        })
+      }
+    }
+  }
+
+  return [] // No path found
+}
+
+function getGenderTerm(gender, maleTerm, femaleTerm, unknownTerm) {
+  if (gender === 1) return maleTerm
+  if (gender === 0) return femaleTerm
+  return unknownTerm
+}
+
+function analyzeRelationship(path) {
+  if (path.length === 1) {
+    return {
+      description: 'Self',
+      type: 'self',
+      commonAncestor: null,
+    }
+  }
+
+  if (path.length === 2) {
+    const rel = path[1].relationship
+    if (rel === 'parent') {
+      const term = getGenderTerm(path[1].gender, 'Father', 'Mother', 'Parent')
+      return {description: term, type: 'parent', commonAncestor: null}
+    }
+    if (rel === 'child') {
+      const term = getGenderTerm(path[1].gender, 'Son', 'Daughter', 'Child')
+      return {description: term, type: 'child', commonAncestor: null}
+    }
+    if (rel === 'spouse') {
+      const term = getGenderTerm(path[1].gender, 'Husband', 'Wife', 'Spouse')
+      return {description: term, type: 'spouse', commonAncestor: null}
+    }
+  }
+
+  // Count steps
+  let stepsUp = 0
+  let stepsDown = 0
+  let foundAncestor = false
+  let commonAncestor = null
+
+  for (let i = 1; i < path.length; i += 1) {
+    if (path[i].relationship === 'parent' && !foundAncestor) {
+      stepsUp += 1
+    } else if (path[i].relationship === 'child') {
+      foundAncestor = true
+      stepsDown += 1
+    }
+  }
+
+  if (stepsUp > 0 && !foundAncestor) {
+    commonAncestor = path[stepsUp]
+  }
+
+  // Siblings
+  if (stepsUp === 1 && stepsDown === 1) {
+    const term = getGenderTerm(
+      path[path.length - 1].gender,
+      'Brother',
+      'Sister',
+      'Sibling'
+    )
+    return {description: term, type: 'sibling', commonAncestor}
+  }
+
+  // Direct ancestors
+  if (stepsUp > 0 && stepsDown === 0) {
+    let term
+    if (stepsUp === 1) {
+      term = getGenderTerm(
+        path[path.length - 1].gender,
+        'Father',
+        'Mother',
+        'Parent'
+      )
+    } else if (stepsUp === 2) {
+      term = getGenderTerm(
+        path[path.length - 1].gender,
+        'Grandfather',
+        'Grandmother',
+        'Grandparent'
+      )
+    } else {
+      const prefix = 'Great-'.repeat(stepsUp - 2)
+      const base = getGenderTerm(
+        path[path.length - 1].gender,
+        'Grandfather',
+        'Grandmother',
+        'Grandparent'
+      )
+      term = prefix + base
+    }
+    return {description: term, type: 'ancestor', commonAncestor}
+  }
+
+  // Direct descendants
+  if (stepsUp === 0 && stepsDown > 0) {
+    let term
+    if (stepsDown === 1) {
+      term = getGenderTerm(
+        path[path.length - 1].gender,
+        'Son',
+        'Daughter',
+        'Child'
+      )
+    } else if (stepsDown === 2) {
+      term = getGenderTerm(
+        path[path.length - 1].gender,
+        'Grandson',
+        'Granddaughter',
+        'Grandchild'
+      )
+    } else {
+      const prefix = 'Great-'.repeat(stepsDown - 2)
+      const base = getGenderTerm(
+        path[path.length - 1].gender,
+        'Grandson',
+        'Granddaughter',
+        'Grandchild'
+      )
+      term = prefix + base
+    }
+    return {description: term, type: 'descendant', commonAncestor}
+  }
+
+  // Cousins
+  if (stepsUp > 0 && stepsDown > 0) {
+    const degree = Math.min(stepsUp, stepsDown) - 1
+    const removal = Math.abs(stepsUp - stepsDown)
+    const ordinals = [
+      '0th',
+      '1st',
+      '2nd',
+      '3rd',
+      '4th',
+      '5th',
+      '6th',
+      '7th',
+      '8th',
+      '9th',
+    ]
+
+    if (degree === 0) {
+      const term = removal === 0 ? 'Sibling' : `${ordinals[removal]} cousin`
+      return {description: term, type: 'cousin', commonAncestor}
+    }
+
+    const cousinType = `${ordinals[degree]} cousin`
+    const term =
+      removal === 0
+        ? cousinType
+        : `${cousinType}, ${removal} time${removal > 1 ? 's' : ''} removed`
+    return {description: term, type: 'cousin', commonAncestor}
+  }
+
+  return {
+    description: 'Distant relative',
+    type: 'distant',
+    commonAncestor,
+  }
+}
+
+function buildAncestorTree(handle, generation, maxGenerations, dbData) {
+  if (generation >= maxGenerations) {
+    return null
+  }
+
+  const person = dbData.people.find(p => p.handle === handle)
+  if (!person) {
+    return null
+  }
+
+  // Get parent family
+  const childFamilies = dbData.families.filter(
+    f => f.child_ref_list && f.child_ref_list.includes(handle)
+  )
+
+  let father = null
+  let mother = null
+
+  if (childFamilies.length > 0) {
+    const family = childFamilies[0]
+    if (family.father_handle) {
+      father = buildAncestorTree(family.father_handle, generation + 1, maxGenerations, dbData)
+    }
+    if (family.mother_handle) {
+      mother = buildAncestorTree(family.mother_handle, generation + 1, maxGenerations, dbData)
+    }
+  }
+
+  return {
+    person,
+    handle: person.handle,
+    gramps_id: person.gramps_id,
+    name: getPathNode(person).name,
+    gender: person.gender,
+    generation,
+    children: [father, mother].filter(Boolean),
+  }
+}
+
+function buildDescendantTree(handle, generation, maxGenerations, dbData) {
+  if (generation >= maxGenerations) {
+    return null
+  }
+
+  const person = dbData.people.find(p => p.handle === handle)
+  if (!person) {
+    return null
+  }
+
+  // Get families where person is a parent
+  const families = dbData.families.filter(
+    f => f.father_handle === handle || f.mother_handle === handle
+  )
+
+  const children = []
+  for (const family of families) {
+    if (family.child_ref_list) {
+      for (const childHandle of family.child_ref_list) {
+        const childTree = buildDescendantTree(
+          childHandle,
+          generation + 1,
+          maxGenerations,
+          dbData
+        )
+        if (childTree) {
+          children.push(childTree)
+        }
+      }
+    }
+  }
+
+  return {
+    person,
+    handle: person.handle,
+    gramps_id: person.gramps_id,
+    name: getPathNode(person).name,
+    gender: person.gender,
+    generation,
+    children,
+  }
+}
+
 /**
  * Calculate relationship between two people
  * POST /api/visualizations/calculate-relationship
@@ -1665,337 +1999,6 @@ app.get('/api/visualizations/descendant-tree/:handle', async (req, res) => {
       .json({error: error.message || 'Failed to get descendant tree data'})
   }
 })
-
-// Helper functions for relationship calculation
-function getPathNode(person, relationship = '') {
-  const name = person?.primary_name
-    ? `${person.primary_name.first_name || ''} ${person.primary_name.surname_list?.[0]?.surname || ''}`.trim()
-    : 'Unknown'
-
-  return {
-    handle: person?.handle || '',
-    gramps_id: person?.gramps_id || '',
-    name,
-    gender: person?.gender ?? 2,
-    relationship,
-  }
-}
-
-function getNeighbors(personHandle, dbData) {
-  const neighbors = []
-
-  // Get families where person is a child
-  const childFamilies = dbData.families.filter(
-    f => f.child_ref_list && f.child_ref_list.includes(personHandle)
-  )
-
-  for (const family of childFamilies) {
-    if (family.father_handle) {
-      const father = dbData.people.find(p => p.handle === family.father_handle)
-      if (father) neighbors.push(getPathNode(father, 'parent'))
-    }
-    if (family.mother_handle) {
-      const mother = dbData.people.find(p => p.handle === family.mother_handle)
-      if (mother) neighbors.push(getPathNode(mother, 'parent'))
-    }
-  }
-
-  // Get families where person is a parent
-  const parentFamilies = dbData.families.filter(
-    f => f.father_handle === personHandle || f.mother_handle === personHandle
-  )
-
-  for (const family of parentFamilies) {
-    // Add spouse
-    if (family.father_handle === personHandle && family.mother_handle) {
-      const spouse = dbData.people.find(p => p.handle === family.mother_handle)
-      if (spouse) neighbors.push(getPathNode(spouse, 'spouse'))
-    } else if (family.mother_handle === personHandle && family.father_handle) {
-      const spouse = dbData.people.find(p => p.handle === family.father_handle)
-      if (spouse) neighbors.push(getPathNode(spouse, 'spouse'))
-    }
-
-    // Add children
-    if (family.child_ref_list) {
-      for (const childHandle of family.child_ref_list) {
-        const child = dbData.people.find(p => p.handle === childHandle)
-        if (child) neighbors.push(getPathNode(child, 'child'))
-      }
-    }
-  }
-
-  return neighbors
-}
-
-function findShortestPath(startHandle, endHandle, dbData) {
-  const visited = new Map()
-  const queue = []
-
-  const startPerson = dbData.people.find(p => p.handle === startHandle)
-  const startNode = getPathNode(startPerson)
-
-  queue.push({handle: startHandle, path: [startNode]})
-  visited.set(startHandle, true)
-
-  while (queue.length > 0) {
-    const {handle, path} = queue.shift()
-
-    if (handle === endHandle) {
-      return path
-    }
-
-    const neighbors = getNeighbors(handle, dbData)
-
-    for (const neighbor of neighbors) {
-      if (!visited.has(neighbor.handle)) {
-        visited.set(neighbor.handle, true)
-        queue.push({
-          handle: neighbor.handle,
-          path: [...path, neighbor],
-        })
-      }
-    }
-  }
-
-  return [] // No path found
-}
-
-function analyzeRelationship(path) {
-  if (path.length === 1) {
-    return {
-      description: 'Self',
-      type: 'self',
-      commonAncestor: null,
-    }
-  }
-
-  if (path.length === 2) {
-    const rel = path[1].relationship
-    if (rel === 'parent') {
-      const term =
-        path[1].gender === 1 ? 'Father' : path[1].gender === 0 ? 'Mother' : 'Parent'
-      return {description: term, type: 'parent', commonAncestor: null}
-    }
-    if (rel === 'child') {
-      const term =
-        path[1].gender === 1 ? 'Son' : path[1].gender === 0 ? 'Daughter' : 'Child'
-      return {description: term, type: 'child', commonAncestor: null}
-    }
-    if (rel === 'spouse') {
-      const term =
-        path[1].gender === 1 ? 'Husband' : path[1].gender === 0 ? 'Wife' : 'Spouse'
-      return {description: term, type: 'spouse', commonAncestor: null}
-    }
-  }
-
-  // Count steps
-  let stepsUp = 0
-  let stepsDown = 0
-  let foundAncestor = false
-  let commonAncestor = null
-
-  for (let i = 1; i < path.length; i++) {
-    if (path[i].relationship === 'parent' && !foundAncestor) {
-      stepsUp++
-    } else if (path[i].relationship === 'child') {
-      foundAncestor = true
-      stepsDown++
-    }
-  }
-
-  if (stepsUp > 0 && !foundAncestor) {
-    commonAncestor = path[stepsUp]
-  }
-
-  // Siblings
-  if (stepsUp === 1 && stepsDown === 1) {
-    const term =
-      path[path.length - 1].gender === 1
-        ? 'Brother'
-        : path[path.length - 1].gender === 0
-          ? 'Sister'
-          : 'Sibling'
-    return {description: term, type: 'sibling', commonAncestor}
-  }
-
-  // Direct ancestors
-  if (stepsUp > 0 && stepsDown === 0) {
-    let term
-    if (stepsUp === 1) {
-      term =
-        path[path.length - 1].gender === 1
-          ? 'Father'
-          : path[path.length - 1].gender === 0
-            ? 'Mother'
-            : 'Parent'
-    } else if (stepsUp === 2) {
-      term =
-        path[path.length - 1].gender === 1
-          ? 'Grandfather'
-          : path[path.length - 1].gender === 0
-            ? 'Grandmother'
-            : 'Grandparent'
-    } else {
-      const prefix = 'Great-'.repeat(stepsUp - 2)
-      const base =
-        path[path.length - 1].gender === 1
-          ? 'Grandfather'
-          : path[path.length - 1].gender === 0
-            ? 'Grandmother'
-            : 'Grandparent'
-      term = prefix + base
-    }
-    return {description: term, type: 'ancestor', commonAncestor}
-  }
-
-  // Direct descendants
-  if (stepsUp === 0 && stepsDown > 0) {
-    let term
-    if (stepsDown === 1) {
-      term =
-        path[path.length - 1].gender === 1
-          ? 'Son'
-          : path[path.length - 1].gender === 0
-            ? 'Daughter'
-            : 'Child'
-    } else if (stepsDown === 2) {
-      term =
-        path[path.length - 1].gender === 1
-          ? 'Grandson'
-          : path[path.length - 1].gender === 0
-            ? 'Granddaughter'
-            : 'Grandchild'
-    } else {
-      const prefix = 'Great-'.repeat(stepsDown - 2)
-      const base =
-        path[path.length - 1].gender === 1
-          ? 'Grandson'
-          : path[path.length - 1].gender === 0
-            ? 'Granddaughter'
-            : 'Grandchild'
-      term = prefix + base
-    }
-    return {description: term, type: 'descendant', commonAncestor}
-  }
-
-  // Cousins
-  if (stepsUp > 0 && stepsDown > 0) {
-    const degree = Math.min(stepsUp, stepsDown) - 1
-    const removal = Math.abs(stepsUp - stepsDown)
-    const ordinals = [
-      '0th',
-      '1st',
-      '2nd',
-      '3rd',
-      '4th',
-      '5th',
-      '6th',
-      '7th',
-      '8th',
-      '9th',
-    ]
-
-    if (degree === 0) {
-      const term = removal === 0 ? 'Sibling' : `${ordinals[removal]} cousin`
-      return {description: term, type: 'cousin', commonAncestor}
-    }
-
-    const cousinType = `${ordinals[degree]} cousin`
-    const term =
-      removal === 0
-        ? cousinType
-        : `${cousinType}, ${removal} time${removal > 1 ? 's' : ''} removed`
-    return {description: term, type: 'cousin', commonAncestor}
-  }
-
-  return {
-    description: 'Distant relative',
-    type: 'distant',
-    commonAncestor,
-  }
-}
-
-function buildAncestorTree(handle, generation, maxGenerations, dbData) {
-  if (generation >= maxGenerations) {
-    return null
-  }
-
-  const person = dbData.people.find(p => p.handle === handle)
-  if (!person) {
-    return null
-  }
-
-  // Get parent family
-  const childFamilies = dbData.families.filter(
-    f => f.child_ref_list && f.child_ref_list.includes(handle)
-  )
-
-  let father = null
-  let mother = null
-
-  if (childFamilies.length > 0) {
-    const family = childFamilies[0]
-    if (family.father_handle) {
-      father = buildAncestorTree(family.father_handle, generation + 1, maxGenerations, dbData)
-    }
-    if (family.mother_handle) {
-      mother = buildAncestorTree(family.mother_handle, generation + 1, maxGenerations, dbData)
-    }
-  }
-
-  return {
-    person,
-    handle: person.handle,
-    gramps_id: person.gramps_id,
-    name: getPathNode(person).name,
-    gender: person.gender,
-    generation,
-    children: [father, mother].filter(Boolean),
-  }
-}
-
-function buildDescendantTree(handle, generation, maxGenerations, dbData) {
-  if (generation >= maxGenerations) {
-    return null
-  }
-
-  const person = dbData.people.find(p => p.handle === handle)
-  if (!person) {
-    return null
-  }
-
-  // Get families where person is a parent
-  const families = dbData.families.filter(
-    f => f.father_handle === handle || f.mother_handle === handle
-  )
-
-  const children = []
-  for (const family of families) {
-    if (family.child_ref_list) {
-      for (const childHandle of family.child_ref_list) {
-        const childTree = buildDescendantTree(
-          childHandle,
-          generation + 1,
-          maxGenerations,
-          dbData
-        )
-        if (childTree) {
-          children.push(childTree)
-        }
-      }
-    }
-  }
-
-  return {
-    person,
-    handle: person.handle,
-    gramps_id: person.gramps_id,
-    name: getPathNode(person).name,
-    gender: person.gender,
-    generation,
-    children,
-  }
-}
 
 // Generic handler for other requests (logging)
 app.use('/api', (req, res) => {

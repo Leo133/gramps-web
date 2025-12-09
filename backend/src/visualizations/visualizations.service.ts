@@ -1,21 +1,21 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import {Injectable} from '@nestjs/common'
+import {PrismaService} from '../prisma/prisma.service'
 
 interface PathNode {
-  handle: string;
-  gramps_id: string;
-  name: string;
-  gender: number;
-  relationship: string;
+  handle: string
+  gramps_id: string
+  name: string
+  gender: number
+  relationship: string
 }
 
 interface RelationshipResult {
-  person1: PathNode;
-  person2: PathNode;
-  relationship: string;
-  commonAncestor: PathNode | null;
-  path: PathNode[];
-  distance: number;
+  person1: PathNode
+  person2: PathNode
+  relationship: string
+  commonAncestor: PathNode | null
+  path: PathNode[]
+  distance: number
   relationshipType:
     | 'self'
     | 'parent'
@@ -26,7 +26,7 @@ interface RelationshipResult {
     | 'ancestor'
     | 'descendant'
     | 'in-law'
-    | 'distant';
+    | 'distant'
 }
 
 @Injectable()
@@ -44,8 +44,8 @@ export class VisualizationsService {
     // Special case: same person
     if (person1Handle === person2Handle) {
       const person = await this.prisma.person.findUnique({
-        where: { handle: person1Handle },
-      });
+        where: {handle: person1Handle},
+      })
       return {
         person1: this.personToPathNode(person),
         person2: this.personToPathNode(person),
@@ -54,11 +54,11 @@ export class VisualizationsService {
         path: [this.personToPathNode(person)],
         distance: 0,
         relationshipType: 'self',
-      };
+      }
     }
 
     // Find shortest path using bidirectional BFS
-    const path = await this.findShortestPath(person1Handle, person2Handle);
+    const path = await this.findShortestPath(person1Handle, person2Handle)
 
     if (!path || path.length === 0) {
       return {
@@ -69,11 +69,11 @@ export class VisualizationsService {
         path: [],
         distance: -1,
         relationshipType: 'distant',
-      };
+      }
     }
 
     // Analyze the path to determine relationship
-    const relationship = this.analyzeRelationship(path);
+    const relationship = this.analyzeRelationship(path)
 
     return {
       person1: path[0],
@@ -83,7 +83,7 @@ export class VisualizationsService {
       path,
       distance: path.length - 1,
       relationshipType: relationship.type,
-    };
+    }
   }
 
   /**
@@ -93,42 +93,42 @@ export class VisualizationsService {
     startHandle: string,
     endHandle: string,
   ): Promise<PathNode[]> {
-    const visited = new Map<string, { from: string | null; node: PathNode }>();
-    const queue: Array<{ handle: string; path: PathNode[] }> = [];
+    const visited = new Map<string, {from: string | null; node: PathNode}>()
+    const queue: Array<{handle: string; path: PathNode[]}> = []
 
     // Start BFS from person1
-    const startPerson = await this.getPersonNode(startHandle);
-    queue.push({ handle: startHandle, path: [startPerson] });
-    visited.set(startHandle, { from: null, node: startPerson });
+    const startPerson = await this.getPersonNode(startHandle)
+    queue.push({handle: startHandle, path: [startPerson]})
+    visited.set(startHandle, {from: null, node: startPerson})
 
     while (queue.length > 0) {
-      const { handle, path } = queue.shift()!;
+      const {handle, path} = queue.shift()!
 
       // Check if we reached the target
       if (handle === endHandle) {
-        return path;
+        return path
       }
 
       // Explore neighbors (parents, children, spouses)
-      const neighbors = await this.getNeighbors(handle);
+      const neighbors = await this.getNeighbors(handle)
 
       for (const neighbor of neighbors) {
         if (!visited.has(neighbor.handle)) {
-          const newPath = [...path, neighbor];
-          visited.set(neighbor.handle, { from: handle, node: neighbor });
-          queue.push({ handle: neighbor.handle, path: newPath });
+          const newPath = [...path, neighbor]
+          visited.set(neighbor.handle, {from: handle, node: neighbor})
+          queue.push({handle: neighbor.handle, path: newPath})
         }
       }
     }
 
-    return []; // No path found
+    return [] // No path found
   }
 
   /**
    * Get all neighboring people (parents, children, spouses)
    */
   private async getNeighbors(personHandle: string): Promise<PathNode[]> {
-    const neighbors: PathNode[] = [];
+    const neighbors: PathNode[] = []
 
     // Get person's families as child (query all families and filter in code)
     const allFamilies = await this.prisma.family.findMany({
@@ -136,128 +136,125 @@ export class VisualizationsService {
         father: true,
         mother: true,
       },
-    });
+    })
 
-    const childFamilies = allFamilies.filter((family) => {
-      if (!family.childRefList) return false;
-      const childList = JSON.parse(family.childRefList);
-      return Array.isArray(childList) && childList.includes(personHandle);
-    });
+    const childFamilies = allFamilies.filter(family => {
+      if (!family.childRefList) return false
+      const childList = JSON.parse(family.childRefList)
+      return Array.isArray(childList) && childList.includes(personHandle)
+    })
 
     for (const family of childFamilies) {
       if (family.father) {
-        neighbors.push(this.personToPathNode(family.father, 'parent'));
+        neighbors.push(this.personToPathNode(family.father, 'parent'))
       }
       if (family.mother) {
-        neighbors.push(this.personToPathNode(family.mother, 'parent'));
+        neighbors.push(this.personToPathNode(family.mother, 'parent'))
       }
     }
 
     // Get person's families as parent
     const parentFamilies = await this.prisma.family.findMany({
       where: {
-        OR: [{ fatherHandle: personHandle }, { motherHandle: personHandle }],
+        OR: [{fatherHandle: personHandle}, {motherHandle: personHandle}],
       },
-    });
+    })
 
     for (const family of parentFamilies) {
       // Add spouse
       if (family.fatherHandle === personHandle && family.motherHandle) {
         const spouse = await this.prisma.person.findUnique({
-          where: { handle: family.motherHandle },
-        });
+          where: {handle: family.motherHandle},
+        })
         if (spouse) {
-          neighbors.push(this.personToPathNode(spouse, 'spouse'));
+          neighbors.push(this.personToPathNode(spouse, 'spouse'))
         }
-      } else if (
-        family.motherHandle === personHandle &&
-        family.fatherHandle
-      ) {
+      } else if (family.motherHandle === personHandle && family.fatherHandle) {
         const spouse = await this.prisma.person.findUnique({
-          where: { handle: family.fatherHandle },
-        });
+          where: {handle: family.fatherHandle},
+        })
         if (spouse) {
-          neighbors.push(this.personToPathNode(spouse, 'spouse'));
+          neighbors.push(this.personToPathNode(spouse, 'spouse'))
         }
       }
 
       // Add children
       if (family.childRefList) {
-        const childList = JSON.parse(family.childRefList);
+        const childList = JSON.parse(family.childRefList)
         if (Array.isArray(childList)) {
           for (const childHandle of childList) {
             const child = await this.prisma.person.findUnique({
-              where: { handle: childHandle },
-            });
+              where: {handle: childHandle},
+            })
             if (child) {
-              neighbors.push(this.personToPathNode(child, 'child'));
+              neighbors.push(this.personToPathNode(child, 'child'))
             }
           }
         }
       }
     }
 
-    return neighbors;
+    return neighbors
   }
 
   /**
    * Analyze relationship path to generate human-readable description
    */
   private analyzeRelationship(path: PathNode[]): {
-    description: string;
-    type: RelationshipResult['relationshipType'];
-    commonAncestor: PathNode | null;
+    description: string
+    type: RelationshipResult['relationshipType']
+    commonAncestor: PathNode | null
   } {
     if (path.length === 1) {
       return {
         description: 'Self',
         type: 'self',
         commonAncestor: null,
-      };
+      }
     }
 
     if (path.length === 2) {
-      const rel = path[1].relationship;
+      const rel = path[1].relationship
       if (rel === 'parent') {
         return {
           description: this.getParentChildTerm(path[1].gender, true),
           type: 'parent',
           commonAncestor: null,
-        };
+        }
       }
       if (rel === 'child') {
         return {
           description: this.getParentChildTerm(path[1].gender, false),
           type: 'child',
           commonAncestor: null,
-        };
+        }
       }
       if (rel === 'spouse') {
         return {
           description: this.getSpouseTerm(path[1].gender),
           type: 'spouse',
           commonAncestor: null,
-        };
+        }
       }
     }
 
     // Count steps up and down
-    let stepsUp = 0;
-    let stepsDown = 0;
-    let foundAncestor = false;
-    let commonAncestor: PathNode | null = null;
+    let stepsUp = 0
+    let stepsDown = 0
+    let foundAncestor = false
+    let commonAncestor: PathNode | null = null
 
     for (let i = 1; i < path.length; i++) {
       if (path[i].relationship === 'parent' && !foundAncestor) {
-        stepsUp++;
+        stepsUp++
       } else if (path[i].relationship === 'child') {
-        foundAncestor = true;
-        stepsDown++;
+        foundAncestor = true
+        stepsDown++
       }
     }
 
     if (stepsUp > 0 && !foundAncestor) {
-      commonAncestor = path[stepsUp];
+      commonAncestor = path[stepsUp]
     }
 
     // Siblings (same parents)
@@ -266,16 +263,19 @@ export class VisualizationsService {
         description: this.getSiblingTerm(path[path.length - 1].gender),
         type: 'sibling',
         commonAncestor,
-      };
+      }
     }
 
     // Direct ancestors
     if (stepsUp > 0 && stepsDown === 0) {
       return {
-        description: this.getAncestorTerm(stepsUp, path[path.length - 1].gender),
+        description: this.getAncestorTerm(
+          stepsUp,
+          path[path.length - 1].gender,
+        ),
         type: 'ancestor',
         commonAncestor,
-      };
+      }
     }
 
     // Direct descendants
@@ -287,7 +287,7 @@ export class VisualizationsService {
         ),
         type: 'descendant',
         commonAncestor,
-      };
+      }
     }
 
     // Cousins
@@ -296,74 +296,82 @@ export class VisualizationsService {
         description: this.getCousinTerm(stepsUp, stepsDown),
         type: 'cousin',
         commonAncestor,
-      };
+      }
     }
 
     return {
       description: 'Distant relative',
       type: 'distant',
       commonAncestor,
-    };
+    }
   }
 
   private getParentChildTerm(gender: number, isParent: boolean): string {
     if (isParent) {
-      return gender === 1 ? 'Father' : gender === 0 ? 'Mother' : 'Parent';
+      return gender === 1 ? 'Father' : gender === 0 ? 'Mother' : 'Parent'
     }
-    return gender === 1 ? 'Son' : gender === 0 ? 'Daughter' : 'Child';
+    return gender === 1 ? 'Son' : gender === 0 ? 'Daughter' : 'Child'
   }
 
   private getSpouseTerm(gender: number): string {
-    return gender === 1 ? 'Husband' : gender === 0 ? 'Wife' : 'Spouse';
+    return gender === 1 ? 'Husband' : gender === 0 ? 'Wife' : 'Spouse'
   }
 
   private getSiblingTerm(gender: number): string {
-    return gender === 1 ? 'Brother' : gender === 0 ? 'Sister' : 'Sibling';
+    return gender === 1 ? 'Brother' : gender === 0 ? 'Sister' : 'Sibling'
   }
 
   private getAncestorTerm(generations: number, gender: number): string {
     if (generations === 1) {
-      return this.getParentChildTerm(gender, true);
+      return this.getParentChildTerm(gender, true)
     }
     if (generations === 2) {
       return gender === 1
         ? 'Grandfather'
         : gender === 0
           ? 'Grandmother'
-          : 'Grandparent';
+          : 'Grandparent'
     }
-    const prefix = 'Great-'.repeat(generations - 2);
+    const prefix = 'Great-'.repeat(generations - 2)
     const base =
-      gender === 1 ? 'Grandfather' : gender === 0 ? 'Grandmother' : 'Grandparent';
-    return prefix + base;
+      gender === 1
+        ? 'Grandfather'
+        : gender === 0
+          ? 'Grandmother'
+          : 'Grandparent'
+    return prefix + base
   }
 
   private getDescendantTerm(generations: number, gender: number): string {
     if (generations === 1) {
-      return this.getParentChildTerm(gender, false);
+      return this.getParentChildTerm(gender, false)
     }
     if (generations === 2) {
-      return gender === 1 ? 'Grandson' : gender === 0 ? 'Granddaughter' : 'Grandchild';
+      return gender === 1
+        ? 'Grandson'
+        : gender === 0
+          ? 'Granddaughter'
+          : 'Grandchild'
     }
-    const prefix = 'Great-'.repeat(generations - 2);
+    const prefix = 'Great-'.repeat(generations - 2)
     const base =
-      gender === 1 ? 'Grandson' : gender === 0 ? 'Granddaughter' : 'Grandchild';
-    return prefix + base;
+      gender === 1 ? 'Grandson' : gender === 0 ? 'Granddaughter' : 'Grandchild'
+    return prefix + base
   }
 
   private getCousinTerm(stepsUp: number, stepsDown: number): string {
-    const degree = Math.min(stepsUp, stepsDown) - 1;
-    const removal = Math.abs(stepsUp - stepsDown);
+    const degree = Math.min(stepsUp, stepsDown) - 1
+    const removal = Math.abs(stepsUp - stepsDown)
 
     if (degree === 0) {
-      return removal === 0 ? 'Sibling' : `${this.getOrdinal(removal)} cousin`;
+      return removal === 0 ? 'Sibling' : `${this.getOrdinal(removal)} cousin`
     }
 
-    const cousinType = `${this.getOrdinal(degree)} cousin`;
+    const cousinType = `${this.getOrdinal(degree)} cousin`
     if (removal === 0) {
-      return cousinType;
+      return cousinType
     }
-    return `${cousinType}, ${removal} time${removal > 1 ? 's' : ''} removed`;
+    return `${cousinType}, ${removal} time${removal > 1 ? 's' : ''} removed`
   }
 
   private getOrdinal(n: number): string {
@@ -378,24 +386,24 @@ export class VisualizationsService {
       '7th',
       '8th',
       '9th',
-    ];
-    return ordinals[n] || `${n}th`;
+    ]
+    return ordinals[n] || `${n}th`
   }
 
   private async getPersonNode(handle: string): Promise<PathNode> {
     const person = await this.prisma.person.findUnique({
-      where: { handle },
-    });
-    return this.personToPathNode(person);
+      where: {handle},
+    })
+    return this.personToPathNode(person)
   }
 
   private personToPathNode(person: any, relationship = ''): PathNode {
     const primaryName = person?.primaryName
       ? JSON.parse(person.primaryName)
-      : null;
+      : null
     const name = primaryName
       ? `${primaryName.first_name || ''} ${primaryName.surname_list?.[0]?.surname || ''}`.trim()
-      : 'Unknown';
+      : 'Unknown'
 
     return {
       handle: person?.handle || '',
@@ -403,7 +411,7 @@ export class VisualizationsService {
       name,
       gender: person?.gender ?? 2,
       relationship,
-    };
+    }
   }
 
   /**
@@ -411,15 +419,15 @@ export class VisualizationsService {
    */
   async getFanChartData(handle: string, maxGenerations = 5) {
     const root = await this.prisma.person.findUnique({
-      where: { handle },
-    });
+      where: {handle},
+    })
 
     if (!root) {
-      return null;
+      return null
     }
 
-    const chartData = await this.buildAncestorTree(handle, 0, maxGenerations);
-    return chartData;
+    const chartData = await this.buildAncestorTree(handle, 0, maxGenerations)
+    return chartData
   }
 
   private async buildAncestorTree(
@@ -428,43 +436,43 @@ export class VisualizationsService {
     maxGenerations: number,
   ): Promise<any> {
     if (generation >= maxGenerations) {
-      return null;
+      return null
     }
 
     const person = await this.prisma.person.findUnique({
-      where: { handle },
-    });
+      where: {handle},
+    })
 
     if (!person) {
-      return null;
+      return null
     }
 
     // Get parent family
-    const allFamilies = await this.prisma.family.findMany();
-    const childFamilies = allFamilies.filter((family) => {
-      if (!family.childRefList) return false;
-      const childList = JSON.parse(family.childRefList);
-      return Array.isArray(childList) && childList.includes(handle);
-    });
+    const allFamilies = await this.prisma.family.findMany()
+    const childFamilies = allFamilies.filter(family => {
+      if (!family.childRefList) return false
+      const childList = JSON.parse(family.childRefList)
+      return Array.isArray(childList) && childList.includes(handle)
+    })
 
-    let father = null;
-    let mother = null;
+    let father = null
+    let mother = null
 
     if (childFamilies.length > 0) {
-      const family = childFamilies[0];
+      const family = childFamilies[0]
       if (family.fatherHandle) {
         father = await this.buildAncestorTree(
           family.fatherHandle,
           generation + 1,
           maxGenerations,
-        );
+        )
       }
       if (family.motherHandle) {
         mother = await this.buildAncestorTree(
           family.motherHandle,
           generation + 1,
           maxGenerations,
-        );
+        )
       }
     }
 
@@ -476,7 +484,7 @@ export class VisualizationsService {
       gender: person.gender,
       generation,
       children: [father, mother].filter(Boolean),
-    };
+    }
   }
 
   /**
@@ -484,25 +492,25 @@ export class VisualizationsService {
    */
   async getTreeChartData(handle: string) {
     const person = await this.prisma.person.findUnique({
-      where: { handle },
-    });
+      where: {handle},
+    })
 
     if (!person) {
-      return null;
+      return null
     }
 
     return {
       person,
       ancestors: await this.buildAncestorTree(handle, 0, 3),
       descendants: await this.buildDescendantTree(handle, 0, 3),
-    };
+    }
   }
 
   /**
    * Get descendant tree data
    */
   async getDescendantTree(handle: string, maxGenerations = 5) {
-    return this.buildDescendantTree(handle, 0, maxGenerations);
+    return this.buildDescendantTree(handle, 0, maxGenerations)
   }
 
   private async buildDescendantTree(
@@ -511,37 +519,37 @@ export class VisualizationsService {
     maxGenerations: number,
   ): Promise<any> {
     if (generation >= maxGenerations) {
-      return null;
+      return null
     }
 
     const person = await this.prisma.person.findUnique({
-      where: { handle },
-    });
+      where: {handle},
+    })
 
     if (!person) {
-      return null;
+      return null
     }
 
     // Get families where this person is a parent
     const families = await this.prisma.family.findMany({
       where: {
-        OR: [{ fatherHandle: handle }, { motherHandle: handle }],
+        OR: [{fatherHandle: handle}, {motherHandle: handle}],
       },
-    });
+    })
 
-    const children = [];
+    const children = []
     for (const family of families) {
       if (family.childRefList) {
-        const childList = JSON.parse(family.childRefList);
+        const childList = JSON.parse(family.childRefList)
         if (Array.isArray(childList)) {
           for (const childHandle of childList) {
             const childTree = await this.buildDescendantTree(
               childHandle,
               generation + 1,
               maxGenerations,
-            );
+            )
             if (childTree) {
-              children.push(childTree);
+              children.push(childTree)
             }
           }
         }
@@ -556,6 +564,6 @@ export class VisualizationsService {
       gender: person.gender,
       generation,
       children,
-    };
+    }
   }
 }

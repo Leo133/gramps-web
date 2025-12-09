@@ -69,11 +69,32 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 
 **Goal:** Bring family history to life with dynamic, interactive graphics.
 
+**Status:** 🚧 IN PROGRESS (Backend Complete)
+
+- [x] **Relationship Calculator:** Instant pathfinding algorithms to show exactly how two people are related (e.g., "3rd cousin twice removed").
+- [x] **Optimized Chart Data APIs:** Backend endpoints for fan chart, tree chart, and descendant tree data
 - [ ] **Canvas/WebGL Charts:** Rewrite heavy SVG charts using Canvas or WebGL (PixiJS) for rendering thousands of nodes smoothly.
 - [ ] **Interactive Fan Chart:** A zoomable, clickable fan chart that acts as a navigation tool.
-- [ ] **Relationship Calculator:** Instant pathfinding algorithms to show exactly how two people are related (e.g., "3rd cousin twice removed").
 - [ ] **Fractal Tree:** A deep-zoom lineage view allowing users to explore generations seamlessly.
 - [ ] **DNA Visualization:** Charts for Y-DNA and mtDNA haplogroups and autosomal matches.
+
+**Implementation Details:** See [PHASE5_IMPLEMENTATION.md](PHASE5_IMPLEMENTATION.md) for complete documentation.
+
+**Backend Features (Complete):**
+- ✅ Relationship calculator with BFS pathfinding
+- ✅ Human-readable relationship descriptions (e.g., "2nd cousin twice removed")
+- ✅ Fan chart data API (configurable generations)
+- ✅ Tree chart data API (mixed ancestors/descendants)
+- ✅ Descendant tree data API
+- ✅ 4 new API endpoints
+- ✅ Mock server implementation
+
+**Frontend Integration (Pending):**
+- [ ] PixiJS or Canvas integration for high-performance rendering
+- [ ] Interactive fan chart component
+- [ ] Fractal tree with infinite zoom
+- [ ] DNA visualization components
+- [ ] Click navigation from charts
 
 ## Phase 6: Geospatial Intelligence (Maps)
 
