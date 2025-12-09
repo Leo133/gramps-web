@@ -1,4 +1,5 @@
 import {css} from 'lit'
+import {designTokens} from './design-tokens.js'
 
 /**
  * Shared Styles for Gramps Web
@@ -6,6 +7,8 @@ import {css} from 'lit'
  * Phase 10: Enhanced with design tokens and accessibility features
  */
 export const sharedStyles = css`
+  ${designTokens}
+  
   :host {
     line-height: 1.6;
     

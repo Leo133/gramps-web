@@ -34,9 +34,14 @@ import './components/GrampsjsTabBar.js'
 import './components/GrampsjsUndoTransaction.js'
 import './components/GrampsjsUpdateAvailable.js'
 import './components/GrampsjsUpgradeDb.js'
+import './components/GrampsjsUpdateAvailableNew.js'
+import './components/GrampsjsInstallPrompt.js'
+import './components/GrampsjsOfflineIndicator.js'
 import {sharedStyles} from './SharedStyles.js'
 import {applyTheme} from './theme.js'
 import {handleOIDCCallback, handleOIDCComplete} from './oidc.js'
+import {initPWA} from './pwa.js'
+import {initAccessibility} from './accessibility.js'
 
 const LOADING_STATE_INITIAL = 0
 const LOADING_STATE_UNAUTHORIZED = 1
@@ -243,6 +248,9 @@ export class GrampsJs extends LitElement {
           >
         </mwc-snackbar>
       </grampsjs-update-available>
+      <grampsjs-update-available-new></grampsjs-update-available-new>
+      <grampsjs-install-prompt></grampsjs-install-prompt>
+      <grampsjs-offline-indicator></grampsjs-offline-indicator>
     `
   }
 
@@ -561,6 +569,12 @@ export class GrampsJs extends LitElement {
     mediaQuery.addEventListener('change', () =>
       applyTheme(this.appState.settings.theme)
     )
+
+    // Initialize PWA features (Phase 10)
+    initPWA().catch(err => console.error('PWA initialization failed:', err))
+
+    // Initialize accessibility features (Phase 10)
+    initAccessibility()
   }
 
   firstUpdated() {
