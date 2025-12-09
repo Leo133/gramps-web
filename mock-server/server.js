@@ -15,7 +15,12 @@ import compression from 'compression'
 import multer from 'multer'
 import {parseGedcom} from './gedcom-parser.js'
 import {generateGedcom} from './gedcom-generator.js'
-import {parseCsv, generateCsvTemplate} from './csv-parser.js'
+import {
+  parseCsv,
+  generateCsvTemplate,
+  analyzeCsv,
+  parseCsvWithMapping,
+} from './csv-parser.js'
 
 const app = express()
 const upload = multer({storage: multer.memoryStorage()})
@@ -987,6 +992,26 @@ app.get('/api/importers/', (req, res) => {
   })
 })
 
+// Analyze CSV file
+app.post('/api/importers/csv/analyze', upload.single('file'), (req, res) => {
+  const {file} = req
+  if (!file) {
+    return res.status(400).json({error: 'No file uploaded'})
+  }
+
+  try {
+    const content = file.buffer.toString('utf-8')
+    const analysis = analyzeCsv(content)
+    if (analysis.error) {
+      return res.status(400).json({error: analysis.error})
+    }
+    return res.json(analysis)
+  } catch (error) {
+    console.error('Analysis error:', error)
+    return res.status(500).json({error: 'Analysis failed'})
+  }
+})
+
 // Import file
 app.post(
   '/api/importers/:format/file',
@@ -1015,7 +1040,17 @@ app.post(
           importedData = parseGedcom(content, '7.0')
           break
         case 'csv':
-          importedData = parseCsv(content)
+          if (req.body.mapping) {
+            try {
+              const mapping = JSON.parse(req.body.mapping)
+              importedData = parseCsvWithMapping(content, mapping)
+            } catch (e) {
+              console.error('Invalid mapping JSON:', e)
+              importedData = parseCsv(content)
+            }
+          } else {
+            importedData = parseCsv(content)
+          }
           break
         case 'gramps':
           // For now, return error for unsupported XML format

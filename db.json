@@ -69,6 +69,74 @@
       "family_list": [
         "f0001"
       ]
+    },
+    {
+      "handle": "vu87rubl3ym0h634djpk3t",
+      "gramps_id": "I0222",
+      "gender": 1,
+      "private": false,
+      "primary_name": {
+        "first_name": "John",
+        "surname_list": [
+          {
+            "surname": "Doe"
+          }
+        ],
+        "call": "John"
+      },
+      "profile": {
+        "name_surname": "Doe",
+        "name_given": "John",
+        "birth": {
+          "date": "1980-01-01",
+          "place_name": ""
+        },
+        "death": {
+          "date": "",
+          "place_name": ""
+        }
+      },
+      "media_list": [],
+      "event_ref_list": [
+        {
+          "ref": "tcdwx1dboditsmahehxxza"
+        }
+      ],
+      "family_list": []
+    },
+    {
+      "handle": "pb91trhngc40ztb0vusq7",
+      "gramps_id": "I3195",
+      "gender": 0,
+      "private": false,
+      "primary_name": {
+        "first_name": "Jane",
+        "surname_list": [
+          {
+            "surname": "Smith"
+          }
+        ],
+        "call": "Jane"
+      },
+      "profile": {
+        "name_surname": "Smith",
+        "name_given": "Jane",
+        "birth": {
+          "date": "1985-05-05",
+          "place_name": ""
+        },
+        "death": {
+          "date": "",
+          "place_name": ""
+        }
+      },
+      "media_list": [],
+      "event_ref_list": [
+        {
+          "ref": "3of48a9f5sl1swh4hu8smj"
+        }
+      ],
+      "family_list": []
     }
   ],
   "families": [
@@ -187,6 +255,30 @@
       "private": false,
       "gramps_id": "E0008",
       "handle": "05cdf4b04a374e9a"
+    },
+    {
+      "handle": "tcdwx1dboditsmahehxxza",
+      "gramps_id": "E4706",
+      "type": {
+        "value": "Birth"
+      },
+      "date": {
+        "val": "1980-01-01"
+      },
+      "place": "",
+      "description": "Birth of John Doe"
+    },
+    {
+      "handle": "3of48a9f5sl1swh4hu8smj",
+      "gramps_id": "E0433",
+      "type": {
+        "value": "Birth"
+      },
+      "date": {
+        "val": "1985-05-05"
+      },
+      "place": "",
+      "description": "Birth of Jane Smith"
     }
   ],
   "places": [

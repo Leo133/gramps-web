@@ -8,6 +8,178 @@
  */
 
 /**
+ * Analyze CSV content to detect structure and suggest mappings
+ * @param {string} csvContent
+ * @returns {Object} Analysis result
+ */
+export function analyzeCsv(csvContent) {
+  const lines = csvContent.split('\n').filter(line => line.trim())
+  if (lines.length === 0) return {error: 'Empty file'}
+
+  // Preview first 10 rows
+  const previewRows = lines.slice(0, 10).map(parseCSVLine)
+
+  // Detect header row (simple heuristic: row with most matches to known fields)
+  let bestHeaderRowIndex = 0
+  let maxMatches = -1
+
+  previewRows.forEach((row, index) => {
+    const map = normalizeHeaders(row)
+    const matches = Object.keys(map).length
+    if (matches > maxMatches) {
+      maxMatches = matches
+      bestHeaderRowIndex = index
+    }
+  })
+
+  // Generate column suggestions based on the detected header row
+  const headerRow = previewRows[bestHeaderRowIndex]
+  const columnSuggestions = headerRow.map(header => {
+    const normalized = header.toLowerCase().trim()
+    if (
+      normalized.includes('first') ||
+      normalized.includes('given') ||
+      normalized === 'name'
+    )
+      return 'firstName'
+    if (
+      normalized.includes('last') ||
+      normalized.includes('surname') ||
+      normalized.includes('family')
+    )
+      return 'lastName'
+    if (normalized.includes('middle')) return 'middleName'
+    if (normalized.includes('sex') || normalized.includes('gender'))
+      return 'gender'
+    if (
+      normalized.includes('birth') &&
+      (normalized.includes('date') || normalized.includes('year'))
+    )
+      return 'birthDate'
+    if (normalized.includes('birth') && normalized.includes('place'))
+      return 'birthPlace'
+    if (
+      normalized.includes('death') &&
+      (normalized.includes('date') || normalized.includes('year'))
+    )
+      return 'deathDate'
+    if (normalized.includes('death') && normalized.includes('place'))
+      return 'deathPlace'
+    if (normalized.includes('id')) return 'id'
+    return null
+  })
+
+  return {
+    totalRows: lines.length,
+    preview: previewRows,
+    detectedHeaderRow: bestHeaderRowIndex,
+    columns: columnSuggestions,
+  }
+}
+
+/**
+ * Parse CSV with explicit mapping
+ * @param {string} csvContent
+ * @param {Object} mapping - Configuration { headerRowIndex, columnMap: { index: fieldName } }
+ */
+export function parseCsvWithMapping(csvContent, mapping) {
+  const lines = csvContent.split('\n').filter(line => line.trim())
+  if (lines.length === 0) {
+    return {people: [], events: [], families: []}
+  }
+
+  const {headerRowIndex = 0, columnMap = {}} = mapping
+
+  // Convert columnMap (index -> fieldName) to headerMap (fieldName -> index)
+  const headerMap = {}
+  Object.entries(columnMap).forEach(([index, field]) => {
+    if (field) {
+      headerMap[field] = parseInt(index, 10)
+    }
+  })
+
+  const people = []
+  const events = []
+  const families = []
+
+  // Parse data rows starting after header row
+  for (let i = headerRowIndex + 1; i < lines.length; i++) {
+    const values = parseCSVLine(lines[i])
+    if (values.length === 0) continue
+
+    // Create a row object where keys are indices (as strings) for createPersonFromRow compatibility?
+    // No, createPersonFromRow expects an object where values are accessed by index from headerMap.
+    // Actually createPersonFromRow takes `row` and `headerMap`.
+    // `row` in parseCsv was constructed as object { "HeaderName": "Value" }.
+    // But `createPersonFromRow` implementation:
+    // function createPersonFromRow(row, headerMap) {
+    //   const values = Object.values(row)
+    //   const firstName = headerMap.firstName !== undefined ? values[headerMap.firstName] : ''
+    // ...
+    // Wait, `Object.values(row)` relies on order?
+    // In `parseCsv`:
+    //     const row = {}
+    //     header.forEach((h, idx) => {
+    //       row[h] = values[idx] || ''
+    //     })
+    // If `row` is that object, `Object.values(row)` might not be in index order if keys are strings.
+    // However, `createPersonFromRow` uses `values[headerMap.firstName]`.
+    // If `headerMap` stores INDICES, then `values` must be an ARRAY of values, not `Object.values(row)`.
+
+    // Let's check `createPersonFromRow` implementation again.
+    const person = createPersonFromRow(values, headerMap)
+    if (person) {
+      people.push(person)
+      // Create birth event if data exists
+      if (person.profile.birth?.date || person.profile.birth?.place_name) {
+        const eventHandle = generateHandle()
+        const eventId = `E${String(Math.floor(Math.random() * 10000)).padStart(
+          4,
+          '0'
+        )}`
+
+        events.push({
+          handle: eventHandle,
+          gramps_id: eventId,
+          type: {value: 'Birth'},
+          date: {val: person.profile.birth.date || ''},
+          place: person.profile.birth.place_name || '',
+          description: `Birth of ${person.primary_name.first_name} ${
+            person.primary_name.surname_list[0]?.surname || ''
+          }`,
+        })
+
+        person.event_ref_list.push({ref: eventHandle})
+      }
+
+      // Create death event if data exists
+      if (person.profile.death?.date || person.profile.death?.place_name) {
+        const eventHandle = generateHandle()
+        const eventId = `E${String(Math.floor(Math.random() * 10000)).padStart(
+          4,
+          '0'
+        )}`
+
+        events.push({
+          handle: eventHandle,
+          gramps_id: eventId,
+          type: {value: 'Death'},
+          date: {val: person.profile.death.date || ''},
+          place: person.profile.death.place_name || '',
+          description: `Death of ${person.primary_name.first_name} ${
+            person.primary_name.surname_list[0]?.surname || ''
+          }`,
+        })
+
+        person.event_ref_list.push({ref: eventHandle})
+      }
+    }
+  }
+
+  return {people, events, families}
+}
+
+/**
  * Parse CSV content into Gramps Web people records
  * @param {string} csvContent - The CSV file content
  * @returns {Object} Parsed data with people and events
