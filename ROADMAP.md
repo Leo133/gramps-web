@@ -276,3 +276,43 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 - [x] **Approval Workflows:** A "Pull Request" system for genealogy—contributors submit changes, and editors review/approve them before they go live.
 
 **Implementation Details:** See [PHASE13_IMPLEMENTATION.md](PHASE13_IMPLEMENTATION.md) and [PHASE13_SUMMARY.md](PHASE13_SUMMARY.md) for complete documentation.
+
+## Phase 14: Polishing, Performance & Production Readiness
+
+**Goal:** Ensure the platform is robust, fully tested, and performant at scale, while closing the gap between backend capabilities and frontend UI.
+
+**Status:** 📅 PLANNED
+
+- [ ] **Core Feature Parity (Missing Backend Modules):**
+    - [ ] **Reporting Engine:** Implement a backend `ReportsModule` to generate PDF/ODT reports (Ahnentafel, Descendant, etc.) matching Gramps Desktop capabilities.
+    - [ ] **DNA Backend:** Implement `DnaModule` to support storing and retrieving DNA matches (supporting the existing frontend views).
+    - [ ] **Gramps XML Support:** Implement full lossless import/export of the native `.gramps` XML format (critical for desktop interoperability).
+- [ ] **Frontend Feature Completion:**
+    - [ ] **Deep Zoom UI:** Integrate OpenSeadragon for the IIIF-compatible media viewer (Phase 4).
+    - [ ] **High-Performance Charts:** Implement Canvas/WebGL (PixiJS) rendering for large Fan Charts and Pedigree Trees (Phase 5).
+    - [ ] **Real-Time Updates:** Implement WebSocket or polling mechanisms for Chat and Activity Feed (Phase 9).
+    - [ ] **Face Tagging UI:** Frontend interface for the face detection API (Phase 4).
+- [ ] **Testing & Quality Assurance:**
+    - [ ] **Backend Test Coverage:** Achieve >80% unit test coverage (currently low).
+    - [ ] **E2E Testing:** Fix and expand End-to-End test suites for critical user flows.
+    - [ ] **Frontend Testing:** Implement comprehensive component tests using `@web/test-runner`.
+- [ ] **Performance Optimization:**
+    - [ ] **Database Query Tuning:** Optimize complex visualization queries (e.g., `visualizations.service.ts`).
+    - [ ] **Virtual Scrolling:** Implement virtual lists for large datasets (People list, Media gallery).
+    - [ ] **Bundle Optimization:** Analyze and reduce frontend bundle size.
+
+## Phase 15: Legacy Compatibility & Advanced Science
+
+**Goal:** Support long-time Gramps users and advanced genetic genealogy use cases.
+
+**Status:** 📅 PLANNED
+
+- [ ] **Advanced Visualizations:**
+    - [ ] **Graph View:** Implement a force-directed graph visualization of the entire family tree.
+    - [ ] **Calendar View:** A dedicated calendar view for birthdays, anniversaries, and historical events.
+- [ ] **Narrative & Blogging:**
+    - [ ] **Blog Backend:** Implement a `BlogModule` to support the narrative/blogging frontend views.
+- [ ] **Advanced Tools:**
+    - [ ] **Date Calculator:** Utility for complex date arithmetic (age between dates, day of week, etc.).
+    - [ ] **DNA Painter Integration:** Visual chromosome mapping and triangulation tools (Phase 12).
+- [ ] **Advanced Search Backend:** Evaluate migration to Meilisearch or Elasticsearch if the SQL-based search hits performance limits.
