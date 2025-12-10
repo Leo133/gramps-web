@@ -111,7 +111,7 @@ export class GrampsjsGraphChart extends LitElement {
         d3
           .forceLink(this.data.links)
           .id(d => d.id)
-          .distance(d => (d.type === 'spouse' ? 80 : 120)),
+          .distance(d => (d.type === 'spouse' ? 80 : 120))
       )
       .force('charge', d3.forceManyBody().strength(-300))
       .force('center', d3.forceCenter(width / 2, height / 2))
@@ -156,12 +156,15 @@ export class GrampsjsGraphChart extends LitElement {
             const {subject} = event
             subject.fx = null
             subject.fy = null
-          }),
+          })
       )
 
     node.append('circle').attr('r', 8)
 
-    node.append('text').attr('dy', 20).text(d => d.name)
+    node
+      .append('text')
+      .attr('dy', 20)
+      .text(d => d.name)
 
     // Add click handler
     node.on('click', (event, d) => {

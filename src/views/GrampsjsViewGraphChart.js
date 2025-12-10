@@ -92,5 +92,5 @@ export class GrampsjsViewGraphChart extends GrampsjsView {
 
 window.customElements.define(
   'grampsjs-view-graph-chart',
-  GrampsjsViewGraphChart,
+  GrampsjsViewGraphChart
 )

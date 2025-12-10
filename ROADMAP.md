@@ -341,3 +341,30 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 - ✅ Gender-based color coding in graph view
 - ✅ Click-to-navigate in all visualizations
 - ✅ Database migration for BlogPost model
+
+## Phase 16: Final Polish & Release Readiness
+
+**Goal:** Consolidate all previous work, resolve pending frontend integrations, ensure build stability, and prepare for a production release.
+
+**Status:** 📅 PLANNED
+
+- [ ] **Frontend Infrastructure & Build:**
+  - [ ] **Build Stability:** Fix the "Killed" (OOM) issues during the frontend build process.
+  - [ ] **Test Environment:** Configure the environment (Chrome binary) to allow `@web/test-runner` to execute successfully.
+  - [ ] **Bundle Optimization:** Ensure the production build is optimized and assets are correctly served.
+
+- [ ] **Pending Frontend Integration (Catch-up):**
+  - [ ] **Phase 4 (Media):** Implement the UI for Gallery Filters, OpenSeadragon (Deep Zoom), and Face Tagging.
+  - [ ] **Phase 5 (Charts):** Implement the high-performance Canvas/WebGL (PixiJS) rendering for large charts.
+  - [ ] **Phase 9 (Real-time):** Verify and polish the Chat and Activity Feed UI.
+
+- [ ] **Quality Assurance & Testing:**
+  - [ ] **End-to-End (E2E) Testing:** Run full user flow tests (Register -> Create Person -> Add Media -> View Chart).
+  - [ ] **Cross-Browser Testing:** Verify layout and functionality on Firefox and Safari.
+  - [ ] **Mobile Responsiveness:** Audit and fix layout issues on smaller screens.
+
+- [ ] **Documentation & Deployment:**
+  - [ ] **Deployment Guide:** Finalize `docker-compose.yml` and Nginx configuration for production.
+  - [ ] **User Guide:** Update documentation to reflect all new features (Blog, Graph, Calendar, etc.).
+  - [ ] **Cleanup:** Remove unused code, temporary files, and deprecated endpoints.
+

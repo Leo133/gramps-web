@@ -148,9 +148,7 @@ export class GrampsjsViewDateCalculator extends GrampsjsView {
             .value=${this._operation}
           >
             <option value="age">${this._('Calculate Age')}</option>
-            <option value="difference">
-              ${this._('Date Difference')}
-            </option>
+            <option value="difference">${this._('Date Difference')}</option>
             <option value="dayOfWeek">${this._('Day of Week')}</option>
             <option value="add">${this._('Add to Date')}</option>
             <option value="subtract">${this._('Subtract from Date')}</option>
@@ -249,9 +247,7 @@ export class GrampsjsViewDateCalculator extends GrampsjsView {
                   : ''}
                 ${this._operation === 'dayOfWeek'
                   ? html`
-                      <div class="result-detail">
-                        ${this._result.dayOfWeek}
-                      </div>
+                      <div class="result-detail">${this._result.dayOfWeek}</div>
                     `
                   : ''}
                 ${this._operation === 'add' || this._operation === 'subtract'
@@ -271,5 +267,5 @@ export class GrampsjsViewDateCalculator extends GrampsjsView {
 
 window.customElements.define(
   'grampsjs-view-date-calculator',
-  GrampsjsViewDateCalculator,
+  GrampsjsViewDateCalculator
 )

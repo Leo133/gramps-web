@@ -58,6 +58,9 @@ import '../views/GrampsjsViewNewNote.js'
 import '../views/GrampsjsViewNewMedia.js'
 import '../views/GrampsjsViewNewTask.js'
 import '../views/GrampsjsViewHelp.js'
+import '../views/GrampsjsViewGraphChart.js'
+import '../views/GrampsjsViewCalendar.js'
+import '../views/GrampsjsViewDateCalculator.js'
 
 class GrampsjsPages extends GrampsjsAppStateMixin(LitElement) {
   static get styles() {
@@ -407,6 +410,21 @@ class GrampsjsPages extends GrampsjsAppStateMixin(LitElement) {
         grampsId="${this.appState.path.pageId}"
         .appState="${this.appState}"
       ></grampsjs-view-task>
+      <grampsjs-view-graph-chart
+        class="page"
+        ?active=${this.appState.path.page === 'graph'}
+        .appState="${this.appState}"
+      ></grampsjs-view-graph-chart>
+      <grampsjs-view-calendar
+        class="page"
+        ?active=${this.appState.path.page === 'calendar'}
+        .appState="${this.appState}"
+      ></grampsjs-view-calendar>
+      <grampsjs-view-date-calculator
+        class="page"
+        ?active=${this.appState.path.page === 'date_calculator'}
+        .appState="${this.appState}"
+      ></grampsjs-view-date-calculator>
     `
   }
 }

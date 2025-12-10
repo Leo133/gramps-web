@@ -90,7 +90,7 @@ export class GrampsjsViewCalendar extends GrampsjsView {
     this._loading = true
     try {
       const response = await fetch(
-        `/api/visualizations/calendar/${this._year}/${this._month}`,
+        `/api/visualizations/calendar/${this._year}/${this._month}`
       )
       if (response.ok) {
         this._data = await response.json()

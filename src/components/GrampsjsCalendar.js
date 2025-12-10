@@ -168,7 +168,7 @@ export class GrampsjsCalendar extends LitElement {
               >
                 ${this._formatEvent(event)}
               </div>
-            `,
+            `
           )}
         </div>
       `)
