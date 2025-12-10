@@ -8,6 +8,8 @@ export class OfflineIndicator extends LitElement {
   static get properties() {
     return {
       offline: {type: Boolean},
+      message: {type: String},
+      type: {type: String}, // 'network' or 'server'
     }
   }
 
@@ -53,13 +55,30 @@ export class OfflineIndicator extends LitElement {
       font-size: 14px;
       font-weight: 500;
     }
+
+    button {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
   `
 
   constructor() {
     super()
     this.offline = false
+    this.message = ''
+    this.type = ''
     this.handleOnline = this.handleOnline.bind(this)
     this.handleOffline = this.handleOffline.bind(this)
+    this.handleApiError = this.handleApiError.bind(this)
   }
 
   connectedCallback() {
@@ -67,24 +86,42 @@ export class OfflineIndicator extends LitElement {
     this.offline = !navigator.onLine
     window.addEventListener('online', this.handleOnline)
     window.addEventListener('offline', this.handleOffline)
+    window.addEventListener('api:error', this.handleApiError)
   }
 
   disconnectedCallback() {
     super.disconnectedCallback()
     window.removeEventListener('online', this.handleOnline)
     window.removeEventListener('offline', this.handleOffline)
+    window.removeEventListener('api:error', this.handleApiError)
   }
 
   handleOnline() {
     this.offline = false
+    this.message = 'Back online'
+    this.type = 'network'
     // Auto-hide after 3 seconds when coming online
     setTimeout(() => {
       this.offline = false
+      this.message = ''
     }, 3000)
   }
 
   handleOffline() {
     this.offline = true
+    this.message = 'You are offline'
+    this.type = 'network'
+  }
+
+  handleApiError(e) {
+    this.offline = true
+    this.message = e.detail.error
+    this.type = e.detail.type
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  reload() {
+    window.location.reload()
   }
 
   render() {
@@ -101,23 +138,21 @@ export class OfflineIndicator extends LitElement {
           : ''}"
       >
         <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-          ${this.offline
-            ? html`
-                <path
-                  d="M23.64 7c-.45-.34-4.93-4-11.64-4-1.5 0-2.89.19-4.15.48L18.18 13.8 23.64 7zm-6.6 8.22L3.27 1.44 2 2.72l2.05 2.06C1.91 5.76.59 6.82.36 7l11.63 14.49.01.01.01-.01 3.9-4.86 3.32 3.32 1.27-1.27-3.46-3.46z"
-                ></path>
-              `
-            : html`
-                <path
-                  d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"
-                ></path>
-              `}
+          ${isOnline
+            ? html`<path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+              ></path>`
+            : html`<path
+                d="M23.64 7c-.45-.34-4.93-4-11.64-4-1.5 0-2.89.19-4.15.48L18.18 13.8 23.64 7zm-6.6 8.22L3.27 1.44 2 2.72l2.05 2.06C1.91 5.76.59 6.82.36 7l11.63 14.49.01.01.01-.01 3.9-4.86 3.32 3.32 1.27-1.27-3.46-3.46z"
+              ></path>`}
         </svg>
-        <span class="message">
-          ${this.offline
-            ? 'You are offline. Viewing cached data.'
-            : 'Back online!'}
-        </span>
+        <span class="message"
+          >${this.message ||
+          (this.offline ? 'You are offline' : 'Back online')}</span
+        >
+        ${this.offline && this.type === 'server'
+          ? html`<button @click=${this.reload}>Retry</button>`
+          : ''}
       </div>
     `
   }

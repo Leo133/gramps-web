@@ -2,7 +2,7 @@
 /**
  * Enhanced Service Worker for Gramps Web
  * Phase 11: Offline Mode Implementation
- * 
+ *
  * This service worker provides:
  * - Offline functionality for viewing cached data
  * - Background sync for queued operations
@@ -10,20 +10,15 @@
  */
 
 // Import Workbox libraries
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-sw.js')
+importScripts(
+  'https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-sw.js'
+)
 
-const {
-  precacheAndRoute,
-  cleanupOutdatedCaches,
-  createHandlerBoundToURL,
-} = workbox.precaching
+const {precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL} =
+  workbox.precaching
 const {registerRoute, NavigationRoute} = workbox.routing
-const {
-  NetworkFirst,
-  CacheFirst,
-  StaleWhileRevalidate,
-  NetworkOnly,
-} = workbox.strategies
+const {NetworkFirst, CacheFirst, StaleWhileRevalidate, NetworkOnly} =
+  workbox.strategies
 const {ExpirationPlugin} = workbox.expiration
 const {CacheableResponsePlugin} = workbox.cacheableResponse
 
@@ -72,7 +67,7 @@ registerRoute(
       }),
     ],
     networkTimeoutSeconds: 10,
-  }),
+  })
 )
 
 // Images - Cache First
@@ -89,7 +84,7 @@ registerRoute(
         maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
       }),
     ],
-  }),
+  })
 )
 
 // Fonts - Cache First
@@ -106,7 +101,7 @@ registerRoute(
         maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
       }),
     ],
-  }),
+  })
 )
 
 // Static Assets - Stale While Revalidate
@@ -126,7 +121,7 @@ registerRoute(
         maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
       }),
     ],
-  }),
+  })
 )
 
 // Handle service worker updates
@@ -134,7 +129,7 @@ self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting()
   }
-  
+
   if (event.data && event.data.type === 'GET_VERSION') {
     event.ports[0].postMessage({version: SW_VERSION})
   }
@@ -146,7 +141,7 @@ self.addEventListener('activate', event => {
     (async () => {
       // Claim all clients
       await self.clients.claim()
-      
+
       // Notify all clients about the update
       const clients = await self.clients.matchAll({type: 'window'})
       clients.forEach(client => {
@@ -155,7 +150,7 @@ self.addEventListener('activate', event => {
           version: SW_VERSION,
         })
       })
-    })(),
+    })()
   )
 })
 

@@ -366,6 +366,12 @@ export async function apiGet(endpoint) {
     if (resp.status === 403) {
       throw new Error('Authorization error')
     }
+    if (resp.status === 503) {
+      fireEvent(window, 'api:error', {
+        error: 'Service unavailable. Please check your connection or drive.',
+        type: 'server',
+      })
+    }
     if (resp.status !== 200) {
       throw new Error(
         resJson?.error?.message || resp.statusText || `Error ${resp.status}`
@@ -378,6 +384,10 @@ export async function apiGet(endpoint) {
     }
   } catch (error) {
     if (error instanceof TypeError) {
+      fireEvent(window, 'api:error', {
+        error: 'Network connection lost',
+        type: 'network',
+      })
       return {error: 'Network error'}
     }
     return {error: error.message}
@@ -430,6 +440,12 @@ async function apiPutPost(
     if (resp.status === 403) {
       throw new Error('Not authorized')
     }
+    if (resp.status === 503) {
+      fireEvent(window, 'api:error', {
+        error: 'Service unavailable. Please check your connection or drive.',
+        type: 'server',
+      })
+    }
     if (resp.status !== 201 && resp.status !== 200 && resp.status !== 202) {
       throw new Error(
         resJson?.error?.message || resp.statusText || `Error ${resp.status}`
@@ -449,6 +465,13 @@ async function apiPutPost(
       etag: resp.headers.get('ETag'),
     }
   } catch (error) {
+    if (error instanceof TypeError) {
+      fireEvent(window, 'api:error', {
+        error: 'Network connection lost',
+        type: 'network',
+      })
+      return {error: 'Network error'}
+    }
     return {error: error.message}
   }
 }
