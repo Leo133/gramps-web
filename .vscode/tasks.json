@@ -25,6 +25,16 @@
       "runOptions": {
         "instanceLimit": 1
       }
+    },
+    {
+      "label": "Serve Backend (Port 4042)",
+      "type": "shell",
+      "command": "DATABASE_URL=\"file:./dev.db\" JWT_SECRET=dev_secret PORT=4042 npm start",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "isBackground": true,
+      "problemMatcher": []
     }
   ]
 }
