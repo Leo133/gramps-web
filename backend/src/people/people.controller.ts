@@ -104,9 +104,16 @@ export class PeopleController {
 
   @Get(':handle/timeline')
   @ApiOperation({summary: 'Get timeline for a person'})
-  @ApiResponse({status: 200, description: 'Person timeline with events and historical context'})
+  @ApiResponse({
+    status: 200,
+    description: 'Person timeline with events and historical context',
+  })
   @ApiResponse({status: 404, description: 'Person not found'})
-  @ApiQuery({name: 'locale', required: false, description: 'Locale for date formatting (default: en)'})
+  @ApiQuery({
+    name: 'locale',
+    required: false,
+    description: 'Locale for date formatting (default: en)',
+  })
   getTimeline(
     @Param('handle') handle: string,
     @Query('locale') locale?: string,

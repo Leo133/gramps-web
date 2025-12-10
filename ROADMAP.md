@@ -317,14 +317,56 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 
 **Goal:** Support long-time Gramps users and advanced genetic genealogy use cases.
 
+**Status:** ✅ COMPLETE
+
+- [x] **Advanced Visualizations:**
+  - [x] **Graph View:** Implement a force-directed graph visualization of the entire family tree.
+  - [x] **Calendar View:** A dedicated calendar view for birthdays, anniversaries, and historical events.
+- [x] **Narrative & Blogging:**
+  - [x] **Blog Backend:** Implement a `BlogModule` to support the narrative/blogging frontend views.
+- [x] **Advanced Tools:**
+  - [x] **Date Calculator:** Utility for complex date arithmetic (age between dates, day of week, etc.).
+  - [ ] **DNA Painter Integration:** Visual chromosome mapping and triangulation tools (Phase 12). _(Deferred)_
+- [ ] **Advanced Search Backend:** Evaluate migration to Meilisearch or Elasticsearch if the SQL-based search hits performance limits. _(Not needed at this time)_
+
+**Implementation Details:** See [PHASE15_IMPLEMENTATION.md](PHASE15_IMPLEMENTATION.md) and [PHASE15_SUMMARY.md](PHASE15_SUMMARY.md) for complete documentation.
+
+**Features Delivered:**
+
+- ✅ Complete blog backend with 7 API endpoints
+- ✅ Force-directed graph visualization with D3.js
+- ✅ Monthly calendar view with event tracking
+- ✅ Comprehensive date calculator utility
+- ✅ Interactive visualizations with zoom/pan
+- ✅ Gender-based color coding in graph view
+- ✅ Click-to-navigate in all visualizations
+- ✅ Database migration for BlogPost model
+
+## Phase 16: Final Polish & Release Readiness
+
+**Goal:** Consolidate all previous work, resolve pending frontend integrations, ensure build stability, and prepare for a production release.
+
 **Status:** 📅 PLANNED
 
-- [ ] **Advanced Visualizations:**
-  - [ ] **Graph View:** Implement a force-directed graph visualization of the entire family tree.
-  - [ ] **Calendar View:** A dedicated calendar view for birthdays, anniversaries, and historical events.
-- [ ] **Narrative & Blogging:**
-  - [ ] **Blog Backend:** Implement a `BlogModule` to support the narrative/blogging frontend views.
-- [ ] **Advanced Tools:**
-  - [ ] **Date Calculator:** Utility for complex date arithmetic (age between dates, day of week, etc.).
-  - [ ] **DNA Painter Integration:** Visual chromosome mapping and triangulation tools (Phase 12).
-- [ ] **Advanced Search Backend:** Evaluate migration to Meilisearch or Elasticsearch if the SQL-based search hits performance limits.
+- [ ] **Frontend Infrastructure & Build:**
+
+  - [ ] **Build Stability:** Fix the "Killed" (OOM) issues during the frontend build process.
+  - [ ] **Test Environment:** Configure the environment (Chrome binary) to allow `@web/test-runner` to execute successfully.
+  - [ ] **Bundle Optimization:** Ensure the production build is optimized and assets are correctly served.
+
+- [ ] **Pending Frontend Integration (Catch-up):**
+
+  - [ ] **Phase 4 (Media):** Implement the UI for Gallery Filters, OpenSeadragon (Deep Zoom), and Face Tagging.
+  - [ ] **Phase 5 (Charts):** Implement the high-performance Canvas/WebGL (PixiJS) rendering for large charts.
+  - [ ] **Phase 9 (Real-time):** Verify and polish the Chat and Activity Feed UI.
+
+- [ ] **Quality Assurance & Testing:**
+
+  - [ ] **End-to-End (E2E) Testing:** Run full user flow tests (Register -> Create Person -> Add Media -> View Chart).
+  - [ ] **Cross-Browser Testing:** Verify layout and functionality on Firefox and Safari.
+  - [ ] **Mobile Responsiveness:** Audit and fix layout issues on smaller screens.
+
+- [ ] **Documentation & Deployment:**
+  - [ ] **Deployment Guide:** Finalize `docker-compose.yml` and Nginx configuration for production.
+  - [ ] **User Guide:** Update documentation to reflect all new features (Blog, Graph, Calendar, etc.).
+  - [ ] **Cleanup:** Remove unused code, temporary files, and deprecated endpoints.

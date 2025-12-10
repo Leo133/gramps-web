@@ -60,9 +60,7 @@ export class TimelineService {
         age: '',
         label: 'Birth',
         description: '',
-        place: person.birth_place
-          ? {name: person.birth_place}
-          : undefined,
+        place: person.birth_place ? {name: person.birth_place} : undefined,
         type: 'birth',
       })
     }
@@ -76,9 +74,7 @@ export class TimelineService {
         age: age ? `Age ${age}` : '',
         label: 'Death',
         description: '',
-        place: person.death_place
-          ? {name: person.death_place}
-          : undefined,
+        place: person.death_place ? {name: person.death_place} : undefined,
         type: 'death',
       })
     }
@@ -196,17 +192,18 @@ export class TimelineService {
 
     for (const person of people) {
       if (person.birthDate && person.deathDate) {
-        const lifespan = this.calculateAge(
-          person.birthDate,
-          person.deathDate,
-        )
+        const lifespan = this.calculateAge(person.birthDate, person.deathDate)
         if (lifespan && lifespan > 0 && lifespan < MAX_REASONABLE_LIFESPAN) {
           lifespans.push(lifespan)
           analysis.with_lifespan++
 
           // Track by gender
           const genderKey =
-            person.gender === 1 ? 'male' : person.gender === 0 ? 'female' : 'unknown'
+            person.gender === 1
+              ? 'male'
+              : person.gender === 0
+                ? 'female'
+                : 'unknown'
           genderLifespans[genderKey].push(lifespan)
           analysis.by_gender[genderKey].count++
 
@@ -238,8 +235,11 @@ export class TimelineService {
       // Calculate gender averages
       for (const [gender, spans] of Object.entries(genderLifespans)) {
         if (spans.length > 0) {
-          analysis.by_gender[gender as keyof typeof analysis.by_gender].avg_lifespan =
-            Math.round((spans.reduce((a, b) => a + b, 0) / spans.length) * 10) / 10
+          analysis.by_gender[
+            gender as keyof typeof analysis.by_gender
+          ].avg_lifespan =
+            Math.round((spans.reduce((a, b) => a + b, 0) / spans.length) * 10) /
+            10
         }
       }
     }
@@ -280,42 +280,234 @@ export class TimelineService {
   private getHistoricalEventsData(): HistoricalEvent[] {
     return [
       // 19th Century
-      {year: 1803, date: '1803-04-30', title: 'Louisiana Purchase', description: 'U.S. doubles in size', category: 'Political'},
-      {year: 1812, date: '1812-06-18', title: 'War of 1812', description: 'War between U.S. and Britain begins', category: 'Military'},
-      {year: 1848, date: '1848-01-24', title: 'Gold Rush Begins', description: 'California Gold Rush starts', category: 'Economic'},
-      {year: 1861, date: '1861-04-12', title: 'Civil War Begins', description: 'American Civil War starts', category: 'Military'},
-      {year: 1863, date: '1863-01-01', title: 'Emancipation Proclamation', description: 'Slaves declared free in Confederate states', category: 'Political'},
-      {year: 1865, date: '1865-04-09', title: 'Civil War Ends', description: 'Confederate surrender at Appomattox', category: 'Military'},
-      {year: 1869, date: '1869-05-10', title: 'Transcontinental Railroad', description: 'First transcontinental railroad completed', category: 'Technology'},
-      {year: 1876, date: '1876-03-10', title: 'Telephone Invented', description: 'Alexander Graham Bell invents telephone', category: 'Technology'},
-      {year: 1898, date: '1898-04-25', title: 'Spanish-American War', description: 'U.S. enters war with Spain', category: 'Military'},
-      
+      {
+        year: 1803,
+        date: '1803-04-30',
+        title: 'Louisiana Purchase',
+        description: 'U.S. doubles in size',
+        category: 'Political',
+      },
+      {
+        year: 1812,
+        date: '1812-06-18',
+        title: 'War of 1812',
+        description: 'War between U.S. and Britain begins',
+        category: 'Military',
+      },
+      {
+        year: 1848,
+        date: '1848-01-24',
+        title: 'Gold Rush Begins',
+        description: 'California Gold Rush starts',
+        category: 'Economic',
+      },
+      {
+        year: 1861,
+        date: '1861-04-12',
+        title: 'Civil War Begins',
+        description: 'American Civil War starts',
+        category: 'Military',
+      },
+      {
+        year: 1863,
+        date: '1863-01-01',
+        title: 'Emancipation Proclamation',
+        description: 'Slaves declared free in Confederate states',
+        category: 'Political',
+      },
+      {
+        year: 1865,
+        date: '1865-04-09',
+        title: 'Civil War Ends',
+        description: 'Confederate surrender at Appomattox',
+        category: 'Military',
+      },
+      {
+        year: 1869,
+        date: '1869-05-10',
+        title: 'Transcontinental Railroad',
+        description: 'First transcontinental railroad completed',
+        category: 'Technology',
+      },
+      {
+        year: 1876,
+        date: '1876-03-10',
+        title: 'Telephone Invented',
+        description: 'Alexander Graham Bell invents telephone',
+        category: 'Technology',
+      },
+      {
+        year: 1898,
+        date: '1898-04-25',
+        title: 'Spanish-American War',
+        description: 'U.S. enters war with Spain',
+        category: 'Military',
+      },
+
       // 20th Century
-      {year: 1903, date: '1903-12-17', title: 'First Flight', description: 'Wright Brothers first powered flight', category: 'Technology'},
-      {year: 1914, date: '1914-07-28', title: 'WWI Begins', description: 'World War I starts in Europe', category: 'Military'},
-      {year: 1917, date: '1917-04-06', title: 'U.S. Enters WWI', description: 'United States enters World War I', category: 'Military'},
-      {year: 1918, date: '1918-11-11', title: 'WWI Ends', description: 'Armistice signed, WWI ends', category: 'Military'},
-      {year: 1920, date: '1920-08-18', title: "Women's Suffrage", description: '19th Amendment gives women the vote', category: 'Political'},
-      {year: 1929, date: '1929-10-29', title: 'Stock Market Crash', description: 'Great Depression begins', category: 'Economic'},
-      {year: 1933, date: '1933-03-04', title: 'FDR Inaugurated', description: 'Franklin D. Roosevelt becomes president', category: 'Political'},
-      {year: 1939, date: '1939-09-01', title: 'WWII Begins', description: 'World War II starts in Europe', category: 'Military'},
-      {year: 1941, date: '1941-12-07', title: 'Pearl Harbor', description: 'Attack on Pearl Harbor, U.S. enters WWII', category: 'Military'},
-      {year: 1945, date: '1945-05-08', title: 'VE Day', description: 'Victory in Europe, WWII ends in Europe', category: 'Military'},
-      {year: 1945, date: '1945-08-15', title: 'VJ Day', description: 'Victory over Japan, WWII ends', category: 'Military'},
-      {year: 1950, date: '1950-06-25', title: 'Korean War Begins', description: 'Korean War starts', category: 'Military'},
-      {year: 1953, date: '1953-07-27', title: 'Korean War Ends', description: 'Armistice signed, Korean War ends', category: 'Military'},
-      {year: 1957, date: '1957-10-04', title: 'Sputnik Launched', description: 'Soviet Union launches first satellite', category: 'Technology'},
-      {year: 1963, date: '1963-11-22', title: 'JFK Assassination', description: 'President Kennedy assassinated', category: 'Political'},
-      {year: 1964, date: '1964-08-07', title: 'Vietnam War Escalates', description: 'Gulf of Tonkin Resolution passed', category: 'Military'},
-      {year: 1969, date: '1969-07-20', title: 'Moon Landing', description: 'Apollo 11 lands on the moon', category: 'Technology'},
-      {year: 1973, date: '1973-01-27', title: 'Vietnam War Ends', description: 'Paris Peace Accords signed', category: 'Military'},
-      {year: 1989, date: '1989-11-09', title: 'Berlin Wall Falls', description: 'Berlin Wall falls, Cold War ending', category: 'Political'},
-      {year: 1991, date: '1991-12-26', title: 'Soviet Union Dissolves', description: 'USSR officially dissolved', category: 'Political'},
-      
+      {
+        year: 1903,
+        date: '1903-12-17',
+        title: 'First Flight',
+        description: 'Wright Brothers first powered flight',
+        category: 'Technology',
+      },
+      {
+        year: 1914,
+        date: '1914-07-28',
+        title: 'WWI Begins',
+        description: 'World War I starts in Europe',
+        category: 'Military',
+      },
+      {
+        year: 1917,
+        date: '1917-04-06',
+        title: 'U.S. Enters WWI',
+        description: 'United States enters World War I',
+        category: 'Military',
+      },
+      {
+        year: 1918,
+        date: '1918-11-11',
+        title: 'WWI Ends',
+        description: 'Armistice signed, WWI ends',
+        category: 'Military',
+      },
+      {
+        year: 1920,
+        date: '1920-08-18',
+        title: "Women's Suffrage",
+        description: '19th Amendment gives women the vote',
+        category: 'Political',
+      },
+      {
+        year: 1929,
+        date: '1929-10-29',
+        title: 'Stock Market Crash',
+        description: 'Great Depression begins',
+        category: 'Economic',
+      },
+      {
+        year: 1933,
+        date: '1933-03-04',
+        title: 'FDR Inaugurated',
+        description: 'Franklin D. Roosevelt becomes president',
+        category: 'Political',
+      },
+      {
+        year: 1939,
+        date: '1939-09-01',
+        title: 'WWII Begins',
+        description: 'World War II starts in Europe',
+        category: 'Military',
+      },
+      {
+        year: 1941,
+        date: '1941-12-07',
+        title: 'Pearl Harbor',
+        description: 'Attack on Pearl Harbor, U.S. enters WWII',
+        category: 'Military',
+      },
+      {
+        year: 1945,
+        date: '1945-05-08',
+        title: 'VE Day',
+        description: 'Victory in Europe, WWII ends in Europe',
+        category: 'Military',
+      },
+      {
+        year: 1945,
+        date: '1945-08-15',
+        title: 'VJ Day',
+        description: 'Victory over Japan, WWII ends',
+        category: 'Military',
+      },
+      {
+        year: 1950,
+        date: '1950-06-25',
+        title: 'Korean War Begins',
+        description: 'Korean War starts',
+        category: 'Military',
+      },
+      {
+        year: 1953,
+        date: '1953-07-27',
+        title: 'Korean War Ends',
+        description: 'Armistice signed, Korean War ends',
+        category: 'Military',
+      },
+      {
+        year: 1957,
+        date: '1957-10-04',
+        title: 'Sputnik Launched',
+        description: 'Soviet Union launches first satellite',
+        category: 'Technology',
+      },
+      {
+        year: 1963,
+        date: '1963-11-22',
+        title: 'JFK Assassination',
+        description: 'President Kennedy assassinated',
+        category: 'Political',
+      },
+      {
+        year: 1964,
+        date: '1964-08-07',
+        title: 'Vietnam War Escalates',
+        description: 'Gulf of Tonkin Resolution passed',
+        category: 'Military',
+      },
+      {
+        year: 1969,
+        date: '1969-07-20',
+        title: 'Moon Landing',
+        description: 'Apollo 11 lands on the moon',
+        category: 'Technology',
+      },
+      {
+        year: 1973,
+        date: '1973-01-27',
+        title: 'Vietnam War Ends',
+        description: 'Paris Peace Accords signed',
+        category: 'Military',
+      },
+      {
+        year: 1989,
+        date: '1989-11-09',
+        title: 'Berlin Wall Falls',
+        description: 'Berlin Wall falls, Cold War ending',
+        category: 'Political',
+      },
+      {
+        year: 1991,
+        date: '1991-12-26',
+        title: 'Soviet Union Dissolves',
+        description: 'USSR officially dissolved',
+        category: 'Political',
+      },
+
       // 21st Century
-      {year: 2001, date: '2001-09-11', title: 'September 11 Attacks', description: 'Terrorist attacks in U.S.', category: 'Political'},
-      {year: 2008, date: '2008-09-15', title: 'Financial Crisis', description: 'Global financial crisis begins', category: 'Economic'},
-      {year: 2020, date: '2020-03-11', title: 'COVID-19 Pandemic', description: 'WHO declares COVID-19 pandemic', category: 'Health'},
+      {
+        year: 2001,
+        date: '2001-09-11',
+        title: 'September 11 Attacks',
+        description: 'Terrorist attacks in U.S.',
+        category: 'Political',
+      },
+      {
+        year: 2008,
+        date: '2008-09-15',
+        title: 'Financial Crisis',
+        description: 'Global financial crisis begins',
+        category: 'Economic',
+      },
+      {
+        year: 2020,
+        date: '2020-03-11',
+        title: 'COVID-19 Pandemic',
+        description: 'WHO declares COVID-19 pandemic',
+        category: 'Health',
+      },
     ]
   }
 
@@ -324,29 +516,42 @@ export class TimelineService {
    */
   private formatDate(dateStr: string, _locale: string): string {
     if (!dateStr) return ''
-    
+
     // Handle various date formats
     // If it's already in a readable format, return it
     if (dateStr.match(/^\d{4}$/)) {
       return dateStr // Just a year
     }
-    
+
     if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
       const [year, month, day] = dateStr.split('-')
       const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
       ]
       return `${monthNames[parseInt(month) - 1]} ${parseInt(day)}, ${year}`
     }
-    
+
     return dateStr
   }
 
   /**
    * Calculate age between two dates
    */
-  private calculateAge(birthDate?: string | null, endDate?: string | null): number | null {
+  private calculateAge(
+    birthDate?: string | null,
+    endDate?: string | null,
+  ): number | null {
     if (!birthDate || !endDate) return null
 
     const birthYear = this.extractYear(birthDate)
