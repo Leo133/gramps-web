@@ -26,6 +26,13 @@ import {
   detectFaces,
   generateIIIFManifest,
 } from './media-processor.js'
+import {
+  generatePedigreeReport,
+  generateFamilyGroupSheet,
+  generateDescendantReport,
+  generateAncestorReport,
+  generatePDFContent,
+} from './report-generator.js'
 
 const app = express()
 const upload = multer({storage: multer.memoryStorage()})
@@ -1521,6 +1528,270 @@ app.post('/api/exporters/:format/file', async (req, res) => {
     console.error('Export error:', error)
     return res.status(500).json({error: error.message || 'Export failed'})
   }
+})
+
+// ============================================================================
+// PHASE 14: REPORTING & PRINT FEATURES
+// ============================================================================
+
+// In-memory storage for generated reports (in production, use Redis or file system)
+const reportStorage = new Map()
+
+/**
+ * Generate a pedigree chart report
+ */
+app.post('/api/reports/pedigree', async (req, res) => {
+  try {
+    const config = req.body
+    const report = generatePedigreeReport(db, config)
+
+    // Store report for later download
+    const pdfContent = generatePDFContent(report)
+    reportStorage.set(report.reportId, {
+      ...report,
+      pdfContent,
+    })
+
+    // Return report metadata without the full data
+    const {data, ...metadata} = report
+    return res.json(metadata)
+  } catch (error) {
+    console.error('Pedigree report error:', error)
+    return res
+      .status(400)
+      .json({error: error.message || 'Failed to generate pedigree report'})
+  }
+})
+
+/**
+ * Generate a family group sheet report
+ */
+app.post('/api/reports/family-group-sheet', async (req, res) => {
+  try {
+    const config = req.body
+    const report = generateFamilyGroupSheet(db, config)
+
+    // Store report for later download
+    const pdfContent = generatePDFContent(report)
+    reportStorage.set(report.reportId, {
+      ...report,
+      pdfContent,
+    })
+
+    // Return report metadata without the full data
+    const {data, ...metadata} = report
+    return res.json(metadata)
+  } catch (error) {
+    console.error('Family group sheet error:', error)
+    return res
+      .status(400)
+      .json({
+        error: error.message || 'Failed to generate family group sheet',
+      })
+  }
+})
+
+/**
+ * Generate a descendant report
+ */
+app.post('/api/reports/descendant', async (req, res) => {
+  try {
+    const config = req.body
+    const report = generateDescendantReport(db, config)
+
+    // Store report for later download
+    const pdfContent = generatePDFContent(report)
+    reportStorage.set(report.reportId, {
+      ...report,
+      pdfContent,
+    })
+
+    // Return report metadata without the full data
+    const {data, content, ...metadata} = report
+    return res.json(metadata)
+  } catch (error) {
+    console.error('Descendant report error:', error)
+    return res
+      .status(400)
+      .json({
+        error: error.message || 'Failed to generate descendant report',
+      })
+  }
+})
+
+/**
+ * Generate an ancestor report
+ */
+app.post('/api/reports/ancestor', async (req, res) => {
+  try {
+    const config = req.body
+    const report = generateAncestorReport(db, config)
+
+    // Store report for later download
+    const pdfContent = generatePDFContent(report)
+    reportStorage.set(report.reportId, {
+      ...report,
+      pdfContent,
+    })
+
+    // Return report metadata without the full data
+    const {data, content, ...metadata} = report
+    return res.json(metadata)
+  } catch (error) {
+    console.error('Ancestor report error:', error)
+    return res
+      .status(400)
+      .json({error: error.message || 'Failed to generate ancestor report'})
+  }
+})
+
+/**
+ * Download a generated report
+ */
+app.get('/api/reports/download/:reportId', async (req, res) => {
+  const {reportId} = req.params
+
+  const report = reportStorage.get(reportId)
+  if (!report) {
+    return res.status(404).json({error: 'Report not found or expired'})
+  }
+
+  // Set headers for PDF download
+  res.setHeader('Content-Type', 'application/pdf')
+  res.setHeader('Content-Disposition', `attachment; filename="${report.filename}"`)
+
+  // In a real implementation, this would stream the actual PDF
+  // For mock, return the text content as a data URL
+  const base64Content = Buffer.from(report.pdfContent).toString('base64')
+  const dataUrl = `data:application/pdf;base64,${base64Content}`
+
+  return res.send(dataUrl)
+})
+
+/**
+ * Get HTML preview of a report
+ */
+app.get('/api/reports/:reportId/preview', async (req, res) => {
+  const {reportId} = req.params
+
+  const report = reportStorage.get(reportId)
+  if (!report) {
+    return res.status(404).json({error: 'Report not found or expired'})
+  }
+
+  // Generate HTML preview
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>${report.filename}</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    h1 { border-bottom: 2px solid #333; }
+    .metadata { background: #f5f5f5; padding: 10px; margin: 20px 0; }
+    pre { white-space: pre-wrap; font-family: 'Courier New', monospace; }
+  </style>
+</head>
+<body>
+  <h1>${report.type.toUpperCase()} Report</h1>
+  <div class="metadata">
+    <strong>Generated:</strong> ${new Date(report.generatedAt).toLocaleString()}<br>
+    <strong>Report ID:</strong> ${report.reportId}<br>
+    <strong>Filename:</strong> ${report.filename}
+  </div>
+  <pre>${report.pdfContent || report.content || 'No content available'}</pre>
+</body>
+</html>
+  `
+
+  res.setHeader('Content-Type', 'text/html')
+  return res.send(html)
+})
+
+/**
+ * List all generated reports
+ */
+app.get('/api/reports', async (req, res) => {
+  const reports = Array.from(reportStorage.values()).map(report => ({
+    reportId: report.reportId,
+    type: report.type,
+    filename: report.filename,
+    generatedAt: report.generatedAt,
+    expiresAt: report.expiresAt,
+    size: report.pdfContent ? report.pdfContent.length : 0,
+  }))
+
+  return res.json({reports})
+})
+
+/**
+ * Delete a report
+ */
+app.delete('/api/reports/:reportId', async (req, res) => {
+  const {reportId} = req.params
+
+  if (!reportStorage.has(reportId)) {
+    return res.status(404).json({error: 'Report not found'})
+  }
+
+  reportStorage.delete(reportId)
+  return res.json({success: true, message: 'Report deleted'})
+})
+
+/**
+ * Get available report templates
+ */
+app.get('/api/reports/templates', async (req, res) => {
+  const templates = [
+    {
+      id: 'pedigree',
+      name: 'Pedigree Chart',
+      description: 'Traditional ancestor chart showing direct lineage',
+      themes: ['classic', 'modern', 'elegant', 'minimal'],
+      options: [
+        'generations',
+        'includePhotos',
+        'includeDates',
+        'includePlaces',
+        'orientation',
+      ],
+    },
+    {
+      id: 'family-group-sheet',
+      name: 'Family Group Sheet',
+      description: 'Comprehensive family report with parents and children',
+      themes: ['classic', 'modern'],
+      options: [
+        'includeNotes',
+        'includeSources',
+        'includePhotos',
+        'detailLevel',
+      ],
+    },
+    {
+      id: 'descendant',
+      name: 'Descendant Report',
+      description: 'All descendants of a given ancestor',
+      themes: ['classic', 'modern'],
+      options: [
+        'generations',
+        'numberingSystem',
+        'format',
+        'includeSpouses',
+        'includeEvents',
+      ],
+      numberingSystems: ['register', 'ngsq', 'henry', 'daboville'],
+    },
+    {
+      id: 'ancestor',
+      name: 'Ancestor Report',
+      description: 'Trace ancestry back through generations',
+      themes: ['classic', 'modern'],
+      options: ['generations', 'includeEvents', 'includeSources', 'format'],
+    },
+  ]
+
+  return res.json({templates})
 })
 
 // Generic handler for other requests (logging)

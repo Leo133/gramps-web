@@ -150,3 +150,15 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 - [ ] **Bulk Operations:** Tools for mass-tagging, find-and-replace, and merging duplicate places/sources.
 - [ ] **System Health Dashboard:** Real-time monitoring of server load, database size, and error rates.
 - [ ] **Approval Workflows:** A "Pull Request" system for genealogy—contributors submit changes, and editors review/approve them before they go live.
+
+## Phase 14: Reporting & Print Features
+
+**Goal:** Generate professional reports and printed family history documents.
+
+- [x] **PDF Report Generation:** Generate high-quality PDF reports using PDFKit with custom styling.
+- [x] **Pedigree Charts:** Traditional ancestor charts showing direct lineage in a tree format.
+- [x] **Family Group Sheets:** Detailed family reports showing parents, children, and key events.
+- [x] **Descendant Reports:** Comprehensive reports showing all descendants of a given ancestor.
+- [x] **Ancestor Reports:** Detailed reports tracing ancestry back through generations.
+- [x] **Custom Report Templates:** Configurable report layouts with privacy controls and styling options.
+- [x] **Report API:** RESTful endpoints for generating and retrieving reports in various formats.
