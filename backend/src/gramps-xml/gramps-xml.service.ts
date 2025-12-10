@@ -4,7 +4,7 @@ import {XMLParser} from 'fast-xml-parser'
 
 /**
  * Service for importing and exporting Gramps XML format
- * 
+ *
  * Gramps XML is the native format used by Gramps Desktop application.
  * This service provides lossless import/export capabilities for full
  * interoperability with the desktop version.
@@ -15,7 +15,7 @@ export class GrampsXmlService {
 
   /**
    * Import a Gramps XML file
-   * 
+   *
    * @param xmlContent - The XML content as a string or Buffer
    * @param options - Import options
    * @returns Import result with statistics
@@ -111,7 +111,7 @@ export class GrampsXmlService {
 
   /**
    * Export data to Gramps XML format
-   * 
+   *
    * @param options - Export options
    * @returns XML string
    */
@@ -165,9 +165,9 @@ export class GrampsXmlService {
       attributeNamePrefix: '@_',
     })
     const parsed = parser.parse(xmlString)
-    
+
     const database = parsed.database || {}
-    
+
     return {
       people: this.ensureArray(database.people?.person),
       families: this.ensureArray(database.families?.family),
@@ -191,7 +191,7 @@ export class GrampsXmlService {
   private generateGrampsXmlString(data: any): string {
     // TODO: Implement XML generation
     // This is a placeholder implementation
-    
+
     const header = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE database PUBLIC "-//Gramps//DTD Gramps XML 1.7.1//EN"
 "http://gramps-project.org/xml/1.7.1/grampsxml.dtd">
