@@ -4,10 +4,11 @@ import '@material/web/icon/icon'
 import '@material/web/menu/menu'
 import '@material/web/menu/menu-item'
 import '@material/web/chips/input-chip'
-import {mdiPalette} from '@mdi/js'
+import {mdiPalette, mdiChartTree} from '@mdi/js'
 
 import {GrampsjsViewTreeChartBase} from './GrampsjsViewTreeChartBase.js'
 import '../components/GrampsjsFanChart.js'
+import '../components/GrampsjsPixiFanChart.js'
 
 const colors = {
   nEvents: 'Number of events',
@@ -51,6 +52,7 @@ export class GrampsjsViewFanChart extends GrampsjsViewTreeChartBase {
   static get properties() {
     return {
       color: {type: String},
+      usePixiJS: {type: Boolean},
     }
   }
 
@@ -60,6 +62,7 @@ export class GrampsjsViewFanChart extends GrampsjsViewTreeChartBase {
     this.nDesc = 1
     this._setAnc = true
     this.color = ''
+    this.usePixiJS = false
   }
 
   _resetLevels() {
@@ -67,6 +70,19 @@ export class GrampsjsViewFanChart extends GrampsjsViewTreeChartBase {
   }
 
   renderChart() {
+    if (this.usePixiJS) {
+      return html`
+        <grampsjs-pixi-fan-chart
+          grampsId=${this.grampsId}
+          depth=${this.nAnc + 1}
+          .data=${this._data}
+          color="${this.color}"
+          nameDisplayFormat=${this.nameDisplayFormat}
+          @node:click="${this._handleNodeClick}"
+        >
+        </grampsjs-pixi-fan-chart>
+      `
+    }
     return html`
       <grampsjs-fan-chart
         grampsId=${this.grampsId}
@@ -80,6 +96,19 @@ export class GrampsjsViewFanChart extends GrampsjsViewTreeChartBase {
     `
   }
 
+  _handleNodeClick(e) {
+    const {grampsId} = e.detail
+    if (grampsId) {
+      this.dispatchEvent(
+        new CustomEvent('nav', {
+          bubbles: true,
+          composed: true,
+          detail: {path: `person/${grampsId}`},
+        })
+      )
+    }
+  }
+
   renderControls() {
     return html`
       ${super.renderControls()}
@@ -91,6 +120,16 @@ export class GrampsjsViewFanChart extends GrampsjsViewTreeChartBase {
       ></mwc-icon-button>
       <grampsjs-tooltip for="btn-color" .appState="${this.appState}"
         >${this._('Color')}</grampsjs-tooltip
+      >
+      <mwc-icon-button
+        icon="performance"
+        @click=${this._togglePixiJS}
+        id="btn-pixi"
+        ?disabled="${this._data?.nodes?.length < 100}"
+      ></mwc-icon-button>
+      <grampsjs-tooltip for="btn-pixi" .appState="${this.appState}"
+        >${this.usePixiJS ? this._('Use SVG (slower)') : this._('Use PixiJS (faster)')}
+      </grampsjs-tooltip
       >
       <span style="position: relative">
         <md-menu id="usage-menu" anchor="btn-color" skip-restore-focus>
@@ -127,6 +166,10 @@ export class GrampsjsViewFanChart extends GrampsjsViewTreeChartBase {
 
   _handleColorClick(color) {
     this.color = color
+  }
+
+  _togglePixiJS() {
+    this.usePixiJS = !this.usePixiJS
   }
 }
 

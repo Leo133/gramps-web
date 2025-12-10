@@ -5,6 +5,7 @@ import '../components/GrampsjsLightbox.js'
 import '../components/GrampsjsRectContainer.js'
 import '../components/GrampsjsRect.js'
 import '../components/GrampsjsTooltip.js'
+import '../components/GrampsjsDeepZoomViewer.js'
 import {getMediaUrl} from '../api.js'
 import {fireEvent, getNameFromProfile} from '../util.js'
 
@@ -26,6 +27,7 @@ export class GrampsjsViewMediaLightbox extends GrampsjsView {
         }
 
         mwc-icon-button.toggle-rect,
+        mwc-icon-button.toggle-deepzoom,
         mwc-icon-button.download {
           color: var(--mdc-theme-primary);
           position: relative;
@@ -50,6 +52,8 @@ export class GrampsjsViewMediaLightbox extends GrampsjsView {
       hideRightArrow: {type: Boolean},
       editRect: {type: Boolean},
       rectHidden: {type: Boolean},
+      deepZoomMode: {type: Boolean},
+      _iiifManifest: {type: Object},
     }
   }
 
@@ -60,6 +64,8 @@ export class GrampsjsViewMediaLightbox extends GrampsjsView {
     this.hideRightArrow = false
     this.editRect = false
     this.rectHidden = false
+    this.deepZoomMode = false
+    this._iiifManifest = null
   }
 
   renderContent() {
@@ -86,6 +92,19 @@ export class GrampsjsViewMediaLightbox extends GrampsjsView {
           <grampsjs-tooltip for="btn-toggle-rect"
             >${this._('Toggle person outlines')}</grampsjs-tooltip
           >
+          ${this._data?.mime?.startsWith('image/')
+            ? html`
+                <mwc-icon-button
+                  id="btn-toggle-deepzoom"
+                  class="toggle-deepzoom"
+                  .icon="${this.deepZoomMode ? 'zoom_out_map' : 'zoom_in_map'}"
+                  @click="${this._handleToggleDeepZoomClick}"
+                ></mwc-icon-button>
+                <grampsjs-tooltip for="btn-toggle-deepzoom"
+                  >${this._('Toggle Deep Zoom')}</grampsjs-tooltip
+                >
+              `
+            : ''}
           <mwc-icon-button
             icon="download"
             class="download"
@@ -155,6 +174,13 @@ export class GrampsjsViewMediaLightbox extends GrampsjsView {
   }
 
   _innerContainerContentImage() {
+    if (this.deepZoomMode && this._iiifManifest) {
+      return html`
+        <grampsjs-deep-zoom-viewer
+          .tileSources="${this._iiifManifest}"
+        ></grampsjs-deep-zoom-viewer>
+      `
+    }
     return html` <grampsjs-rect-container
       ?edit="${this.editRect}"
       .appState="${this.appState}"
@@ -207,6 +233,26 @@ export class GrampsjsViewMediaLightbox extends GrampsjsView {
 
   _handleToggleRectButtonClick() {
     this.rectHidden = !this.rectHidden
+  }
+
+  _handleToggleDeepZoomClick() {
+    this.deepZoomMode = !this.deepZoomMode
+    if (this.deepZoomMode && !this._iiifManifest) {
+      this._fetchIIIFManifest()
+    }
+  }
+
+  async _fetchIIIFManifest() {
+    if (!this.handle) return
+    try {
+      const url = `/api/media/${this.handle}/iiif/info.json`
+      const response = await this.appState.apiGet(url)
+      if (response && !response.error) {
+        this._iiifManifest = response
+      }
+    } catch (error) {
+      console.error('Failed to fetch IIIF manifest:', error)
+    }
   }
 
   _handleSaveRect(e) {
