@@ -5,7 +5,7 @@
 /* eslint-disable no-nested-ternary */
 import {html, css} from 'lit'
 
-import {mdiSelectDrag, mdiTextRecognition} from '@mdi/js'
+import {mdiSelectDrag, mdiTextRecognition, mdiFaceRecognition} from '@mdi/js'
 import {GrampsjsObject} from './GrampsjsObject.js'
 import './GrampsJsImage.js'
 import './GrampsjsFormEditDate.js'
@@ -89,6 +89,7 @@ export class GrampsjsMediaObject extends GrampsjsObject {
       dbInfo: {type: Object},
       _drawing: {type: Boolean},
       _ocr: {type: Boolean},
+      _detectingFaces: {type: Boolean},
     }
   }
 
@@ -103,6 +104,7 @@ export class GrampsjsMediaObject extends GrampsjsObject {
     this.dbInfo = {}
     this._drawing = false
     this._ocr = false
+    this._detectingFaces = false
   }
 
   renderProfile() {
@@ -333,11 +335,80 @@ export class GrampsjsMediaObject extends GrampsjsObject {
             </p>
           `
         : ''}
+      ${this.data.mime?.startsWith('image/')
+        ? html`
+            <p>
+              <mwc-button 
+                raised 
+                @click="${this._handleDetectFacesClick}"
+                ?disabled="${this._detectingFaces}"
+              >
+                ${renderIconSvg(
+                  mdiFaceRecognition,
+                  'var(--mdc-theme-on-primary)',
+                  0,
+                  'icon'
+                )}
+                ${this._detectingFaces ? this._('Detecting Faces...') : this._('Detect Faces')}
+              </mwc-button>
+            </p>
+          `
+        : ''}
     `
   }
 
   _handleOcrClick() {
     this._ocr = true
+  }
+
+  async _handleDetectFacesClick() {
+    if (!this.data.handle) return
+    
+    this._detectingFaces = true
+    try {
+      const url = `/api/media/${this.data.handle}/faces/detect`
+      const response = await this.appState.apiPost(url, {})
+      
+      if (response && !response.error) {
+        // Show success message
+        this.dispatchEvent(
+          new CustomEvent('grampsjs:notification', {
+            bubbles: true,
+            composed: true,
+            detail: {
+              message: this._('Face detection complete. Refresh to see detected faces.'),
+            },
+          })
+        )
+        // Refresh the media object to show detected faces
+        setTimeout(() => {
+          fireEvent(this, 'db:changed')
+        }, 500)
+      } else {
+        this.dispatchEvent(
+          new CustomEvent('grampsjs:error', {
+            bubbles: true,
+            composed: true,
+            detail: {
+              message: this._('Face detection failed'),
+            },
+          })
+        )
+      }
+    } catch (error) {
+      console.error('Face detection error:', error)
+      this.dispatchEvent(
+        new CustomEvent('grampsjs:error', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            message: this._('Face detection error'),
+          },
+        })
+      )
+    } finally {
+      this._detectingFaces = false
+    }
   }
 
   _handleCloseOcrClick() {
