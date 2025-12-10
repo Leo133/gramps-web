@@ -137,31 +137,27 @@ export class AuditService {
       if (endDate) where.timestamp.lte = endDate
     }
 
-    const [
-      totalLogs,
-      actionCounts,
-      entityTypeCounts,
-      userActivity,
-    ] = await Promise.all([
-      this.prisma.auditLog.count({where}),
-      this.prisma.auditLog.groupBy({
-        by: ['action'],
-        where,
-        _count: true,
-      }),
-      this.prisma.auditLog.groupBy({
-        by: ['entityType'],
-        where,
-        _count: true,
-      }),
-      this.prisma.auditLog.groupBy({
-        by: ['userId'],
-        where,
-        _count: true,
-        orderBy: {_count: {userId: 'desc'}},
-        take: 10,
-      }),
-    ])
+    const [totalLogs, actionCounts, entityTypeCounts, userActivity] =
+      await Promise.all([
+        this.prisma.auditLog.count({where}),
+        this.prisma.auditLog.groupBy({
+          by: ['action'],
+          where,
+          _count: true,
+        }),
+        this.prisma.auditLog.groupBy({
+          by: ['entityType'],
+          where,
+          _count: true,
+        }),
+        this.prisma.auditLog.groupBy({
+          by: ['userId'],
+          where,
+          _count: true,
+          orderBy: {_count: {userId: 'desc'}},
+          take: 10,
+        }),
+      ])
 
     return {
       totalLogs,

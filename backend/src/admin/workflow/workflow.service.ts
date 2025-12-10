@@ -16,7 +16,14 @@ export class WorkflowService {
     proposedChanges: any
     currentState?: any
   }) {
-    const {submitterId, entityType, entityId, operation, proposedChanges, currentState} = params
+    const {
+      submitterId,
+      entityType,
+      entityId,
+      operation,
+      proposedChanges,
+      currentState,
+    } = params
 
     // Validate that submitter has contributor or lower role
     const submitter = await this.prisma.user.findUnique({
@@ -53,7 +60,9 @@ export class WorkflowService {
     return {
       ...proposal,
       proposedChanges: JSON.parse(proposal.proposedChanges),
-      currentState: proposal.currentState ? JSON.parse(proposal.currentState) : null,
+      currentState: proposal.currentState
+        ? JSON.parse(proposal.currentState)
+        : null,
     }
   }
 
@@ -157,7 +166,9 @@ export class WorkflowService {
     return {
       ...proposal,
       proposedChanges: JSON.parse(proposal.proposedChanges),
-      currentState: proposal.currentState ? JSON.parse(proposal.currentState) : null,
+      currentState: proposal.currentState
+        ? JSON.parse(proposal.currentState)
+        : null,
     }
   }
 
@@ -244,7 +255,9 @@ export class WorkflowService {
     return {
       ...updated,
       proposedChanges: JSON.parse(updated.proposedChanges),
-      currentState: updated.currentState ? JSON.parse(updated.currentState) : null,
+      currentState: updated.currentState
+        ? JSON.parse(updated.currentState)
+        : null,
       appliedChanges: applied,
     }
   }
@@ -329,7 +342,9 @@ export class WorkflowService {
     return {
       ...updated,
       proposedChanges: JSON.parse(updated.proposedChanges),
-      currentState: updated.currentState ? JSON.parse(updated.currentState) : null,
+      currentState: updated.currentState
+        ? JSON.parse(updated.currentState)
+        : null,
     }
   }
 
@@ -364,7 +379,8 @@ export class WorkflowService {
       pending: pendingCount,
       approved: approvedCount,
       rejected: rejectedCount,
-      approvalRate: totalProposals > 0 ? (approvedCount / totalProposals) * 100 : 0,
+      approvalRate:
+        totalProposals > 0 ? (approvedCount / totalProposals) * 100 : 0,
       byEntityType: byEntityType.map(item => ({
         entityType: item.entityType,
         count: item._count,

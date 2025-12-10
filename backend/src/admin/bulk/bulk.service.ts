@@ -76,16 +76,36 @@ export class BulkService {
     // Handle different entity types
     switch (entityType) {
       case 'person':
-        affected = await this.findReplaceInPeople(field, regex, replaceText, changes)
+        affected = await this.findReplaceInPeople(
+          field,
+          regex,
+          replaceText,
+          changes,
+        )
         break
       case 'place':
-        affected = await this.findReplaceInPlaces(field, regex, replaceText, changes)
+        affected = await this.findReplaceInPlaces(
+          field,
+          regex,
+          replaceText,
+          changes,
+        )
         break
       case 'source':
-        affected = await this.findReplaceInSources(field, regex, replaceText, changes)
+        affected = await this.findReplaceInSources(
+          field,
+          regex,
+          replaceText,
+          changes,
+        )
         break
       case 'note':
-        affected = await this.findReplaceInNotes(field, regex, replaceText, changes)
+        affected = await this.findReplaceInNotes(
+          field,
+          regex,
+          replaceText,
+          changes,
+        )
         break
     }
 
@@ -121,7 +141,13 @@ export class BulkService {
     strategy?: 'prefer-primary' | 'prefer-newest' | 'prefer-oldest'
     userId: string
   }) {
-    const {entityType, primaryId, duplicateIds, strategy = 'prefer-primary', userId} = params
+    const {
+      entityType,
+      primaryId,
+      duplicateIds,
+      strategy = 'prefer-primary',
+      userId,
+    } = params
 
     // Get the primary entity
     let primary: any
@@ -227,13 +253,13 @@ export class BulkService {
 
     switch (entityType) {
       case 'person':
-        duplicates.push(...await this.findDuplicatePeople(threshold))
+        duplicates.push(...(await this.findDuplicatePeople(threshold)))
         break
       case 'place':
-        duplicates.push(...await this.findDuplicatePlaces(threshold))
+        duplicates.push(...(await this.findDuplicatePlaces(threshold)))
         break
       case 'source':
-        duplicates.push(...await this.findDuplicateSources(threshold))
+        duplicates.push(...(await this.findDuplicateSources(threshold)))
         break
     }
 
@@ -247,7 +273,12 @@ export class BulkService {
   /**
    * Helper: Find and replace in people
    */
-  private async findReplaceInPeople(field: string, regex: RegExp, replaceText: string, changes: any[]) {
+  private async findReplaceInPeople(
+    field: string,
+    regex: RegExp,
+    replaceText: string,
+    changes: any[],
+  ) {
     let affected = 0
     const validFields = ['firstName', 'surname', 'callName']
 
@@ -276,7 +307,12 @@ export class BulkService {
   /**
    * Helper: Find and replace in places
    */
-  private async findReplaceInPlaces(field: string, regex: RegExp, replaceText: string, changes: any[]) {
+  private async findReplaceInPlaces(
+    field: string,
+    regex: RegExp,
+    replaceText: string,
+    changes: any[],
+  ) {
     let affected = 0
     const validFields = ['name', 'title']
 
@@ -305,7 +341,12 @@ export class BulkService {
   /**
    * Helper: Find and replace in sources
    */
-  private async findReplaceInSources(field: string, regex: RegExp, replaceText: string, changes: any[]) {
+  private async findReplaceInSources(
+    field: string,
+    regex: RegExp,
+    replaceText: string,
+    changes: any[],
+  ) {
     let affected = 0
     const validFields = ['title', 'author', 'pubInfo']
 
@@ -334,7 +375,12 @@ export class BulkService {
   /**
    * Helper: Find and replace in notes
    */
-  private async findReplaceInNotes(field: string, regex: RegExp, replaceText: string, changes: any[]) {
+  private async findReplaceInNotes(
+    field: string,
+    regex: RegExp,
+    replaceText: string,
+    changes: any[],
+  ) {
     let affected = 0
 
     if (field !== 'content') {
@@ -371,9 +417,15 @@ export class BulkService {
 
         if (!merged[key] && dup[key]) {
           merged[key] = dup[key]
-        } else if (strategy === 'prefer-newest' && dup.updatedAt > merged.updatedAt) {
+        } else if (
+          strategy === 'prefer-newest' &&
+          dup.updatedAt > merged.updatedAt
+        ) {
           merged[key] = dup[key]
-        } else if (strategy === 'prefer-oldest' && dup.createdAt < merged.createdAt) {
+        } else if (
+          strategy === 'prefer-oldest' &&
+          dup.createdAt < merged.createdAt
+        ) {
           merged[key] = dup[key]
         }
       }
@@ -441,7 +493,10 @@ export class BulkService {
 
     for (let i = 0; i < sources.length; i++) {
       for (let j = i + 1; j < sources.length; j++) {
-        const similarity = this.calculateSourceSimilarity(sources[i], sources[j])
+        const similarity = this.calculateSourceSimilarity(
+          sources[i],
+          sources[j],
+        )
         if (similarity >= threshold) {
           duplicates.push({
             entities: [sources[i], sources[j]],
@@ -499,8 +554,8 @@ export class BulkService {
     if (p1.latitude && p2.latitude && p1.longitude && p2.longitude) {
       checks++
       const distance = Math.sqrt(
-        Math.pow(p1.latitude - p2.latitude, 2) + 
-        Math.pow(p1.longitude - p2.longitude, 2)
+        Math.pow(p1.latitude - p2.latitude, 2) +
+          Math.pow(p1.longitude - p2.longitude, 2),
       )
       if (distance < 0.001) score++ // Very close coordinates
     }

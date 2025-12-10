@@ -1,4 +1,15 @@
-import {IsString, IsOptional, IsDateString, IsInt, Min, Max, IsEnum, IsArray, IsBoolean, IsNumber} from 'class-validator'
+import {
+  IsString,
+  IsOptional,
+  IsDateString,
+  IsInt,
+  Min,
+  Max,
+  IsEnum,
+  IsArray,
+  IsBoolean,
+  IsNumber,
+} from 'class-validator'
 import {ApiProperty, ApiPropertyOptional} from '@nestjs/swagger'
 
 // Audit DTOs
@@ -39,7 +50,12 @@ export class AuditLogQueryDto {
   @Min(1)
   page?: number
 
-  @ApiPropertyOptional({description: 'Items per page', minimum: 1, maximum: 100, default: 50})
+  @ApiPropertyOptional({
+    description: 'Items per page',
+    minimum: 1,
+    maximum: 100,
+    default: 50,
+  })
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -55,12 +71,20 @@ export class RollbackDto {
 
 // Backup DTOs
 export class CreateBackupDto {
-  @ApiPropertyOptional({description: 'Backup type', enum: ['manual', 'scheduled'], default: 'manual'})
+  @ApiPropertyOptional({
+    description: 'Backup type',
+    enum: ['manual', 'scheduled'],
+    default: 'manual',
+  })
   @IsOptional()
   @IsEnum(['manual', 'scheduled'])
   type?: 'manual' | 'scheduled'
 
-  @ApiPropertyOptional({description: 'Destination', enum: ['local', 's3', 'google-drive'], default: 'local'})
+  @ApiPropertyOptional({
+    description: 'Destination',
+    enum: ['local', 's3', 'google-drive'],
+    default: 'local',
+  })
   @IsOptional()
   @IsEnum(['local', 's3', 'google-drive'])
   destination?: 'local' | 's3' | 'google-drive'
@@ -70,7 +94,11 @@ export class CreateBackupDto {
   @IsBoolean()
   encrypted?: boolean
 
-  @ApiPropertyOptional({description: 'Compression type', enum: ['gzip', 'zip', 'none'], default: 'gzip'})
+  @ApiPropertyOptional({
+    description: 'Compression type',
+    enum: ['gzip', 'zip', 'none'],
+    default: 'gzip',
+  })
   @IsOptional()
   @IsEnum(['gzip', 'zip', 'none'])
   compression?: 'gzip' | 'zip' | 'none'
@@ -93,7 +121,12 @@ export class BackupQueryDto {
   @Min(1)
   page?: number
 
-  @ApiPropertyOptional({description: 'Items per page', minimum: 1, maximum: 100, default: 50})
+  @ApiPropertyOptional({
+    description: 'Items per page',
+    minimum: 1,
+    maximum: 100,
+    default: 50,
+  })
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -102,7 +135,11 @@ export class BackupQueryDto {
 }
 
 export class CleanupBackupsDto {
-  @ApiProperty({description: 'Retention period in days', minimum: 1, default: 30})
+  @ApiProperty({
+    description: 'Retention period in days',
+    minimum: 1,
+    default: 30,
+  })
   @IsInt()
   @Min(1)
   retentionDays: number
@@ -110,7 +147,10 @@ export class CleanupBackupsDto {
 
 // Bulk Operations DTOs
 export class MassTagDto {
-  @ApiProperty({description: 'Entity type', enum: ['person', 'place', 'source', 'media']})
+  @ApiProperty({
+    description: 'Entity type',
+    enum: ['person', 'place', 'source', 'media'],
+  })
   @IsEnum(['person', 'place', 'source', 'media'])
   entityType: 'person' | 'place' | 'source' | 'media'
 
@@ -126,7 +166,10 @@ export class MassTagDto {
 }
 
 export class FindReplaceDto {
-  @ApiProperty({description: 'Entity type', enum: ['person', 'place', 'source', 'note']})
+  @ApiProperty({
+    description: 'Entity type',
+    enum: ['person', 'place', 'source', 'note'],
+  })
   @IsEnum(['person', 'place', 'source', 'note'])
   entityType: 'person' | 'place' | 'source' | 'note'
 
@@ -154,7 +197,10 @@ export class FindReplaceDto {
 }
 
 export class MergeDuplicatesDto {
-  @ApiProperty({description: 'Entity type', enum: ['person', 'place', 'source']})
+  @ApiProperty({
+    description: 'Entity type',
+    enum: ['person', 'place', 'source'],
+  })
   @IsEnum(['person', 'place', 'source'])
   entityType: 'person' | 'place' | 'source'
 
@@ -162,23 +208,38 @@ export class MergeDuplicatesDto {
   @IsString()
   primaryId: string
 
-  @ApiProperty({description: 'IDs of duplicate entities to merge', type: [String]})
+  @ApiProperty({
+    description: 'IDs of duplicate entities to merge',
+    type: [String],
+  })
   @IsArray()
   @IsString({each: true})
   duplicateIds: string[]
 
-  @ApiPropertyOptional({description: 'Merge strategy', enum: ['prefer-primary', 'prefer-newest', 'prefer-oldest'], default: 'prefer-primary'})
+  @ApiPropertyOptional({
+    description: 'Merge strategy',
+    enum: ['prefer-primary', 'prefer-newest', 'prefer-oldest'],
+    default: 'prefer-primary',
+  })
   @IsOptional()
   @IsEnum(['prefer-primary', 'prefer-newest', 'prefer-oldest'])
   strategy?: 'prefer-primary' | 'prefer-newest' | 'prefer-oldest'
 }
 
 export class FindDuplicatesDto {
-  @ApiProperty({description: 'Entity type', enum: ['person', 'place', 'source']})
+  @ApiProperty({
+    description: 'Entity type',
+    enum: ['person', 'place', 'source'],
+  })
   @IsEnum(['person', 'place', 'source'])
   entityType: 'person' | 'place' | 'source'
 
-  @ApiPropertyOptional({description: 'Similarity threshold (0-1)', minimum: 0, maximum: 1, default: 0.8})
+  @ApiPropertyOptional({
+    description: 'Similarity threshold (0-1)',
+    minimum: 0,
+    maximum: 1,
+    default: 0.8,
+  })
   @IsOptional()
   @IsNumber()
   @Min(0)
@@ -198,7 +259,11 @@ export class HealthMetricsQueryDto {
   @IsDateString()
   endDate?: string
 
-  @ApiPropertyOptional({description: 'Aggregation interval', enum: ['hour', 'day', 'week'], default: 'hour'})
+  @ApiPropertyOptional({
+    description: 'Aggregation interval',
+    enum: ['hour', 'day', 'week'],
+    default: 'hour',
+  })
   @IsOptional()
   @IsEnum(['hour', 'day', 'week'])
   interval?: 'hour' | 'day' | 'week'
@@ -209,7 +274,12 @@ export class HealthMetricsQueryDto {
   @Min(1)
   page?: number
 
-  @ApiPropertyOptional({description: 'Items per page', minimum: 1, maximum: 100, default: 100})
+  @ApiPropertyOptional({
+    description: 'Items per page',
+    minimum: 1,
+    maximum: 100,
+    default: 100,
+  })
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -218,7 +288,11 @@ export class HealthMetricsQueryDto {
 }
 
 export class CleanupMetricsDto {
-  @ApiProperty({description: 'Retention period in days', minimum: 1, default: 90})
+  @ApiProperty({
+    description: 'Retention period in days',
+    minimum: 1,
+    default: 90,
+  })
   @IsInt()
   @Min(1)
   retentionDays: number
@@ -235,20 +309,28 @@ export class SubmitProposalDto {
   @IsString()
   entityId?: string
 
-  @ApiProperty({description: 'Operation type', enum: ['CREATE', 'UPDATE', 'DELETE']})
+  @ApiProperty({
+    description: 'Operation type',
+    enum: ['CREATE', 'UPDATE', 'DELETE'],
+  })
   @IsEnum(['CREATE', 'UPDATE', 'DELETE'])
   operation: 'CREATE' | 'UPDATE' | 'DELETE'
 
   @ApiProperty({description: 'Proposed changes as JSON object'})
   proposedChanges: any
 
-  @ApiPropertyOptional({description: 'Current state as JSON object (for updates)'})
+  @ApiPropertyOptional({
+    description: 'Current state as JSON object (for updates)',
+  })
   @IsOptional()
   currentState?: any
 }
 
 export class ProposalQueryDto {
-  @ApiPropertyOptional({description: 'Filter by status', enum: ['pending', 'approved', 'rejected']})
+  @ApiPropertyOptional({
+    description: 'Filter by status',
+    enum: ['pending', 'approved', 'rejected'],
+  })
   @IsOptional()
   @IsEnum(['pending', 'approved', 'rejected'])
   status?: 'pending' | 'approved' | 'rejected'
@@ -274,7 +356,12 @@ export class ProposalQueryDto {
   @Min(1)
   page?: number
 
-  @ApiPropertyOptional({description: 'Items per page', minimum: 1, maximum: 100, default: 50})
+  @ApiPropertyOptional({
+    description: 'Items per page',
+    minimum: 1,
+    maximum: 100,
+    default: 50,
+  })
   @IsOptional()
   @IsInt()
   @Min(1)

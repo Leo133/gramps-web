@@ -13,7 +13,7 @@ import {SourcesModule} from './sources/sources.module'
 import {NotesModule} from './notes/notes.module'
 import {MetadataModule} from './metadata/metadata.module'
 import {TreeSettingsModule} from './tree-settings/tree-settings.module'
-import { AdminModule } from './admin/admin.module';
+import {AdminModule} from './admin/admin.module'
 
 @Module({
   imports: [

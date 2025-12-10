@@ -56,7 +56,8 @@ export class BackupService {
       const backupPath = path.join(this.backupDir, filename)
 
       // Get database path from environment
-      const dbPath = process.env.DATABASE_URL?.replace('file:', '') || './prisma/dev.db'
+      const dbPath =
+        process.env.DATABASE_URL?.replace('file:', '') || './prisma/dev.db'
 
       // Copy database file
       let finalPath = backupPath + '.db'
@@ -186,7 +187,10 @@ export class BackupService {
         try {
           await fs.unlink(backup.filePath)
         } catch (error) {
-          console.error(`Failed to delete backup file: ${backup.filePath}`, error)
+          console.error(
+            `Failed to delete backup file: ${backup.filePath}`,
+            error,
+          )
         }
       }
 
