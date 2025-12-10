@@ -1,5 +1,6 @@
 import {Injectable, BadRequestException} from '@nestjs/common'
 import {PrismaService} from '../prisma/prisma.service'
+import {XMLParser} from 'fast-xml-parser'
 
 /**
  * Service for importing and exporting Gramps XML format
@@ -159,22 +160,29 @@ export class GrampsXmlService {
    * Parse Gramps XML string into structured data
    */
   private async parseGrampsXml(xmlString: string): Promise<any> {
-    // TODO: Implement XML parsing using fast-xml-parser
-    // This is a placeholder implementation
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_',
+    })
+    const parsed = parser.parse(xmlString)
     
-    // In production, use fast-xml-parser to parse the XML
-    // and extract all objects (people, families, events, etc.)
+    const database = parsed.database || {}
     
     return {
-      people: [],
-      families: [],
-      events: [],
-      places: [],
-      sources: [],
-      repositories: [],
-      media: [],
-      notes: [],
+      people: this.ensureArray(database.people?.person),
+      families: this.ensureArray(database.families?.family),
+      events: this.ensureArray(database.events?.event),
+      places: this.ensureArray(database.places?.place),
+      sources: this.ensureArray(database.sources?.source),
+      repositories: this.ensureArray(database.repositories?.repository),
+      media: this.ensureArray(database.media?.media),
+      notes: this.ensureArray(database.notes?.note),
     }
+  }
+
+  private ensureArray(item: any): any[] {
+    if (!item) return []
+    return Array.isArray(item) ? item : [item]
   }
 
   /**
