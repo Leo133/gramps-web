@@ -1,6 +1,12 @@
 import {Injectable, NotFoundException} from '@nestjs/common'
 import {PrismaService} from '../../prisma/prisma.service'
 
+// Constants for data quality analysis
+const LIKELY_DECEASED_AGE_THRESHOLD = 120
+const MIN_PARENT_AGE = 13
+const MAX_MOTHER_AGE = 60
+const MAX_FATHER_AGE = 80
+
 interface PersonHint {
   type: string
   severity: 'info' | 'warning' | 'error'
@@ -81,7 +87,10 @@ export class SmartHintsService {
 
     // Check for age inconsistencies with children
     if (familiesAsParent.length > 0) {
-      const ageHints = await this.checkParentChildAgeConsistency(person, familiesAsParent)
+      const ageHints = await this.checkParentChildAgeConsistency(
+        person,
+        familiesAsParent,
+      )
       hints.push(...ageHints)
     }
 
@@ -103,8 +112,11 @@ export class SmartHintsService {
 
     // Check for extremely long lifespan (>120 years)
     if (person.birthDate && person.deathDate) {
-      const lifespan = this.calculateLifespan(person.birthDate, person.deathDate)
-      if (lifespan > 120) {
+      const lifespan = this.calculateLifespan(
+        person.birthDate,
+        person.deathDate,
+      )
+      if (lifespan > LIKELY_DECEASED_AGE_THRESHOLD) {
         hints.push({
           type: 'unusual_lifespan',
           severity: 'warning',
@@ -160,19 +172,24 @@ export class SmartHintsService {
           issues.dateInconsistencies++
           issues.issues.push({
             personHandle: person.handle,
-            personName: `${person.firstName || ''} ${person.surname || ''}`.trim(),
+            personName:
+              `${person.firstName || ''} ${person.surname || ''}`.trim(),
             type: 'birth_after_death',
             severity: 'error',
             message: 'Birth date is after death date',
           })
         }
 
-        const lifespan = this.calculateLifespan(person.birthDate, person.deathDate)
-        if (lifespan > 120) {
+        const lifespan = this.calculateLifespan(
+          person.birthDate,
+          person.deathDate,
+        )
+        if (lifespan > LIKELY_DECEASED_AGE_THRESHOLD) {
           issues.unusualLifespans++
           issues.issues.push({
             personHandle: person.handle,
-            personName: `${person.firstName || ''} ${person.surname || ''}`.trim(),
+            personName:
+              `${person.firstName || ''} ${person.surname || ''}`.trim(),
             type: 'unusual_lifespan',
             severity: 'warning',
             message: `Lifespan of ${lifespan} years is unusually long`,
@@ -210,7 +227,7 @@ export class SmartHintsService {
     try {
       const birthYear = this.extractYear(person.birthDate)
       const currentYear = new Date().getFullYear()
-      return currentYear - birthYear > 120
+      return currentYear - birthYear > LIKELY_DECEASED_AGE_THRESHOLD
     } catch {
       return false
     }
@@ -240,7 +257,7 @@ export class SmartHintsService {
             const ageAtChildBirth = childBirthYear - parentBirthYear
 
             // Parent too young (< 13)
-            if (ageAtChildBirth < 13) {
+            if (ageAtChildBirth < MIN_PARENT_AGE) {
               hints.push({
                 type: 'parent_too_young',
                 severity: 'warning',
@@ -248,14 +265,15 @@ export class SmartHintsService {
                 suggestion: 'Verify birth dates are correct',
                 data: {
                   childHandle: child.handle,
-                  childName: `${child.firstName || ''} ${child.surname || ''}`.trim(),
+                  childName:
+                    `${child.firstName || ''} ${child.surname || ''}`.trim(),
                   ageAtBirth: ageAtChildBirth,
                 },
               })
             }
 
             // Parent too old (> 60 for women, > 80 for men)
-            const maxAge = person.gender === 0 ? 60 : 80
+            const maxAge = person.gender === 0 ? MAX_MOTHER_AGE : MAX_FATHER_AGE
             if (ageAtChildBirth > maxAge) {
               hints.push({
                 type: 'parent_too_old',
@@ -264,7 +282,8 @@ export class SmartHintsService {
                 suggestion: 'Verify birth dates are correct',
                 data: {
                   childHandle: child.handle,
-                  childName: `${child.firstName || ''} ${child.surname || ''}`.trim(),
+                  childName:
+                    `${child.firstName || ''} ${child.surname || ''}`.trim(),
                   ageAtBirth: ageAtChildBirth,
                 },
               })

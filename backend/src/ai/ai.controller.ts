@@ -111,7 +111,9 @@ export class AiController {
    * Tag a face with a person
    */
   @Post('faces/tag')
-  async tagFace(@Body() data: {mediaHandle: string; faceId: string; personHandle: string}) {
+  async tagFace(
+    @Body() data: {mediaHandle: string; faceId: string; personHandle: string},
+  ) {
     return this.faceRecognitionService.tagFace(
       data.mediaHandle,
       data.faceId,

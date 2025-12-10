@@ -17,7 +17,10 @@ export class AiService {
         'FACE_RECOGNITION_ENABLED',
         true,
       ),
-      smartHintsEnabled: this.configService.get<boolean>('SMART_HINTS_ENABLED', true),
+      smartHintsEnabled: this.configService.get<boolean>(
+        'SMART_HINTS_ENABLED',
+        true,
+      ),
     }
   }
 

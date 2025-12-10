@@ -2,6 +2,10 @@ import {Injectable, NotFoundException} from '@nestjs/common'
 import {PrismaService} from '../../prisma/prisma.service'
 import {ConfigService} from '@nestjs/config'
 
+// Constants for OCR processing
+const DEFAULT_CONFIDENCE_MIN = 0.85
+const DEFAULT_CONFIDENCE_MAX = 0.95
+
 @Injectable()
 export class OcrService {
   constructor(
@@ -30,7 +34,7 @@ export class OcrService {
     const ocrResult = await this.performOcrProcessing(file, language)
 
     // Save OCR results
-    await this.saveOcrResults(mediaHandle, ocrResult)
+    await this.saveOcrResults(mediaHandle, ocrResult, language)
 
     return {
       mediaHandle,
@@ -84,8 +88,8 @@ export class OcrService {
    * Perform OCR processing (mock implementation)
    */
   private async performOcrProcessing(
-    file: Express.Multer.File,
-    language: string,
+    _file: Express.Multer.File,
+    _language: string,
   ): Promise<{text: string; confidence: number}> {
     // In production, this would use Tesseract.js or a cloud OCR service
     // For now, return mock data
@@ -102,18 +106,24 @@ export class OcrService {
 
     return {
       text: mockTexts[Math.floor(Math.random() * mockTexts.length)],
-      confidence: 0.85 + Math.random() * 0.1, // 85-95% confidence
+      confidence:
+        DEFAULT_CONFIDENCE_MIN +
+        Math.random() * (DEFAULT_CONFIDENCE_MAX - DEFAULT_CONFIDENCE_MIN),
     }
   }
 
   /**
    * Save OCR results to metadata
    */
-  private async saveOcrResults(mediaHandle: string, ocrResult: any) {
+  private async saveOcrResults(
+    mediaHandle: string,
+    ocrResult: any,
+    language: string = 'eng',
+  ) {
     const data = {
       text: ocrResult.text,
       confidence: ocrResult.confidence,
-      language: 'eng',
+      language,
       processedAt: new Date().toISOString(),
     }
 

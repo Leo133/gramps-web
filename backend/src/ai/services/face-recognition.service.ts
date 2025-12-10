@@ -2,6 +2,11 @@ import {Injectable, NotFoundException} from '@nestjs/common'
 import {PrismaService} from '../../prisma/prisma.service'
 import {ConfigService} from '@nestjs/config'
 
+// Constants for face recognition
+const MAX_MEDIA_BATCH_SIZE = 100
+const DEFAULT_FACE_CONFIDENCE_MIN = 0.85
+const DEFAULT_FACE_CONFIDENCE_MAX = 1.0
+
 interface FaceDetection {
   faceId: string
   boundingBox: {
@@ -71,7 +76,9 @@ export class FaceRecognitionService {
     })
 
     if (!person) {
-      throw new NotFoundException(`Person with handle ${personHandle} not found`)
+      throw new NotFoundException(
+        `Person with handle ${personHandle} not found`,
+      )
     }
 
     // Get existing face detections
@@ -168,7 +175,9 @@ export class FaceRecognitionService {
       })
 
       if (!media) {
-        throw new NotFoundException(`Media with handle ${mediaHandle} not found`)
+        throw new NotFoundException(
+          `Media with handle ${mediaHandle} not found`,
+        )
       }
 
       mediaList = [media]
@@ -180,7 +189,7 @@ export class FaceRecognitionService {
             startsWith: 'image/',
           },
         },
-        take: 100, // Limit to 100 for performance
+        take: MAX_MEDIA_BATCH_SIZE,
       })
     }
 
@@ -191,7 +200,10 @@ export class FaceRecognitionService {
       const detections = await this.detectFaces(media.handle)
 
       // Auto-tag faces (mock implementation)
-      const autoTags = await this.performAutoTagging(media.handle, detections.faces)
+      const autoTags = await this.performAutoTagging(
+        media.handle,
+        detections.faces,
+      )
 
       results.push({
         mediaHandle: media.handle,
@@ -203,7 +215,10 @@ export class FaceRecognitionService {
     return {
       mediaProcessed: mediaList.length,
       totalFacesDetected: results.reduce((sum, r) => sum + r.facesDetected, 0),
-      totalFacesAutoTagged: results.reduce((sum, r) => sum + r.facesAutoTagged, 0),
+      totalFacesAutoTagged: results.reduce(
+        (sum, r) => sum + r.facesAutoTagged,
+        0,
+      ),
       results,
     }
   }
@@ -228,7 +243,10 @@ export class FaceRecognitionService {
           width: 0.2 + Math.random() * 0.1,
           height: 0.2 + Math.random() * 0.1,
         },
-        confidence: 0.85 + Math.random() * 0.15, // 85-100%
+        confidence:
+          DEFAULT_FACE_CONFIDENCE_MIN +
+          Math.random() *
+            (DEFAULT_FACE_CONFIDENCE_MAX - DEFAULT_FACE_CONFIDENCE_MIN),
       })
     }
 
@@ -239,8 +257,8 @@ export class FaceRecognitionService {
    * Perform auto-tagging of faces (mock implementation)
    */
   private async performAutoTagging(
-    mediaHandle: string,
-    faces: FaceDetection[],
+    _mediaHandle: string,
+    _faces: FaceDetection[],
   ): Promise<FaceTag[]> {
     // In production, this would use face recognition to match against known people
     // For now, return empty array (manual tagging only)
@@ -257,7 +275,10 @@ export class FaceRecognitionService {
   /**
    * Save face detection results
    */
-  private async saveFaceDetections(mediaHandle: string, faces: FaceDetection[]) {
+  private async saveFaceDetections(
+    mediaHandle: string,
+    faces: FaceDetection[],
+  ) {
     const data = {
       faces,
       detectedAt: new Date().toISOString(),

@@ -3,6 +3,10 @@ import {ConfigService} from '@nestjs/config'
 import {PrismaService} from '../../prisma/prisma.service'
 import {GenerateBiographyDto} from '../dto/generate-biography.dto'
 
+// Constants for AI API
+const DEFAULT_BIOGRAPHY_LENGTH = 500
+const TOKEN_MULTIPLIER = 1.5
+
 @Injectable()
 export class BiographyService {
   constructor(
@@ -139,7 +143,10 @@ export class BiographyService {
   /**
    * Call AI API to generate biography
    */
-  private async callAiApi(context: string, dto: GenerateBiographyDto): Promise<string> {
+  private async callAiApi(
+    context: string,
+    dto: GenerateBiographyDto,
+  ): Promise<string> {
     const apiKey = this.configService.get<string>('OPENAI_API_KEY')
 
     if (!apiKey) {
@@ -150,29 +157,34 @@ export class BiographyService {
     try {
       // Call OpenAI API
       const model = this.configService.get<string>('OPENAI_MODEL', 'gpt-4')
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
+      const response = await fetch(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              {
+                role: 'system',
+                content:
+                  'You are a professional genealogist and biographer. Generate compelling, accurate biographies based on the provided genealogical data. Write in a clear, engaging style appropriate to the requested format.',
+              },
+              {
+                role: 'user',
+                content: context,
+              },
+            ],
+            max_tokens: Math.ceil(
+              (dto.length || DEFAULT_BIOGRAPHY_LENGTH) * TOKEN_MULTIPLIER,
+            ), // Allow some overhead
+            temperature: 0.7,
+          }),
         },
-        body: JSON.stringify({
-          model,
-          messages: [
-            {
-              role: 'system',
-              content:
-                'You are a professional genealogist and biographer. Generate compelling, accurate biographies based on the provided genealogical data. Write in a clear, engaging style appropriate to the requested format.',
-            },
-            {
-              role: 'user',
-              content: context,
-            },
-          ],
-          max_tokens: Math.ceil((dto.length || 500) * 1.5), // Allow some overhead
-          temperature: 0.7,
-        }),
-      })
+      )
 
       if (!response.ok) {
         throw new Error(`OpenAI API error: ${response.statusText}`)
@@ -190,11 +202,20 @@ export class BiographyService {
   /**
    * Generate a mock biography for testing (when no AI API is available)
    */
-  private generateMockBiography(context: string, dto: GenerateBiographyDto): string {
+  private generateMockBiography(
+    context: string,
+    _dto: GenerateBiographyDto,
+  ): string {
     const lines = context.split('\n')
-    const name = lines.find(l => l.startsWith('Name:'))?.replace('Name: ', '') || 'This person'
-    const birth = lines.find(l => l.startsWith('Birth:'))?.replace('Birth: ', '')
-    const death = lines.find(l => l.startsWith('Death:'))?.replace('Death: ', '')
+    const name =
+      lines.find(l => l.startsWith('Name:'))?.replace('Name: ', '') ||
+      'This person'
+    const birth = lines
+      .find(l => l.startsWith('Birth:'))
+      ?.replace('Birth: ', '')
+    const death = lines
+      .find(l => l.startsWith('Death:'))
+      ?.replace('Death: ', '')
 
     let biography = `${name} was a remarkable individual whose life story is preserved in genealogical records. `
 
