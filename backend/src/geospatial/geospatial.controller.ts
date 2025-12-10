@@ -30,7 +30,7 @@ export class GeospatialController {
     @Query('north') north?: string,
     @Query('south') south?: string,
     @Query('east') east?: string,
-    @Query('west') west?: string
+    @Query('west') west?: string,
   ) {
     const options: any = {}
 

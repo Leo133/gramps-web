@@ -58,13 +58,16 @@ export class VisualizationsController {
     status: 200,
     description: 'Date calculation performed successfully',
   })
-  async calculateDate(@Body() body: {
-    operation: 'age' | 'difference' | 'dayOfWeek' | 'add' | 'subtract'
-    date1: string
-    date2?: string
-    amount?: number
-    unit?: 'days' | 'months' | 'years'
-  }) {
+  async calculateDate(
+    @Body()
+    body: {
+      operation: 'age' | 'difference' | 'dayOfWeek' | 'add' | 'subtract'
+      date1: string
+      date2?: string
+      amount?: number
+      unit?: 'days' | 'months' | 'years'
+    },
+  ) {
     return this.visualizationsService.calculateDate(body)
   }
 

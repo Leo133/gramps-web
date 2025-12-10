@@ -125,7 +125,8 @@ export class GrampsjsViewDateCalculator extends GrampsjsView {
         this._result = await response.json()
       }
     } catch (error) {
-      console.error('Error calculating date:', error)
+      // Error calculating date
+      this._result = {error: 'Calculation failed'}
     }
   }
 
@@ -200,7 +201,7 @@ export class GrampsjsViewDateCalculator extends GrampsjsView {
                   id="amount"
                   .value=${this._amount}
                   @input=${e => {
-                    this._amount = parseInt(e.target.value)
+                    this._amount = parseInt(e.target.value, 10)
                   }}
                 />
               </div>

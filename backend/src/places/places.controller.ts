@@ -52,7 +52,7 @@ export class PlacesController {
   @ApiQuery({name: 'longitude', required: true})
   reverseGeocode(
     @Query('latitude') latitude: string,
-    @Query('longitude') longitude: string
+    @Query('longitude') longitude: string,
   ) {
     const lat = parseFloat(latitude)
     const lng = parseFloat(longitude)

@@ -726,14 +726,11 @@ export class VisualizationsService {
     const nodes = people.map(person => ({
       id: person.handle,
       grampsId: person.grampsId,
-      name: `${person.firstName || ''} ${person.surname || ''}`.trim() || 'Unknown',
+      name:
+        `${person.firstName || ''} ${person.surname || ''}`.trim() || 'Unknown',
       gender: person.gender,
-      birthYear: person.birthDate
-        ? this.extractYear(person.birthDate)
-        : null,
-      deathYear: person.deathDate
-        ? this.extractYear(person.deathDate)
-        : null,
+      birthYear: person.birthDate ? this.extractYear(person.birthDate) : null,
+      deathYear: person.deathDate ? this.extractYear(person.deathDate) : null,
     }))
 
     // Build links (edges)
@@ -819,7 +816,8 @@ export class VisualizationsService {
     }> = []
 
     people.forEach(person => {
-      const name = `${person.firstName || ''} ${person.surname || ''}`.trim() || 'Unknown'
+      const name =
+        `${person.firstName || ''} ${person.surname || ''}`.trim() || 'Unknown'
 
       // Parse birthday
       if (person.birthDate) {

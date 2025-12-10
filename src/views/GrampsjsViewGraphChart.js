@@ -55,7 +55,8 @@ export class GrampsjsViewGraphChart extends GrampsjsView {
         this._data = await response.json()
       }
     } catch (error) {
-      console.error('Error loading graph data:', error)
+      // Error loading graph data
+      this._data = null
     } finally {
       this._loading = false
     }

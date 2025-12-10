@@ -115,11 +115,13 @@ export class GrampsXmlService {
    * @param options - Export options
    * @returns XML string
    */
-  async exportGrampsXml(options: {
-    includeMedia?: boolean
-    includeLiving?: boolean
-    privateOnly?: boolean
-  } = {}): Promise<string> {
+  async exportGrampsXml(
+    options: {
+      includeMedia?: boolean
+      includeLiving?: boolean
+      privateOnly?: boolean
+    } = {},
+  ): Promise<string> {
     // Fetch all data from database
     const [
       people,

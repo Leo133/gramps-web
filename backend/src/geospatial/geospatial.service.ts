@@ -64,7 +64,7 @@ export class GeospatialService {
             latitude: place.latitude,
             longitude: place.longitude,
           }
-        })
+        }),
       )
 
       const validEvents = eventsWithPlaces.filter(e => e !== null)
@@ -115,7 +115,7 @@ export class GeospatialService {
     const {zoom = 1, bounds} = options || {}
 
     // Get all places with coordinates
-    let whereClause: any = {
+    const whereClause: any = {
       AND: [
         {latitude: {not: null}},
         {longitude: {not: null}},

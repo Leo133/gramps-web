@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { QualityCheckService } from './quality-check.service';
-import { QualityCheckController } from './quality-check.controller';
-import { PrismaModule } from '../prisma/prisma.module';
+import {Module} from '@nestjs/common'
+import {QualityCheckService} from './quality-check.service'
+import {QualityCheckController} from './quality-check.controller'
+import {PrismaModule} from '../prisma/prisma.module'
 
 @Module({
   imports: [PrismaModule],

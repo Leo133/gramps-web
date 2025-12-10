@@ -101,13 +101,17 @@ export class GrampsjsCalendar extends LitElement {
     return this.data.events.filter(event => event.date === day)
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _handleEventClick(event) {
+    // Navigate to person page
     if (event.person && event.person.handle) {
       window.location.href = `#/person/${event.person.handle}`
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _formatEvent(event) {
+    // Format event text
     let text = ''
     if (event.type === 'birthday') {
       text = `🎂 ${event.person.name}`
@@ -138,12 +142,12 @@ export class GrampsjsCalendar extends LitElement {
     })
 
     // Add empty cells for days before the first day of the month
-    for (let i = 0; i < firstDay; i++) {
+    for (let i = 0; i < firstDay; i += 1) {
       days.push(html` <div class="calendar-day empty-day"></div> `)
     }
 
     // Add days of the month
-    for (let day = 1; day <= daysInMonth; day++) {
+    for (let day = 1; day <= daysInMonth; day += 1) {
       const events = this._getEventsForDay(day)
       days.push(html`
         <div class="calendar-day">
@@ -152,7 +156,14 @@ export class GrampsjsCalendar extends LitElement {
             event => html`
               <div
                 class="event ${event.type}"
+                role="button"
+                tabindex="0"
                 @click=${() => this._handleEventClick(event)}
+                @keydown=${e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    this._handleEventClick(event)
+                  }
+                }}
                 title="${this._formatEvent(event)}"
               >
                 ${this._formatEvent(event)}

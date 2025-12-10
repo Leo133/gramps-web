@@ -183,7 +183,12 @@ export class BlogService {
     return this.transformPost(post)
   }
 
-  async update(id: string, userId: string, userRole: string, updateDto: UpdateBlogPostDto) {
+  async update(
+    id: string,
+    userId: string,
+    userRole: string,
+    updateDto: UpdateBlogPostDto,
+  ) {
     const post = await this.findOne(id)
 
     // Only the author or editor/owner can update
@@ -211,11 +216,11 @@ export class BlogService {
     if (updateDto.content !== undefined) data.content = updateDto.content
     if (updateDto.excerpt !== undefined) data.excerpt = updateDto.excerpt
     if (updateDto.status !== undefined) data.status = updateDto.status
-    if (updateDto.visibility !== undefined) data.visibility = updateDto.visibility
+    if (updateDto.visibility !== undefined)
+      data.visibility = updateDto.visibility
     if (updateDto.featuredImage !== undefined)
       data.featuredImage = updateDto.featuredImage
-    if (updateDto.tags !== undefined)
-      data.tags = JSON.stringify(updateDto.tags)
+    if (updateDto.tags !== undefined) data.tags = JSON.stringify(updateDto.tags)
     if (updateDto.categories !== undefined)
       data.categories = JSON.stringify(updateDto.categories)
     if (updateDto.publishedAt !== undefined)

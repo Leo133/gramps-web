@@ -132,8 +132,9 @@ export class GrampsjsGraphChart extends LitElement {
       .data(this.data.nodes)
       .join('g')
       .attr('class', d => {
-        const gender =
-          d.gender === 0 ? 'female' : d.gender === 1 ? 'male' : 'unknown'
+        let gender = 'unknown'
+        if (d.gender === 0) gender = 'female'
+        else if (d.gender === 1) gender = 'male'
         return `node ${gender}`
       })
       .call(
@@ -141,17 +142,20 @@ export class GrampsjsGraphChart extends LitElement {
           .drag()
           .on('start', event => {
             if (!event.active) simulation.alphaTarget(0.3).restart()
-            event.subject.fx = event.subject.x
-            event.subject.fy = event.subject.y
+            const {subject} = event
+            subject.fx = subject.x
+            subject.fy = subject.y
           })
           .on('drag', event => {
-            event.subject.fx = event.x
-            event.subject.fy = event.y
+            const {subject} = event
+            subject.fx = event.x
+            subject.fy = event.y
           })
           .on('end', event => {
             if (!event.active) simulation.alphaTarget(0)
-            event.subject.fx = null
-            event.subject.fy = null
+            const {subject} = event
+            subject.fx = null
+            subject.fy = null
           }),
       )
 

@@ -96,7 +96,8 @@ export class GrampsjsViewCalendar extends GrampsjsView {
         this._data = await response.json()
       }
     } catch (error) {
-      console.error('Error loading calendar data:', error)
+      // Error loading calendar data
+      this._data = null
     } finally {
       this._loading = false
     }
@@ -105,9 +106,9 @@ export class GrampsjsViewCalendar extends GrampsjsView {
   _handlePrevMonth() {
     if (this._month === 1) {
       this._month = 12
-      this._year--
+      this._year -= 1
     } else {
-      this._month--
+      this._month -= 1
     }
     this._loadCalendarData()
   }
@@ -115,9 +116,9 @@ export class GrampsjsViewCalendar extends GrampsjsView {
   _handleNextMonth() {
     if (this._month === 12) {
       this._month = 1
-      this._year++
+      this._year += 1
     } else {
-      this._month++
+      this._month += 1
     }
     this._loadCalendarData()
   }
@@ -157,16 +158,20 @@ export class GrampsjsViewCalendar extends GrampsjsView {
 
         ${this._loading
           ? html` <div class="loading">${this._('Loading calendar...')}</div> `
-          : this._data
-            ? html`
-                <grampsjs-calendar
-                  .data=${this._data}
-                  .appState=${this.appState}
-                  .year=${this._year}
-                  .month=${this._month}
-                ></grampsjs-calendar>
-              `
-            : html` <div class="loading">${this._('No data available')}</div> `}
+          : ''}
+        ${!this._loading && this._data
+          ? html`
+              <grampsjs-calendar
+                .data=${this._data}
+                .appState=${this.appState}
+                .year=${this._year}
+                .month=${this._month}
+              ></grampsjs-calendar>
+            `
+          : ''}
+        ${!this._loading && !this._data
+          ? html` <div class="loading">${this._('No data available')}</div> `
+          : ''}
       </div>
     `
   }

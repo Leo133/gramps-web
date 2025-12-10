@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-const stringSimilarity = require('string-similarity');
-const compareTwoStrings = stringSimilarity.compareTwoStrings;
+import {Injectable} from '@nestjs/common'
+import {PrismaService} from '../prisma/prisma.service'
+const stringSimilarity = require('string-similarity')
+const compareTwoStrings = stringSimilarity.compareTwoStrings
 
 @Injectable()
 export class DuplicatesService {
@@ -11,37 +11,39 @@ export class DuplicatesService {
    * Find potential duplicate people
    */
   async findDuplicatePeople(minSimilarity: number = 0.7): Promise<any[]> {
-    const people = await this.prisma.person.findMany();
-    const suggestions = [];
+    const people = await this.prisma.person.findMany()
+    const suggestions = []
 
     // Compare all pairs of people
     for (let i = 0; i < people.length; i++) {
       for (let j = i + 1; j < people.length; j++) {
-        const person1 = people[i];
-        const person2 = people[j];
+        const person1 = people[i]
+        const person2 = people[j]
 
-        const matchReasons = [];
-        let totalScore = 0;
-        let scoreCount = 0;
+        const matchReasons = []
+        let totalScore = 0
+        let scoreCount = 0
 
         // Compare names
-        const name1 = `${person1.firstName || ''} ${person1.surname || ''}`.trim();
-        const name2 = `${person2.firstName || ''} ${person2.surname || ''}`.trim();
-        
+        const name1 =
+          `${person1.firstName || ''} ${person1.surname || ''}`.trim()
+        const name2 =
+          `${person2.firstName || ''} ${person2.surname || ''}`.trim()
+
         if (name1 && name2) {
           const nameSimilarity = compareTwoStrings(
             name1.toLowerCase(),
             name2.toLowerCase(),
-          );
-          
+          )
+
           if (nameSimilarity > minSimilarity) {
             matchReasons.push({
               type: 'name',
               score: nameSimilarity,
-              details: { name1, name2 },
-            });
-            totalScore += nameSimilarity;
-            scoreCount++;
+              details: {name1, name2},
+            })
+            totalScore += nameSimilarity
+            scoreCount++
           }
         }
 
@@ -51,10 +53,10 @@ export class DuplicatesService {
             matchReasons.push({
               type: 'birth_date',
               score: 1.0,
-              details: { date: person1.birthDate },
-            });
-            totalScore += 1.0;
-            scoreCount++;
+              details: {date: person1.birthDate},
+            })
+            totalScore += 1.0
+            scoreCount++
           }
         }
 
@@ -63,23 +65,23 @@ export class DuplicatesService {
           const placeSimilarity = compareTwoStrings(
             person1.birthPlace.toLowerCase(),
             person2.birthPlace.toLowerCase(),
-          );
-          
+          )
+
           if (placeSimilarity > 0.8) {
             matchReasons.push({
               type: 'birth_place',
               score: placeSimilarity,
-              details: { place1: person1.birthPlace, place2: person2.birthPlace },
-            });
-            totalScore += placeSimilarity;
-            scoreCount++;
+              details: {place1: person1.birthPlace, place2: person2.birthPlace},
+            })
+            totalScore += placeSimilarity
+            scoreCount++
           }
         }
 
         // If we found matches, create a suggestion
         if (matchReasons.length > 0) {
-          const avgScore = totalScore / scoreCount;
-          
+          const avgScore = totalScore / scoreCount
+
           if (avgScore >= minSimilarity) {
             suggestions.push({
               entityType: 'Person',
@@ -97,7 +99,7 @@ export class DuplicatesService {
               },
               similarityScore: avgScore,
               matchReasons,
-            });
+            })
 
             // Store in database
             await this.prisma.duplicateSuggestion.create({
@@ -109,13 +111,13 @@ export class DuplicatesService {
                 matchReasons: JSON.stringify(matchReasons),
                 status: 'pending',
               },
-            });
+            })
           }
         }
       }
     }
 
-    return suggestions;
+    return suggestions
   }
 
   /**
@@ -125,12 +127,12 @@ export class DuplicatesService {
     const suggestions = await this.prisma.duplicateSuggestion.findMany({
       where: {
         status: 'pending',
-        ...(entityType ? { entityType } : {}),
+        ...(entityType ? {entityType} : {}),
       },
       orderBy: {
         similarityScore: 'desc',
       },
-    });
+    })
 
     return suggestions.map(s => ({
       id: s.id,
@@ -141,7 +143,7 @@ export class DuplicatesService {
       matchReasons: JSON.parse(s.matchReasons),
       status: s.status,
       createdAt: s.createdAt,
-    }));
+    }))
   }
 
   /**
@@ -153,33 +155,37 @@ export class DuplicatesService {
     userId: string,
   ): Promise<any> {
     return this.prisma.duplicateSuggestion.update({
-      where: { id },
+      where: {id},
       data: {
         status,
         reviewedBy: userId,
         reviewedAt: new Date(),
       },
-    });
+    })
   }
 
   /**
    * Merge two people (not yet implemented)
-   * 
+   *
    * This is a complex operation that requires:
    * 1. Combining all data from both records
    * 2. Updating all references (families, events, media, etc.)
    * 3. Handling conflicts in data
    * 4. Preserving audit trail
    * 5. Deleting the duplicate record
-   * 
+   *
    * @throws Error indicating feature is not yet available
    * @returns Never - always throws an error
    */
-  async mergePeople(handle1: string, handle2: string, keepHandle: string): Promise<any> {
+  async mergePeople(
+    handle1: string,
+    handle2: string,
+    keepHandle: string,
+  ): Promise<any> {
     throw new Error(
       'Merge functionality is not yet implemented. ' +
-      'This is a complex operation that requires careful handling of all ' +
-      'entity relationships. Please manually merge records for now.'
-    );
+        'This is a complex operation that requires careful handling of all ' +
+        'entity relationships. Please manually merge records for now.',
+    )
   }
 }

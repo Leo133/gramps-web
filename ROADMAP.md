@@ -317,14 +317,27 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 
 **Goal:** Support long-time Gramps users and advanced genetic genealogy use cases.
 
-**Status:** 📅 PLANNED
+**Status:** ✅ COMPLETE
 
-- [ ] **Advanced Visualizations:**
-  - [ ] **Graph View:** Implement a force-directed graph visualization of the entire family tree.
-  - [ ] **Calendar View:** A dedicated calendar view for birthdays, anniversaries, and historical events.
-- [ ] **Narrative & Blogging:**
-  - [ ] **Blog Backend:** Implement a `BlogModule` to support the narrative/blogging frontend views.
-- [ ] **Advanced Tools:**
-  - [ ] **Date Calculator:** Utility for complex date arithmetic (age between dates, day of week, etc.).
-  - [ ] **DNA Painter Integration:** Visual chromosome mapping and triangulation tools (Phase 12).
-- [ ] **Advanced Search Backend:** Evaluate migration to Meilisearch or Elasticsearch if the SQL-based search hits performance limits.
+- [x] **Advanced Visualizations:**
+  - [x] **Graph View:** Implement a force-directed graph visualization of the entire family tree.
+  - [x] **Calendar View:** A dedicated calendar view for birthdays, anniversaries, and historical events.
+- [x] **Narrative & Blogging:**
+  - [x] **Blog Backend:** Implement a `BlogModule` to support the narrative/blogging frontend views.
+- [x] **Advanced Tools:**
+  - [x] **Date Calculator:** Utility for complex date arithmetic (age between dates, day of week, etc.).
+  - [ ] **DNA Painter Integration:** Visual chromosome mapping and triangulation tools (Phase 12). *(Deferred)*
+- [ ] **Advanced Search Backend:** Evaluate migration to Meilisearch or Elasticsearch if the SQL-based search hits performance limits. *(Not needed at this time)*
+
+**Implementation Details:** See [PHASE15_IMPLEMENTATION.md](PHASE15_IMPLEMENTATION.md) and [PHASE15_SUMMARY.md](PHASE15_SUMMARY.md) for complete documentation.
+
+**Features Delivered:**
+
+- ✅ Complete blog backend with 7 API endpoints
+- ✅ Force-directed graph visualization with D3.js
+- ✅ Monthly calendar view with event tracking
+- ✅ Comprehensive date calculator utility
+- ✅ Interactive visualizations with zoom/pan
+- ✅ Gender-based color coding in graph view
+- ✅ Click-to-navigate in all visualizations
+- ✅ Database migration for BlogPost model

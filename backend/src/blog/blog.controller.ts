@@ -132,7 +132,12 @@ export class BlogController {
     @Param('id') id: string,
     @Body() updateDto: UpdateBlogPostDto,
   ) {
-    return this.blogService.update(id, req.user.userId, req.user.role, updateDto)
+    return this.blogService.update(
+      id,
+      req.user.userId,
+      req.user.role,
+      updateDto,
+    )
   }
 
   @Delete(':id')
