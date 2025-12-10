@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  Req,
-} from '@nestjs/common'
+import {Controller, Get, Post, Delete, Body, Param, Query} from '@nestjs/common'
 import {
   ApiTags,
   ApiOperation,
@@ -90,10 +80,7 @@ export class AdminController {
   @Roles('owner')
   @ApiOperation({summary: 'Rollback a change (Owner only)'})
   @ApiResponse({status: 200, description: 'Change rolled back successfully'})
-  async rollbackChange(
-    @Body() dto: RollbackDto,
-    @CurrentUser() user: any,
-  ) {
+  async rollbackChange(@Body() dto: RollbackDto, @CurrentUser() user: any) {
     return this.auditService.rollback(dto.auditLogId, user.id)
   }
 
@@ -102,10 +89,7 @@ export class AdminController {
   @Roles('owner')
   @ApiOperation({summary: 'Create a backup (Owner only)'})
   @ApiResponse({status: 201, description: 'Backup created successfully'})
-  async createBackup(
-    @Body() dto: CreateBackupDto,
-    @CurrentUser() user: any,
-  ) {
+  async createBackup(@Body() dto: CreateBackupDto, @CurrentUser() user: any) {
     return this.backupService.createBackup({
       type: dto.type || 'manual',
       destination: dto.destination,
@@ -152,10 +136,7 @@ export class AdminController {
   @Roles('editor', 'owner')
   @ApiOperation({summary: 'Mass tag entities'})
   @ApiResponse({status: 200, description: 'Entities tagged successfully'})
-  async massTag(
-    @Body() dto: MassTagDto,
-    @CurrentUser() user: any,
-  ) {
+  async massTag(@Body() dto: MassTagDto, @CurrentUser() user: any) {
     return this.bulkService.massTag({
       ...dto,
       userId: user.id,
@@ -166,10 +147,7 @@ export class AdminController {
   @Roles('editor', 'owner')
   @ApiOperation({summary: 'Find and replace text in entities'})
   @ApiResponse({status: 200, description: 'Find and replace completed'})
-  async findReplace(
-    @Body() dto: FindReplaceDto,
-    @CurrentUser() user: any,
-  ) {
+  async findReplace(@Body() dto: FindReplaceDto, @CurrentUser() user: any) {
     return this.bulkService.findAndReplace({
       ...dto,
       userId: user.id,

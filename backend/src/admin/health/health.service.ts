@@ -102,7 +102,7 @@ export class HealthService {
     const trends = this.calculateTrends(recentMetrics)
 
     // Determine overall health status
-    const status = this.determineHealthStatus(current, trends)
+    const status = this.determineHealthStatus(current)
 
     return {
       status,
@@ -152,8 +152,15 @@ export class HealthService {
         notes: noteCount,
         auditLogs: auditLogCount,
       },
-      totalRecords: userCount + personCount + familyCount + eventCount + 
-                     placeCount + mediaCount + sourceCount + noteCount,
+      totalRecords:
+        userCount +
+        personCount +
+        familyCount +
+        eventCount +
+        placeCount +
+        mediaCount +
+        sourceCount +
+        noteCount,
       databaseSize: dbSize,
     }
   }
@@ -194,7 +201,7 @@ export class HealthService {
 
     const idle = totalIdle / cpus.length
     const total = totalTick / cpus.length
-    const usage = 100 - ~~(100 * idle / total)
+    const usage = 100 - ~~((100 * idle) / total)
 
     return usage
   }
@@ -234,7 +241,8 @@ export class HealthService {
    */
   private async getDatabaseSize(): Promise<number> {
     try {
-      const dbPath = process.env.DATABASE_URL?.replace('file:', '') || './prisma/dev.db'
+      const dbPath =
+        process.env.DATABASE_URL?.replace('file:', '') || './prisma/dev.db'
       const stats = await fs.stat(dbPath)
       return stats.size
     } catch (error) {
@@ -279,7 +287,7 @@ export class HealthService {
    */
   private async getActiveUsers(): Promise<number> {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
-    
+
     const activeUserIds = await this.prisma.auditLog.findMany({
       where: {
         timestamp: {gte: oneHourAgo},
@@ -340,7 +348,9 @@ export class HealthService {
       aggregated.push(avg)
     })
 
-    return aggregated.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+    return aggregated.sort(
+      (a, b) => b.timestamp.getTime() - a.timestamp.getTime(),
+    )
   }
 
   /**
@@ -372,23 +382,23 @@ export class HealthService {
     return {
       cpuTrend: this.calculateTrend(
         this.average(older.map(m => m.cpuUsage)),
-        this.average(recent.map(m => m.cpuUsage))
+        this.average(recent.map(m => m.cpuUsage)),
       ),
       memoryTrend: this.calculateTrend(
         this.average(older.map(m => m.memoryUsage)),
-        this.average(recent.map(m => m.memoryUsage))
+        this.average(recent.map(m => m.memoryUsage)),
       ),
       diskTrend: this.calculateTrend(
         this.average(older.map(m => m.diskUsage)),
-        this.average(recent.map(m => m.diskUsage))
+        this.average(recent.map(m => m.diskUsage)),
       ),
       requestTrend: this.calculateTrend(
         this.average(older.map(m => m.requestCount)),
-        this.average(recent.map(m => m.requestCount))
+        this.average(recent.map(m => m.requestCount)),
       ),
       errorTrend: this.calculateTrend(
         this.average(older.map(m => m.errorCount)),
-        this.average(recent.map(m => m.errorCount))
+        this.average(recent.map(m => m.errorCount)),
       ),
     }
   }
@@ -407,7 +417,7 @@ export class HealthService {
   /**
    * Helper: Determine overall health status
    */
-  private determineHealthStatus(current: any, trends: any): string {
+  private determineHealthStatus(current: any): string {
     const warnings: string[] = []
 
     if (current.cpuUsage > 80) warnings.push('High CPU usage')
