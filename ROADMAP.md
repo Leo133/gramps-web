@@ -151,14 +151,26 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 - [ ] **System Health Dashboard:** Real-time monitoring of server load, database size, and error rates.
 - [ ] **Approval Workflows:** A "Pull Request" system for genealogy—contributors submit changes, and editors review/approve them before they go live.
 
-## Phase 14: Reporting & Print Features
+## Phase 14: Polishing, Performance & Production Readiness
 
-**Goal:** Generate professional reports and printed family history documents.
+**Goal:** Ensure the platform is robust, fully tested, and performant at scale, while closing the gap between backend capabilities and frontend UI.
 
-- [x] **PDF Report Generation:** Generate high-quality PDF reports using PDFKit with custom styling.
-- [x] **Pedigree Charts:** Traditional ancestor charts showing direct lineage in a tree format.
-- [x] **Family Group Sheets:** Detailed family reports showing parents, children, and key events.
-- [x] **Descendant Reports:** Comprehensive reports showing all descendants of a given ancestor.
-- [x] **Ancestor Reports:** Detailed reports tracing ancestry back through generations.
-- [x] **Custom Report Templates:** Configurable report layouts with privacy controls and styling options.
-- [x] **Report API:** RESTful endpoints for generating and retrieving reports in various formats.
+**Status:** 📅 PLANNED
+
+- [ ] **Core Feature Parity (Missing Backend Modules):**
+  - [ ] **Reporting Engine:** Implement a backend `ReportsModule` to generate PDF/ODT reports (Ahnentafel, Descendant, etc.) matching Gramps Desktop capabilities.
+  - [ ] **DNA Backend:** Implement `DnaModule` to support storing and retrieving DNA matches (supporting the existing frontend views).
+  - [ ] **Gramps XML Support:** Implement full lossless import/export of the native `.gramps` XML format (critical for desktop interoperability).
+- [ ] **Frontend Feature Completion:**
+  - [ ] **Deep Zoom UI:** Integrate OpenSeadragon for the IIIF-compatible media viewer (Phase 4).
+  - [ ] **High-Performance Charts:** Implement Canvas/WebGL (PixiJS) rendering for large Fan Charts and Pedigree Trees (Phase 5).
+  - [ ] **Real-Time Updates:** Implement WebSocket or polling mechanisms for Chat and Activity Feed (Phase 9).
+  - [ ] **Face Tagging UI:** Frontend interface for the face detection API (Phase 4).
+- [ ] **Testing & Quality Assurance:**
+  - [ ] **Backend Test Coverage:** Achieve >80% unit test coverage (currently low).
+  - [ ] **E2E Testing:** Fix and expand End-to-End test suites for critical user flows.
+  - [ ] **Frontend Testing:** Implement comprehensive component tests using `@web/test-runner`.
+- [ ] **Performance Optimization:**
+  - [ ] **Database Query Tuning:** Optimize complex visualization queries (e.g., `visualizations.service.ts`).
+  - [ ] **Virtual Scrolling:** Implement virtual lists for large datasets (People list, Media gallery).
+  - [ ] **Bundle Optimization:** Analyze and reduce frontend bundle size.

@@ -1,450 +1,347 @@
-# Phase 14: Reporting & Print Features - Implementation Guide
+# Phase 14: Polishing, Performance & Production Readiness - Implementation Guide
 
-This document describes the implementation of Phase 14 features for Gramps Web, focusing on professional report generation and printable family history documents.
+This document describes the implementation plan for Phase 14 features for Gramps Web, focusing on production readiness, feature parity, testing, and performance optimization.
 
 ## Overview
 
-Phase 14 adds comprehensive reporting capabilities to Gramps Web, enabling users to:
-- Generate professional PDF reports
-- Create printable pedigree charts
-- Generate family group sheets
-- Produce descendant and ancestor reports
-- Customize report styling and privacy settings
-- Export reports in multiple formats
+Phase 14 is about closing the gap between backend capabilities and frontend UI, ensuring the platform is robust, fully tested, and performant at scale. This phase addresses missing backend modules, completes frontend features, improves test coverage, and optimizes performance.
 
-## Features Implemented
+## Implementation Status
 
-### 1. PDF Report Generation Service
+### Core Feature Parity (Missing Backend Modules)
 
-**What it does:**
-- Generates high-quality PDF documents using PDFKit
-- Supports custom fonts, colors, and layouts
-- Includes automatic page breaks and headers/footers
-- Ready for production use with configurable styling
+#### 1. Reporting Engine (Backend)
+**Status:** 📅 Planned for implementation
 
-**Current Implementation:**
-- Mock implementation returns PDF metadata and download URLs
-- Designed for easy integration with PDFKit library
-- Supports multiple report types and configurations
+**Goal:** Implement a backend `ReportsModule` to generate PDF/ODT reports matching Gramps Desktop capabilities.
 
-**Usage:**
-```javascript
-// Generate a pedigree chart
-POST /api/reports/pedigree
-Content-Type: application/json
-Body: {
-  personId: "I0001",
-  generations: 4,
-  includePhotos: true,
-  privacyLevel: "living"
-}
+**Reports to Support:**
+- **Ahnentafel Report:** Ancestor numbering system (1, 2, 3, 4...)
+- **Descendant Report:** Multiple numbering systems (Register, NGSQ, Henry, d'Aboville)
+- **Pedigree Chart:** Traditional ancestor tree visualization
+- **Family Group Sheet:** Detailed family unit reports
+- **Custom Reports:** Configurable templates
 
-// Returns:
-{
-  reportId: "unique-report-id",
-  url: "/api/reports/download/unique-report-id",
-  format: "pdf",
-  filename: "pedigree_chart.pdf"
-}
+**Technical Approach:**
+- Create `backend/src/reports/` module using NestJS
+- Use PDFKit or similar library for PDF generation
+- Use libreoffice-convert for ODT generation
+- Implement report templates system
+- Add privacy filtering (living vs deceased)
+- Support multiple output formats (PDF, ODT, HTML)
+
+**API Endpoints:**
+```typescript
+POST /api/reports/generate
+GET /api/reports/:id/download
+GET /api/reports/templates
+DELETE /api/reports/:id
 ```
 
-**Production Integration:**
-To enable real PDF generation in production, install PDFKit:
-```bash
-npm install pdfkit
-```
+#### 2. DNA Backend Module
+**Status:** 📅 Planned for implementation
 
-### 2. Pedigree Chart Reports
-
-**What it does:**
-- Traditional ancestor chart showing direct lineage
-- Configurable number of generations (1-10)
-- Includes birth, death, and marriage information
-- Optional photo inclusion
-- Privacy controls for living individuals
+**Goal:** Implement `DnaModule` to support storing and retrieving DNA matches.
 
 **Features:**
-- Clean, professional layout
-- Automatic scaling based on generation depth
-- Color-coded by gender (optional)
-- Direct ancestor highlighting
-- Page orientation (portrait/landscape)
+- Store DNA test results
+- Manage DNA matches
+- Link DNA matches to people in the tree
+- Support multiple DNA test providers (Ancestry, 23andMe, MyHeritage, etc.)
+- Chromosome browser data storage
+- Shared segment visualization data
 
-**Configuration Options:**
-```json
-{
-  "personId": "I0001",
-  "generations": 5,
-  "includePhotos": true,
-  "includeDates": true,
-  "includePlaces": true,
-  "privacyLevel": "living",
-  "orientation": "landscape",
-  "theme": "classic"
-}
+**Technical Approach:**
+- Create `backend/src/dna/` module using NestJS
+- Design Prisma schema for DNA data
+- Implement CRUD operations for DNA matches
+- Add DNA match import from CSV/GEDCOM
+- Support triangulation data
+
+**API Endpoints:**
+```typescript
+POST /api/dna/tests
+GET /api/dna/tests/:id
+POST /api/dna/matches
+GET /api/dna/matches
+PUT /api/dna/matches/:id
+DELETE /api/dna/matches/:id
 ```
 
-**API Endpoint:**
-```
-POST /api/reports/pedigree
-```
+#### 3. Gramps XML Support
+**Status:** 📅 Planned for implementation
 
-### 3. Family Group Sheets
-
-**What it does:**
-- Comprehensive family report centered on a family unit
-- Shows father, mother, and all children
-- Includes detailed event information
-- Marriage details and relationships
-- Notes and sources (optional)
+**Goal:** Implement full lossless import/export of the native `.gramps` XML format.
 
 **Features:**
-- Traditional genealogical format
-- Separate sections for parents and children
-- Event timeline for each person
-- Source citations (when included)
-- Customizable fields
+- Import Gramps XML files
+- Export to Gramps XML format
+- Preserve all Gramps-specific metadata
+- Handle compressed .gramps files (gzip)
+- Support for all Gramps object types
+- Round-trip compatibility testing
 
-**Configuration Options:**
-```json
-{
-  "familyId": "F0001",
-  "includeNotes": true,
-  "includeSources": true,
-  "includePhotos": true,
-  "privacyLevel": "living",
-  "detailLevel": "full"
-}
+**Technical Approach:**
+- Create `backend/src/gramps-xml/` module
+- Implement XML parser using fast-xml-parser
+- Map Gramps XML schema to Prisma models
+- Handle media file extraction from compressed archives
+- Implement incremental sync for updates
+
+**API Endpoints:**
+```typescript
+POST /api/importers/gramps-xml/file
+POST /api/exporters/gramps-xml/file
+GET /api/importers/gramps-xml/status/:jobId
 ```
 
-**API Endpoint:**
-```
-POST /api/reports/family-group-sheet
-```
+### Frontend Feature Completion
 
-### 4. Descendant Reports
+#### 4. Deep Zoom UI (OpenSeadragon Integration)
+**Status:** 📅 Planned
 
-**What it does:**
-- Shows all descendants of a given ancestor
-- Multiple numbering systems (Register, NGSQ, Henry, d'Aboville)
-- Configurable generation depth
-- Narrative or outline format
-- Includes all events and relationships
+**Goal:** Integrate OpenSeadragon for the IIIF-compatible media viewer.
 
-**Numbering Systems:**
-- **Register System:** Modified Register numbering (1, 2, i, ii, a, b)
-- **NGSQ:** National Genealogical Society Quarterly system
-- **Henry:** Henry numbering system (1, 11, 111)
-- **d'Aboville:** d'Aboville system (1, 1.1, 1.1.1)
+**Implementation:**
+- Install OpenSeadragon package
+- Create OpenSeadragon component wrapper
+- Integrate with existing IIIF manifest endpoint
+- Add zoom controls and navigation
+- Implement touch gestures for mobile
 
-**Configuration Options:**
-```json
-{
-  "personId": "I0001",
-  "generations": 5,
-  "numberingSystem": "register",
-  "format": "narrative",
-  "includeSpouses": true,
-  "includeEvents": true,
-  "privacyLevel": "all"
-}
-```
+**Files to Modify:**
+- `src/components/MediaViewer.js`
+- Create `src/components/DeepZoomViewer.js`
 
-**API Endpoint:**
-```
-POST /api/reports/descendant
-```
+#### 5. High-Performance Charts (Canvas/WebGL)
+**Status:** 📅 Planned
 
-### 5. Ancestor Reports
+**Goal:** Implement Canvas/WebGL rendering for large Fan Charts and Pedigree Trees.
 
-**What it does:**
-- Traces ancestry back through multiple generations
-- Ahnentafel numbering system
-- Narrative biographical format
-- Includes source citations
-- Optional event details
+**Implementation:**
+- Integrate PixiJS for WebGL rendering
+- Rewrite SVG charts to use Canvas
+- Implement viewport culling for performance
+- Add progressive rendering for large trees
+- Optimize layout algorithms
 
-**Features:**
-- Standard Ahnentafel numbering (1, 2, 3, 4, 5...)
-- Person #1 is the subject, #2-3 parents, #4-7 grandparents, etc.
-- Automatic generation limiting
-- Privacy-aware content filtering
-- Multiple output formats
+**Files to Modify:**
+- `src/charts/FanChart.js`
+- `src/charts/PedigreeChart.js`
 
-**Configuration Options:**
-```json
-{
-  "personId": "I0001",
-  "generations": 6,
-  "includeEvents": true,
-  "includeSources": true,
-  "privacyLevel": "living",
-  "format": "outline"
-}
-```
+#### 6. Real-Time Updates
+**Status:** 📅 Planned
 
-**API Endpoint:**
-```
-POST /api/reports/ancestor
-```
+**Goal:** Implement WebSocket or polling mechanisms for Chat and Activity Feed.
 
-### 6. Custom Report Templates
+**Backend:**
+- Add WebSocket gateway using NestJS
+- Implement room-based messaging
+- Add presence detection
 
-**What it does:**
-- Configurable report styling and themes
-- Privacy controls (all, living, deceased only)
-- Content filtering options
-- Multiple output formats (PDF, HTML preview)
-- Save and reuse report configurations
+**Frontend:**
+- Create WebSocket service
+- Update Chat component
+- Update Activity Feed component
 
-**Available Themes:**
-- **Classic:** Traditional black and white with serif fonts
-- **Modern:** Clean sans-serif with subtle colors
-- **Elegant:** Formal with decorative elements
-- **Minimal:** Clean, simple design with maximum content
-- **Custom:** User-defined colors and fonts
+#### 7. Face Tagging UI
+**Status:** 📅 Planned
 
-**Privacy Levels:**
-- **all:** Include all individuals
-- **living:** Hide living individuals (based on death date or age)
-- **deceased:** Only show deceased individuals
-- **public:** Apply custom privacy rules
+**Goal:** Frontend interface for the face detection API (Phase 4).
 
-**Global Report Configuration:**
-```json
-{
-  "theme": "classic",
-  "privacyLevel": "living",
-  "includePhotos": true,
-  "includeSources": false,
-  "includeNotes": true,
-  "pageSize": "letter",
-  "orientation": "portrait",
-  "margins": {
-    "top": 72,
-    "bottom": 72,
-    "left": 72,
-    "right": 72
-  }
-}
-```
+**Implementation:**
+- Create face tagging modal
+- Draw face bounding boxes on images
+- Person selection for tagging
+- Save tags via existing API
 
-### 7. Report API Endpoints
+### Testing & Quality Assurance
 
-All report endpoints follow RESTful conventions:
+#### 8. Backend Test Coverage
+**Status:** 📅 Planned
 
-#### Generate Reports
-- `POST /api/reports/pedigree` - Generate pedigree chart
-- `POST /api/reports/family-group-sheet` - Generate family group sheet
-- `POST /api/reports/descendant` - Generate descendant report
-- `POST /api/reports/ancestor` - Generate ancestor report
+**Goal:** Achieve >80% unit test coverage.
 
-#### Download Reports
-- `GET /api/reports/download/:reportId` - Download generated report
-- `GET /api/reports/:reportId/preview` - Get HTML preview
+**Current State:** Test coverage is currently low
+**Target:** >80% coverage
 
-#### List & Manage Reports
-- `GET /api/reports` - List all generated reports
-- `DELETE /api/reports/:reportId` - Delete a report
-- `GET /api/reports/templates` - Get available report templates
+**Approach:**
+- Add unit tests for all services
+- Add integration tests for controllers
+- Use Jest for testing framework
+- Mock Prisma client for tests
+- Add test coverage reporting
 
-## Technical Implementation
+**Files to Create:**
+- `backend/src/**/*.spec.ts`
 
-### Backend Structure
+#### 9. E2E Testing
+**Status:** 📅 Planned
 
-```
-mock-server/
-  ├── report-generator.js      # Main report generation logic
-  ├── report-templates.js      # Report template definitions
-  └── report-utils.js          # Utility functions for reports
+**Goal:** Fix and expand End-to-End test suites for critical user flows.
 
-Routes:
-  └── reports.js               # Report API endpoints
-```
+**Test Scenarios:**
+- User registration and login
+- Creating and editing people
+- Adding families and relationships
+- Uploading media
+- Importing/exporting GEDCOM
+- Generating reports
 
-### Report Generation Flow
+**Tools:**
+- Playwright or Cypress
+- Existing `@web/test-runner` setup
 
-1. Client requests a report via POST to `/api/reports/{type}`
-2. Server validates request parameters
-3. Report generator fetches required data from database
-4. Privacy rules are applied to filter data
-5. Report is generated using selected template
-6. Report is saved to temporary storage
-7. Client receives reportId and download URL
-8. Client downloads the report via GET `/api/reports/download/{reportId}`
+#### 10. Frontend Testing
+**Status:** 📅 Planned
 
-### Data Privacy
+**Goal:** Implement comprehensive component tests using `@web/test-runner`.
 
-Reports respect privacy settings:
-- Living individuals can be hidden based on death date or estimated age
-- Custom privacy rules can be defined per individual
-- Sensitive data (SSN, medical records) never included
-- Source citations can be excluded to protect unpublished research
+**Coverage:**
+- All major components
+- User interaction flows
+- State management
+- API integration
 
-### Performance Considerations
+### Performance Optimization
 
-- Reports are generated asynchronously for large family trees
-- Generated reports are cached for 24 hours
-- Pagination is used for very large descendant reports
-- Background job queue for long-running report generation
+#### 11. Database Query Tuning
+**Status:** 📅 Planned
 
-## API Examples
+**Goal:** Optimize complex visualization queries.
 
-### Generate a Pedigree Chart
+**Approach:**
+- Add database indexes
+- Use query explain plans
+- Optimize N+1 queries
+- Add database query logging
+- Implement query result caching
 
-```bash
-curl -X POST http://localhost:3001/api/reports/pedigree \
-  -H "Content-Type: application/json" \
-  -d '{
-    "personId": "I0001",
-    "generations": 4,
-    "includePhotos": true,
-    "privacyLevel": "living",
-    "theme": "classic"
-  }'
-```
+**Files to Optimize:**
+- `backend/src/visualizations/visualizations.service.ts`
+- Other service files with complex queries
 
-Response:
-```json
-{
-  "reportId": "rep_1234567890",
-  "url": "/api/reports/download/rep_1234567890",
-  "format": "pdf",
-  "filename": "pedigree_chart_John_Doe.pdf",
-  "generatedAt": "2025-12-10T01:52:00Z"
-}
-```
+#### 12. Virtual Scrolling
+**Status:** 📅 Planned
 
-### Generate a Family Group Sheet
+**Goal:** Implement virtual lists for large datasets.
 
-```bash
-curl -X POST http://localhost:3001/api/reports/family-group-sheet \
-  -H "Content-Type: application/json" \
-  -d '{
-    "familyId": "F0001",
-    "includeNotes": true,
-    "includeSources": true,
-    "includePhotos": false
-  }'
-```
+**Implementation:**
+- Use `lit-virtualizer` for web components
+- Implement virtual scrolling in:
+  - People list
+  - Media gallery
+  - Search results
+  - Event lists
 
-### Download a Report
+#### 13. Bundle Optimization
+**Status:** 📅 Planned
 
-```bash
-curl -o report.pdf http://localhost:3001/api/reports/download/rep_1234567890
-```
+**Goal:** Analyze and reduce frontend bundle size.
 
-### List Generated Reports
+**Approach:**
+- Run webpack bundle analyzer
+- Implement code splitting
+- Lazy load routes
+- Tree shake unused code
+- Optimize images and assets
+- Use dynamic imports
 
-```bash
-curl http://localhost:3001/api/reports
-```
+## Implementation Priority
 
-Response:
-```json
-{
-  "reports": [
-    {
-      "reportId": "rep_1234567890",
-      "type": "pedigree",
-      "filename": "pedigree_chart_John_Doe.pdf",
-      "generatedAt": "2025-12-10T01:52:00Z",
-      "expiresAt": "2025-12-11T01:52:00Z",
-      "size": 245678
-    }
-  ]
-}
-```
+### Phase 1: Critical Backend Modules (Weeks 1-2)
+1. Gramps XML Support (highest priority for desktop interoperability)
+2. Reporting Engine (core feature parity)
+3. DNA Backend Module
 
-## Testing
+### Phase 2: Testing Infrastructure (Weeks 3-4)
+4. Backend test coverage
+5. E2E testing setup
+6. Frontend testing
+
+### Phase 3: Frontend Completion (Weeks 5-6)
+7. Deep Zoom UI
+8. Face Tagging UI
+9. High-Performance Charts
+
+### Phase 4: Performance (Weeks 7-8)
+10. Database query tuning
+11. Virtual scrolling
+12. Bundle optimization
+13. Real-time updates
+
+## Success Criteria
+
+- ✅ All backend modules implemented and tested
+- ✅ Frontend feature parity achieved
+- ✅ >80% backend test coverage
+- ✅ E2E tests covering all critical flows
+- ✅ All frontend components tested
+- ✅ Database queries optimized
+- ✅ Virtual scrolling implemented
+- ✅ Bundle size reduced by >30%
+
+## Testing Strategy
 
 ### Unit Tests
-- Test report generation logic
-- Verify privacy filtering
-- Test numbering systems
-- Validate PDF output structure
-
-### Integration Tests
-- End-to-end report generation
-- API endpoint testing
-- Download functionality
-- Report expiration and cleanup
-
-### Test Command
 ```bash
-cd mock-server
-npm test -- --grep "Report"
+# Backend
+cd backend
+npm test
+
+# Frontend
+npm test
 ```
 
-## Future Enhancements
-
-### Planned for Future Phases:
-- [ ] **Interactive Reports:** HTML5 reports with clickable links
-- [ ] **Custom CSS:** User-uploadable CSS for reports
-- [ ] **Book Publishing:** Multi-chapter book generation
-- [ ] **Index Generation:** Automatic surname and place indexes
-- [ ] **Statistical Reports:** Demographics, lifespan analysis
-- [ ] **Photo Books:** Image-heavy coffee table books
-- [ ] **Export to Word:** DOCX format for further editing
-- [ ] **Report Scheduling:** Automatic report generation and email
-
-## Compatibility
-
-**Supported Formats:**
-- PDF (primary)
-- HTML (preview)
-- Plain Text (basic)
-
-**Page Sizes:**
-- Letter (8.5" x 11")
-- Legal (8.5" x 14")
-- A4 (210mm x 297mm)
-- A3 (297mm x 420mm)
-
-**Privacy Compliance:**
-- GDPR-compliant data handling
-- Configurable data retention
-- Right to be forgotten support
-
-## Production Deployment
-
-### Dependencies
+### E2E Tests
 ```bash
-npm install pdfkit
-npm install canvas  # For chart rendering
-npm install @pdf-lib/fontkit  # For custom fonts
+npm run test:e2e
 ```
 
-### Environment Variables
+### Performance Testing
 ```bash
-REPORT_STORAGE_PATH=/tmp/reports
-REPORT_CACHE_DURATION=86400  # 24 hours in seconds
-MAX_REPORT_GENERATIONS=10
-REPORT_PAGE_SIZE=letter
+# Lighthouse scores
+npm run lighthouse
+
+# Bundle analysis
+npm run analyze
 ```
 
-### Cron Jobs
-Set up automatic cleanup of expired reports:
-```bash
-0 */6 * * * /usr/local/bin/cleanup-reports.sh
+## Production Deployment Checklist
+
+- [ ] All tests passing
+- [ ] No console errors or warnings
+- [ ] Database migrations tested
+- [ ] Environment variables documented
+- [ ] Security audit completed
+- [ ] Performance benchmarks met
+- [ ] Documentation updated
+- [ ] User guide created
+- [ ] Backup and restore tested
+
+## Dependencies
+
+### Backend
+```json
+{
+  "pdfkit": "^0.13.0",
+  "fast-xml-parser": "^4.3.0",
+  "socket.io": "^4.6.0",
+  "@nestjs/websockets": "^10.0.0"
+}
 ```
 
-## Support
+### Frontend
+```json
+{
+  "openseadragon": "^4.1.0",
+  "pixi.js": "^7.3.0",
+  "lit-virtualizer": "^2.0.0"
+}
+```
 
-For questions or issues with Phase 14 implementation:
-1. Check the [API Documentation](../docs/api/reports.md)
-2. Review test cases in `test/reports.test.js`
-3. See examples in `mock-server/report-generator.js`
+## Notes
 
-## Changelog
+This is a comprehensive phase that will take multiple weeks to complete. Each sub-task should be implemented incrementally and tested thoroughly before moving to the next.
 
-### Version 1.0.0 (Phase 14 Initial Release)
-- ✅ PDF report generation service
-- ✅ Pedigree chart reports
-- ✅ Family group sheet reports
-- ✅ Descendant reports with multiple numbering systems
-- ✅ Ancestor reports with Ahnentafel numbering
-- ✅ Custom report templates and themes
-- ✅ Privacy controls and filtering
-- ✅ RESTful API endpoints
-- ✅ Report caching and management
+The priority is on backend feature parity and testing infrastructure, as these are foundational for a production-ready application.
