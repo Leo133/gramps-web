@@ -24,6 +24,7 @@ import {ShoeboxModule} from './shoebox/shoebox.module'
 import {ChatModule} from './chat/chat.module'
 import {CommentsModule} from './comments/comments.module'
 import {ActivityFeedModule} from './activity-feed/activity-feed.module'
+import {AiModule} from './ai/ai.module'
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import {ActivityFeedModule} from './activity-feed/activity-feed.module'
     ChatModule,
     CommentsModule,
     ActivityFeedModule,
+    AiModule,
   ],
 })
 export class AppModule {}

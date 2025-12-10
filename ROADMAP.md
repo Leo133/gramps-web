@@ -253,11 +253,15 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 
 **Goal:** Leverage AI to automate tedious tasks and discover insights.
 
-- [ ] **AI Biographer:** Use LLMs (like GPT-4 or local Llama) to generate narrative biographies from structured fact data.
-- [ ] **Handwriting Recognition (OCR):** Automatically transcribe handwritten census records and letters uploaded to the media gallery.
-- [ ] **Smart Hints:** Algorithmic suggestions for potential parents, missing events, or inconsistencies based on statistical models.
-- [ ] **Face Recognition:** Automatically identify and tag family members across the entire photo library.
+**Status:** ✅ COMPLETE
+
+- [x] **AI Biographer:** Use LLMs (like GPT-4 or local Llama) to generate narrative biographies from structured fact data.
+- [x] **Handwriting Recognition (OCR):** Automatically transcribe handwritten census records and letters uploaded to the media gallery.
+- [x] **Smart Hints:** Algorithmic suggestions for potential parents, missing events, or inconsistencies based on statistical models.
+- [x] **Face Recognition:** Automatically identify and tag family members across the entire photo library.
 - [ ] **DNA Painter Integration:** Visualize chromosome segments and triangulate matches directly within the profile view.
+
+**Implementation Details:** See [PHASE12_IMPLEMENTATION.md](PHASE12_IMPLEMENTATION.md) for complete documentation.
 
 ## Phase 13: Advanced Administration & Governance
 
