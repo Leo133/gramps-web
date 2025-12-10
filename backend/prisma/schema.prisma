@@ -26,13 +26,15 @@ model User {
   lastLogin     DateTime? @map("last_login")
 
   // Relations
-  refreshTokens   RefreshToken[]
-  auditLogs       AuditLog[]
-  researchTasks   ResearchTask[]
-  shoeboxItems    ShoeboxItem[]
-  chatMessages    ChatMessage[]
-  comments        Comment[]
-  activities      Activity[]
+  refreshTokens       RefreshToken[]
+  auditLogs           AuditLog[]
+  researchTasks       ResearchTask[]
+  shoeboxItems        ShoeboxItem[]
+  chatMessages        ChatMessage[]
+  comments            Comment[]
+  activities          Activity[]
+  submittedProposals  ChangeProposal[] @relation("SubmittedProposals")
+  reviewedProposals   ChangeProposal[] @relation("ReviewedProposals")
 
   @@map("users")
 }
@@ -216,19 +218,88 @@ model TreeSettings {
   @@map("tree_settings")
 }
 
-// Audit Log for tracking changes
+// Audit Log for tracking changes (Enhanced for Phase 13)
 model AuditLog {
   id         String   @id @default(uuid())
   userId     String   @map("user_id")
   action     String   // CREATE, UPDATE, DELETE
   entityType String   @map("entity_type") // Person, Family, etc.
   entityId   String   @map("entity_id")
-  changes    String?  // JSON of changes
+  changes    String?  // JSON of changes (before/after state)
   timestamp  DateTime @default(now())
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  rolledBack Boolean  @default(false) @map("rolled_back")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("audit_logs")
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([timestamp])
+}
+
+// Change Proposals for Approval Workflows
+model ChangeProposal {
+  id          String   @id @default(uuid())
+  submitterId String   @map("submitter_id")
+  reviewerId  String?  @map("reviewer_id")
+  entityType  String   @map("entity_type") // Person, Family, etc.
+  entityId    String?  @map("entity_id") // null for new entities
+  operation   String   // CREATE, UPDATE, DELETE
+  proposedChanges String @map("proposed_changes") // JSON of proposed changes
+  currentState String? @map("current_state") // JSON of current state (for updates)
+  status      String   @default("pending") // pending, approved, rejected
+  comment     String?  // Reviewer comment
+  submittedAt DateTime @default(now()) @map("submitted_at")
+  reviewedAt  DateTime? @map("reviewed_at")
+
+  submitter User  @relation("SubmittedProposals", fields: [submitterId], references: [id], onDelete: Cascade)
+  reviewer  User? @relation("ReviewedProposals", fields: [reviewerId], references: [id])
+
+  @@map("change_proposals")
+  @@index([status])
+  @@index([submitterId])
+  @@index([reviewerId])
+}
+
+// Backup Jobs for scheduled backups
+model BackupJob {
+  id           String   @id @default(uuid())
+  status       String   @default("pending") // pending, running, completed, failed
+  type         String   // manual, scheduled
+  destination  String   // local, s3, google-drive
+  filePath     String?  @map("file_path")
+  fileSize     Int?     @map("file_size")
+  encrypted    Boolean  @default(false)
+  compression  String?  // gzip, zip, none
+  startedAt    DateTime? @map("started_at")
+  completedAt  DateTime? @map("completed_at")
+  errorMessage String?  @map("error_message")
+  createdBy    String?  @map("created_by")
+  metadata     String?  // JSON for additional info
+
+  @@map("backup_jobs")
+  @@index([status])
+  @@index([startedAt])
+}
+
+// System Health Metrics
+model SystemHealth {
+  id            String   @id @default(uuid())
+  timestamp     DateTime @default(now())
+  cpuUsage      Float?   @map("cpu_usage")
+  memoryUsage   Float?   @map("memory_usage")
+  diskUsage     Float?   @map("disk_usage")
+  dbSize        Int?     @map("db_size") // in bytes
+  dbConnections Int?     @map("db_connections")
+  requestCount  Int?     @map("request_count")
+  errorCount    Int?     @map("error_count")
+  activeUsers   Int?     @map("active_users")
+  metadata      String?  // JSON for additional metrics
+
+  @@map("system_health")
+  @@index([timestamp])
 }
 
 // Phase 8: Data Quality & Research Tools

@@ -25,6 +25,7 @@ import {ChatModule} from './chat/chat.module'
 import {CommentsModule} from './comments/comments.module'
 import {ActivityFeedModule} from './activity-feed/activity-feed.module'
 import {AiModule} from './ai/ai.module'
+import {AdminModule} from './admin/admin.module'
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import {AiModule} from './ai/ai.module'
     CommentsModule,
     ActivityFeedModule,
     AiModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

@@ -16,7 +16,7 @@ import {CacheService} from './cache.service'
         // If Redis is configured, use it; otherwise, use in-memory cache
         if (redisUrl) {
           return {
-            store: redisStore,
+            store: redisStore as any,
             url: redisUrl,
             ttl: 300, // Default TTL: 5 minutes
             max: 100, // Max items in cache
