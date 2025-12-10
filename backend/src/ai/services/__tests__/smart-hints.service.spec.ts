@@ -5,7 +5,6 @@ import {PrismaService} from '../../../prisma/prisma.service'
 
 describe('SmartHintsService', () => {
   let service: SmartHintsService
-  let prismaService: PrismaService
 
   const mockPrismaService = {
     person: {
@@ -32,7 +31,6 @@ describe('SmartHintsService', () => {
     }).compile()
 
     service = module.get<SmartHintsService>(SmartHintsService)
-    prismaService = module.get<PrismaService>(PrismaService)
   })
 
   afterEach(() => {

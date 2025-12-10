@@ -3,12 +3,13 @@ import {ConfigService} from '@nestjs/config'
 import {NotFoundException} from '@nestjs/common'
 import {BiographyService} from '../biography.service'
 import {PrismaService} from '../../../prisma/prisma.service'
-import {GenerateBiographyDto, BiographyStyle} from '../../dto/generate-biography.dto'
+import {
+  GenerateBiographyDto,
+  BiographyStyle,
+} from '../../dto/generate-biography.dto'
 
 describe('BiographyService', () => {
   let service: BiographyService
-  let prismaService: PrismaService
-  let configService: ConfigService
 
   const mockPrismaService = {
     person: {
@@ -43,8 +44,6 @@ describe('BiographyService', () => {
     }).compile()
 
     service = module.get<BiographyService>(BiographyService)
-    prismaService = module.get<PrismaService>(PrismaService)
-    configService = module.get<ConfigService>(ConfigService)
   })
 
   afterEach(() => {
@@ -60,9 +59,9 @@ describe('BiographyService', () => {
         length: 500,
       }
 
-      await expect(service.generateBiography('invalid-handle', dto)).rejects.toThrow(
-        NotFoundException,
-      )
+      await expect(
+        service.generateBiography('invalid-handle', dto),
+      ).rejects.toThrow(NotFoundException)
     })
 
     it('should generate a mock biography when no API key is configured', async () => {
