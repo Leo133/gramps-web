@@ -26,6 +26,7 @@ import {CommentsModule} from './comments/comments.module'
 import {ActivityFeedModule} from './activity-feed/activity-feed.module'
 import {AiModule} from './ai/ai.module'
 import {AdminModule} from './admin/admin.module'
+import {GrampsXmlModule} from './gramps-xml/gramps-xml.module'
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import {AdminModule} from './admin/admin.module'
     ActivityFeedModule,
     AiModule,
     AdminModule,
+    GrampsXmlModule,
   ],
 })
 export class AppModule {}
