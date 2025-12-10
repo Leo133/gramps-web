@@ -51,6 +51,7 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 **Implementation Details:** See [PHASE4_IMPLEMENTATION.md](PHASE4_IMPLEMENTATION.md) for complete documentation.
 
 **Backend Features (Complete):**
+
 - ✅ Automatic thumbnail generation (3 sizes)
 - ✅ EXIF/IPTC metadata extraction
 - ✅ Event and place suggestions from metadata
@@ -60,6 +61,7 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 - ✅ 8 new API endpoints
 
 **Frontend Integration (Pending):**
+
 - [ ] UI for gallery filters and sorting
 - [ ] OpenSeadragon integration for deep zoom
 - [ ] Face tagging UI
@@ -81,6 +83,7 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 **Implementation Details:** See [PHASE5_IMPLEMENTATION.md](PHASE5_IMPLEMENTATION.md) for complete documentation.
 
 **Backend Features (Complete):**
+
 - ✅ Relationship calculator with BFS pathfinding
 - ✅ Human-readable relationship descriptions (e.g., "2nd cousin twice removed")
 - ✅ Fan chart data API (configurable generations)
@@ -90,6 +93,7 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 - ✅ Mock server implementation
 
 **Frontend Integration (Pending):**
+
 - [ ] PixiJS or Canvas integration for high-performance rendering
 - [ ] Interactive fan chart component
 - [ ] Fractal tree with infinite zoom
@@ -122,6 +126,7 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 **Implementation Details:** See [PHASE7_IMPLEMENTATION.md](PHASE7_IMPLEMENTATION.md) for complete documentation.
 
 **Features (Complete):**
+
 - ✅ Person timeline with historical context integration
 - ✅ Curated database of 40+ historical events (1800s-2020s)
 - ✅ Comparative timeline visualization with lifespan bars
@@ -159,6 +164,7 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 **Implementation Details:** See [PHASE9_IMPLEMENTATION.md](PHASE9_IMPLEMENTATION.md) for complete documentation.
 
 **Backend Features (Complete):**
+
 - ✅ Real-time chat with context awareness
 - ✅ Full editing and drafting capabilities for messages
 - ✅ Comments and annotations on any record
@@ -170,6 +176,7 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 - ✅ Database migration
 
 **Frontend Integration (Pending):**
+
 - [ ] Chat UI components
 - [ ] Comment widgets on record pages
 - [ ] Activity feed dashboard
@@ -184,6 +191,7 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 **Status:** 🚧 IN PROGRESS (Foundation Complete - 50% Complete)
 
 **Completed:**
+
 - [x] **Design System Foundation:** Comprehensive design tokens system (spacing, typography, colors, shadows, transitions, breakpoints)
 - [x] **Accessibility Framework:** WCAG 2.1 AA compliance utilities (focus management, screen readers, keyboard navigation, color contrast)
 - [x] **Responsive Design System:** Mobile-first utilities, 12-column grid, device detection, viewport management
@@ -191,6 +199,7 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 - [x] **Documentation:** Complete design system and implementation documentation (30KB+ of guides)
 
 **In Progress:**
+
 - [ ] **Component Library Enhancement:** Audit and update all 171+ components with design system
 - [ ] **Phase 4 Frontend Integration:** Gallery filters, deep zoom viewer, face tagging UI, lazy loading
 - [ ] **Performance Optimization:** Code splitting, bundle optimization, virtual scrolling
@@ -198,9 +207,10 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 - [ ] **Testing:** Comprehensive UI tests, accessibility audits, cross-browser validation
 
 **Files Created (12 files, ~100KB code + 30KB docs):**
+
 - `src/design-tokens.js` - Design tokens (13.5KB)
 - `src/accessibility.js` - Accessibility utilities (16.1KB)
-- `src/responsive.js` - Responsive utilities (16.6KB)  
+- `src/responsive.js` - Responsive utilities (16.6KB)
 - `src/pwa.js` - PWA utilities (10.9KB)
 - `service-worker.js` - Service worker (8.6KB)
 - `src/components/GrampsjsUpdateAvailableNew.js` - Update notification (6.5KB)
@@ -220,6 +230,7 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 **Implementation Details:** See [PHASE10_IMPLEMENTATION.md](PHASE10_IMPLEMENTATION.md) for complete documentation.
 
 **Features Delivered:**
+
 - ✅ Comprehensive design token system with utilities
 - ✅ Enhanced theme management with persistence
 - ✅ Service worker for offline support
@@ -230,8 +241,9 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 - ✅ Theme preview component
 
 **Next Steps:**
+
 1. Update all components to use design tokens
-2. Complete Phase 4 frontend features  
+2. Complete Phase 4 frontend features
 3. Add performance optimizations
 4. Implement visual polish
 5. Comprehensive testing and audits
@@ -284,22 +296,22 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 **Status:** 📅 PLANNED
 
 - [ ] **Core Feature Parity (Missing Backend Modules):**
-    - [ ] **Reporting Engine:** Implement a backend `ReportsModule` to generate PDF/ODT reports (Ahnentafel, Descendant, etc.) matching Gramps Desktop capabilities.
-    - [ ] **DNA Backend:** Implement `DnaModule` to support storing and retrieving DNA matches (supporting the existing frontend views).
-    - [ ] **Gramps XML Support:** Implement full lossless import/export of the native `.gramps` XML format (critical for desktop interoperability).
+  - [ ] **Reporting Engine:** Implement a backend `ReportsModule` to generate PDF/ODT reports (Ahnentafel, Descendant, etc.) matching Gramps Desktop capabilities.
+  - [ ] **DNA Backend:** Implement `DnaModule` to support storing and retrieving DNA matches (supporting the existing frontend views).
+  - [ ] **Gramps XML Support:** Implement full lossless import/export of the native `.gramps` XML format (critical for desktop interoperability).
 - [ ] **Frontend Feature Completion:**
-    - [ ] **Deep Zoom UI:** Integrate OpenSeadragon for the IIIF-compatible media viewer (Phase 4).
-    - [ ] **High-Performance Charts:** Implement Canvas/WebGL (PixiJS) rendering for large Fan Charts and Pedigree Trees (Phase 5).
-    - [ ] **Real-Time Updates:** Implement WebSocket or polling mechanisms for Chat and Activity Feed (Phase 9).
-    - [ ] **Face Tagging UI:** Frontend interface for the face detection API (Phase 4).
+  - [ ] **Deep Zoom UI:** Integrate OpenSeadragon for the IIIF-compatible media viewer (Phase 4).
+  - [ ] **High-Performance Charts:** Implement Canvas/WebGL (PixiJS) rendering for large Fan Charts and Pedigree Trees (Phase 5).
+  - [ ] **Real-Time Updates:** Implement WebSocket or polling mechanisms for Chat and Activity Feed (Phase 9).
+  - [ ] **Face Tagging UI:** Frontend interface for the face detection API (Phase 4).
 - [ ] **Testing & Quality Assurance:**
-    - [ ] **Backend Test Coverage:** Achieve >80% unit test coverage (currently low).
-    - [ ] **E2E Testing:** Fix and expand End-to-End test suites for critical user flows.
-    - [ ] **Frontend Testing:** Implement comprehensive component tests using `@web/test-runner`.
+  - [ ] **Backend Test Coverage:** Achieve >80% unit test coverage (currently low).
+  - [ ] **E2E Testing:** Fix and expand End-to-End test suites for critical user flows.
+  - [ ] **Frontend Testing:** Implement comprehensive component tests using `@web/test-runner`.
 - [ ] **Performance Optimization:**
-    - [ ] **Database Query Tuning:** Optimize complex visualization queries (e.g., `visualizations.service.ts`).
-    - [ ] **Virtual Scrolling:** Implement virtual lists for large datasets (People list, Media gallery).
-    - [ ] **Bundle Optimization:** Analyze and reduce frontend bundle size.
+  - [ ] **Database Query Tuning:** Optimize complex visualization queries (e.g., `visualizations.service.ts`).
+  - [ ] **Virtual Scrolling:** Implement virtual lists for large datasets (People list, Media gallery).
+  - [ ] **Bundle Optimization:** Analyze and reduce frontend bundle size.
 
 ## Phase 15: Legacy Compatibility & Advanced Science
 
@@ -308,11 +320,11 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 **Status:** 📅 PLANNED
 
 - [ ] **Advanced Visualizations:**
-    - [ ] **Graph View:** Implement a force-directed graph visualization of the entire family tree.
-    - [ ] **Calendar View:** A dedicated calendar view for birthdays, anniversaries, and historical events.
+  - [ ] **Graph View:** Implement a force-directed graph visualization of the entire family tree.
+  - [ ] **Calendar View:** A dedicated calendar view for birthdays, anniversaries, and historical events.
 - [ ] **Narrative & Blogging:**
-    - [ ] **Blog Backend:** Implement a `BlogModule` to support the narrative/blogging frontend views.
+  - [ ] **Blog Backend:** Implement a `BlogModule` to support the narrative/blogging frontend views.
 - [ ] **Advanced Tools:**
-    - [ ] **Date Calculator:** Utility for complex date arithmetic (age between dates, day of week, etc.).
-    - [ ] **DNA Painter Integration:** Visual chromosome mapping and triangulation tools (Phase 12).
+  - [ ] **Date Calculator:** Utility for complex date arithmetic (age between dates, day of week, etc.).
+  - [ ] **DNA Painter Integration:** Visual chromosome mapping and triangulation tools (Phase 12).
 - [ ] **Advanced Search Backend:** Evaluate migration to Meilisearch or Elasticsearch if the SQL-based search hits performance limits.
