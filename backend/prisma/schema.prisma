@@ -35,6 +35,7 @@ model User {
   activities          Activity[]
   submittedProposals  ChangeProposal[] @relation("SubmittedProposals")
   reviewedProposals   ChangeProposal[] @relation("ReviewedProposals")
+  blogPosts           BlogPost[]
 
   @@map("users")
 }
@@ -462,4 +463,31 @@ model Activity {
   @@map("activities")
   @@index([createdAt])
   @@index([visibility])
+}
+
+// Blog Posts
+model BlogPost {
+  id            String    @id @default(uuid())
+  title         String
+  slug          String    @unique
+  content       String    // Rich text content (HTML or Markdown)
+  excerpt       String?   // Optional summary
+  authorId      String    @map("author_id")
+  status        String    @default("draft") // draft, published, archived
+  visibility    String    @default("public") // public, private, members
+  publishedAt   DateTime? @map("published_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  featuredImage String?   @map("featured_image") // Media handle or URL
+  tags          String?   // JSON array of tags
+  categories    String?   // JSON array of categories
+  metadata      String?   // JSON for additional metadata
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("blog_posts")
+  @@index([authorId])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([slug])
 }

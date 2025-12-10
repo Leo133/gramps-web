@@ -51,4 +51,46 @@ export class VisualizationsController {
   async getDescendantTree(@Param('handle') handle: string) {
     return this.visualizationsService.getDescendantTree(handle)
   }
+
+  @Post('date-calculator')
+  @ApiOperation({summary: 'Perform date calculations'})
+  @ApiResponse({
+    status: 200,
+    description: 'Date calculation performed successfully',
+  })
+  async calculateDate(@Body() body: {
+    operation: 'age' | 'difference' | 'dayOfWeek' | 'add' | 'subtract'
+    date1: string
+    date2?: string
+    amount?: number
+    unit?: 'days' | 'months' | 'years'
+  }) {
+    return this.visualizationsService.calculateDate(body)
+  }
+
+  @Get('graph-data')
+  @ApiOperation({summary: 'Get force-directed graph data for family tree'})
+  @ApiResponse({
+    status: 200,
+    description: 'Graph data retrieved successfully',
+  })
+  async getGraphData() {
+    return this.visualizationsService.getGraphData()
+  }
+
+  @Get('calendar/:year/:month')
+  @ApiOperation({summary: 'Get calendar events for a specific month'})
+  @ApiResponse({
+    status: 200,
+    description: 'Calendar data retrieved successfully',
+  })
+  async getCalendarData(
+    @Param('year') year: string,
+    @Param('month') month: string,
+  ) {
+    return this.visualizationsService.getCalendarData(
+      parseInt(year),
+      parseInt(month),
+    )
+  }
 }

@@ -594,4 +594,311 @@ export class VisualizationsService {
       children,
     }
   }
+
+  /**
+   * Date calculator - performs various date calculations
+   */
+  async calculateDate(params: {
+    operation: 'age' | 'difference' | 'dayOfWeek' | 'add' | 'subtract'
+    date1: string
+    date2?: string
+    amount?: number
+    unit?: 'days' | 'months' | 'years'
+  }) {
+    const {operation, date1, date2, amount, unit} = params
+    const d1 = new Date(date1)
+
+    if (operation === 'age') {
+      const now = date2 ? new Date(date2) : new Date()
+      const ageMs = now.getTime() - d1.getTime()
+      const ageDate = new Date(ageMs)
+      const years = Math.abs(ageDate.getUTCFullYear() - 1970)
+      const months = ageDate.getUTCMonth()
+      const days = ageDate.getUTCDate() - 1
+
+      return {
+        years,
+        months,
+        days,
+        totalDays: Math.floor(ageMs / (1000 * 60 * 60 * 24)),
+        description: `${years} years, ${months} months, ${days} days`,
+      }
+    }
+
+    if (operation === 'difference' && date2) {
+      const d2 = new Date(date2)
+      const diffMs = Math.abs(d2.getTime() - d1.getTime())
+      const diffDate = new Date(diffMs)
+      const years = diffDate.getUTCFullYear() - 1970
+      const months = diffDate.getUTCMonth()
+      const days = diffDate.getUTCDate() - 1
+      const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+      return {
+        years,
+        months,
+        days,
+        totalDays,
+        totalWeeks: Math.floor(totalDays / 7),
+        description: `${years} years, ${months} months, ${days} days`,
+      }
+    }
+
+    if (operation === 'dayOfWeek') {
+      const dayNames = [
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+      ]
+      return {
+        dayOfWeek: dayNames[d1.getDay()],
+        dayNumber: d1.getDay(),
+        date: date1,
+      }
+    }
+
+    if (operation === 'add' && amount && unit) {
+      const result = new Date(d1)
+      if (unit === 'days') {
+        result.setDate(result.getDate() + amount)
+      } else if (unit === 'months') {
+        result.setMonth(result.getMonth() + amount)
+      } else if (unit === 'years') {
+        result.setFullYear(result.getFullYear() + amount)
+      }
+      return {
+        result: result.toISOString(),
+        operation: `${date1} + ${amount} ${unit}`,
+      }
+    }
+
+    if (operation === 'subtract' && amount && unit) {
+      const result = new Date(d1)
+      if (unit === 'days') {
+        result.setDate(result.getDate() - amount)
+      } else if (unit === 'months') {
+        result.setMonth(result.getMonth() - amount)
+      } else if (unit === 'years') {
+        result.setFullYear(result.getFullYear() - amount)
+      }
+      return {
+        result: result.toISOString(),
+        operation: `${date1} - ${amount} ${unit}`,
+      }
+    }
+
+    return {error: 'Invalid operation or missing parameters'}
+  }
+
+  /**
+   * Get force-directed graph data for the entire family tree
+   */
+  async getGraphData() {
+    const [people, families] = await Promise.all([
+      this.prisma.person.findMany({
+        select: {
+          id: true,
+          handle: true,
+          grampsId: true,
+          firstName: true,
+          surname: true,
+          gender: true,
+          birthDate: true,
+          deathDate: true,
+        },
+      }),
+      this.prisma.family.findMany({
+        select: {
+          id: true,
+          handle: true,
+          fatherHandle: true,
+          motherHandle: true,
+          childRefList: true,
+        },
+      }),
+    ])
+
+    // Build nodes
+    const nodes = people.map(person => ({
+      id: person.handle,
+      grampsId: person.grampsId,
+      name: `${person.firstName || ''} ${person.surname || ''}`.trim() || 'Unknown',
+      gender: person.gender,
+      birthYear: person.birthDate
+        ? this.extractYear(person.birthDate)
+        : null,
+      deathYear: person.deathDate
+        ? this.extractYear(person.deathDate)
+        : null,
+    }))
+
+    // Build links (edges)
+    const links: Array<{
+      source: string
+      target: string
+      type: 'parent' | 'spouse'
+    }> = []
+
+    families.forEach(family => {
+      // Parent-child relationships
+      if (family.childRefList) {
+        try {
+          const children = JSON.parse(family.childRefList)
+          children.forEach((childRef: any) => {
+            const childHandle =
+              typeof childRef === 'string' ? childRef : childRef.ref
+
+            if (family.fatherHandle) {
+              links.push({
+                source: family.fatherHandle,
+                target: childHandle,
+                type: 'parent',
+              })
+            }
+            if (family.motherHandle) {
+              links.push({
+                source: family.motherHandle,
+                target: childHandle,
+                type: 'parent',
+              })
+            }
+          })
+        } catch (e) {
+          // Skip invalid child ref lists
+        }
+      }
+
+      // Spousal relationships
+      if (family.fatherHandle && family.motherHandle) {
+        links.push({
+          source: family.fatherHandle,
+          target: family.motherHandle,
+          type: 'spouse',
+        })
+      }
+    })
+
+    return {
+      nodes,
+      links,
+      stats: {
+        totalPeople: nodes.length,
+        totalRelationships: links.length,
+      },
+    }
+  }
+
+  /**
+   * Get calendar events for a specific month
+   */
+  async getCalendarData(year: number, month: number) {
+    const people = await this.prisma.person.findMany({
+      select: {
+        handle: true,
+        grampsId: true,
+        firstName: true,
+        surname: true,
+        birthDate: true,
+        deathDate: true,
+      },
+    })
+
+    const events: Array<{
+      date: number
+      type: 'birthday' | 'anniversary' | 'death'
+      person: {
+        handle: string
+        name: string
+      }
+      year?: number
+      age?: number
+    }> = []
+
+    people.forEach(person => {
+      const name = `${person.firstName || ''} ${person.surname || ''}`.trim() || 'Unknown'
+
+      // Parse birthday
+      if (person.birthDate) {
+        const birthInfo = this.parseDate(person.birthDate)
+        if (birthInfo && birthInfo.month === month) {
+          const age = year - birthInfo.year
+          events.push({
+            date: birthInfo.day,
+            type: 'birthday',
+            person: {handle: person.handle, name},
+            year: birthInfo.year,
+            age: age >= 0 ? age : undefined,
+          })
+        }
+      }
+
+      // Parse death anniversary
+      if (person.deathDate) {
+        const deathInfo = this.parseDate(person.deathDate)
+        if (deathInfo && deathInfo.month === month) {
+          const yearsSince = year - deathInfo.year
+          events.push({
+            date: deathInfo.day,
+            type: 'death',
+            person: {handle: person.handle, name},
+            year: deathInfo.year,
+            age: yearsSince >= 0 ? yearsSince : undefined,
+          })
+        }
+      }
+    })
+
+    // Sort events by date
+    events.sort((a, b) => a.date - b.date)
+
+    return {
+      year,
+      month,
+      events,
+      totalEvents: events.length,
+    }
+  }
+
+  /**
+   * Helper to extract year from date string
+   */
+  private extractYear(dateStr: string): number | null {
+    const yearMatch = dateStr.match(/\d{4}/)
+    return yearMatch ? parseInt(yearMatch[0]) : null
+  }
+
+  /**
+   * Helper to parse date string into components
+   */
+  private parseDate(dateStr: string): {
+    year: number
+    month: number
+    day: number
+  } | null {
+    // Try to parse ISO format first
+    const isoMatch = dateStr.match(/(\d{4})-(\d{2})-(\d{2})/)
+    if (isoMatch) {
+      return {
+        year: parseInt(isoMatch[1]),
+        month: parseInt(isoMatch[2]),
+        day: parseInt(isoMatch[3]),
+      }
+    }
+
+    // Try to parse common formats
+    const parts = dateStr.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/)
+    if (parts) {
+      return {
+        year: parseInt(parts[3]),
+        month: parseInt(parts[1]),
+        day: parseInt(parts[2]),
+      }
+    }
+
+    return null
+  }
 }
