@@ -27,7 +27,8 @@ export class GrampsjsPixiTreeChart extends GrampsjsPixiChart {
     if (!this.grampsId) return
 
     try {
-      const url = `/api/visualizations/treechart/${this.grampsId}?ancestors=${this.nAnc}&descendants=${this.nDesc}`
+      const encodedId = encodeURIComponent(this.grampsId)
+      const url = `/api/visualizations/treechart/${encodedId}?ancestors=${this.nAnc}&descendants=${this.nDesc}`
       const response = await fetch(url)
       if (response.ok) {
         this.data = await response.json()

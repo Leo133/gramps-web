@@ -27,7 +27,8 @@ export class GrampsjsPixiFanChart extends GrampsjsPixiChart {
     if (!this.grampsId) return
 
     try {
-      const url = `/api/visualizations/fanchart/${this.grampsId}?depth=${this.depth}`
+      const encodedId = encodeURIComponent(this.grampsId)
+      const url = `/api/visualizations/fanchart/${encodedId}?depth=${this.depth}`
       const response = await fetch(url)
       if (response.ok) {
         this.data = await response.json()
