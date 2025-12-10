@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals, no-undef, no-console, no-unused-vars */
 /**
  * Enhanced Service Worker for Gramps Web
  * Phase 11: Offline Mode Implementation
@@ -158,18 +159,19 @@ self.addEventListener('activate', event => {
   )
 })
 
+// Background Sync helper function
+async function syncOfflineChanges() {
+  // Placeholder for background sync logic
+  console.log('Background sync triggered')
+  // Future: Sync offline changes to server
+}
+
 // Background Sync for offline operations (future enhancement)
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-offline-changes') {
     event.waitUntil(syncOfflineChanges())
   }
 })
-
-async function syncOfflineChanges() {
-  // Placeholder for background sync logic
-  console.log('Background sync triggered')
-  // Future: Sync offline changes to server
-}
 
 // Log service worker installation
 self.addEventListener('install', event => {
