@@ -1,6 +1,7 @@
 import {Module} from '@nestjs/common'
 import {ConfigModule} from '@nestjs/config'
 import {PrismaModule} from './prisma/prisma.module'
+import {CacheModule} from './cache/cache.module'
 import {AuthModule} from './auth/auth.module'
 import {UsersModule} from './users/users.module'
 import {PeopleModule} from './people/people.module'
@@ -30,6 +31,7 @@ import {ActivityFeedModule} from './activity-feed/activity-feed.module'
       isGlobal: true,
     }),
     PrismaModule,
+    CacheModule,
     AuthModule,
     UsersModule,
     PeopleModule,
