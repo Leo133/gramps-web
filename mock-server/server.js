@@ -2044,6 +2044,821 @@ app.get('/api/visualizations/descendant-tree/:handle', async (req, res) => {
   }
 })
 
+// ========== PHASE 16: PUBLISHING, SHARING & EXTERNAL INTEGRATION ==========
+
+// In-memory storage for Phase 16 data
+const publishingData = {
+  sites: [],
+  shareLinks: [],
+  apiKeys: [],
+  webhooks: [],
+  exportJobs: [],
+}
+
+// Generate random ID
+function generateId() {
+  return Math.random().toString(36).substring(2, 15)
+}
+
+// Generate secure token
+function generateToken() {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+}
+
+// ===== Site Generation Endpoints =====
+
+// Get available themes
+app.get('/api/publishing/themes', (req, res) => {
+  res.json([
+    {
+      id: 'classic',
+      name: 'Classic Heritage',
+      description: 'Traditional family history design with sepia tones and elegant typography',
+      preview: '/themes/classic/preview.jpg',
+      colors: {primary: '#8B4513', secondary: '#D2691E', background: '#FDF5E6'},
+    },
+    {
+      id: 'modern',
+      name: 'Modern Minimal',
+      description: 'Clean, contemporary design with focus on content',
+      preview: '/themes/modern/preview.jpg',
+      colors: {primary: '#1976D2', secondary: '#42A5F5', background: '#FFFFFF'},
+    },
+    {
+      id: 'vintage',
+      name: 'Vintage Album',
+      description: 'Photo album style with decorative borders',
+      preview: '/themes/vintage/preview.jpg',
+      colors: {primary: '#4A4A4A', secondary: '#8B7355', background: '#F5F5DC'},
+    },
+    {
+      id: 'nature',
+      name: 'Nature & Roots',
+      description: 'Organic design inspired by family trees and growth',
+      preview: '/themes/nature/preview.jpg',
+      colors: {primary: '#2E7D32', secondary: '#66BB6A', background: '#F1F8E9'},
+    },
+    {
+      id: 'elegant',
+      name: 'Elegant Script',
+      description: 'Sophisticated design with script fonts and gold accents',
+      preview: '/themes/elegant/preview.jpg',
+      colors: {primary: '#B8860B', secondary: '#FFD700', background: '#FFFEF0'},
+    },
+  ])
+})
+
+// Create site
+app.post('/api/publishing/sites', (req, res) => {
+  const {name, subdomain, theme, customDomain, settings} = req.body
+
+  // Check if subdomain is taken
+  if (publishingData.sites.find(s => s.subdomain === subdomain)) {
+    return res.status(409).json({error: 'Subdomain is already taken'})
+  }
+
+  const site = {
+    id: generateId(),
+    userId: 'demo-user',
+    name,
+    subdomain,
+    customDomain,
+    theme: theme || 'classic',
+    settings,
+    status: 'draft',
+    lastPublished: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+
+  publishingData.sites.push(site)
+  res.status(201).json(site)
+})
+
+// Get user's sites
+app.get('/api/publishing/sites', (req, res) => {
+  res.json(publishingData.sites)
+})
+
+// Get specific site
+app.get('/api/publishing/sites/:id', (req, res) => {
+  const site = publishingData.sites.find(s => s.id === req.params.id)
+  if (!site) {
+    return res.status(404).json({error: 'Site not found'})
+  }
+  res.json(site)
+})
+
+// Update site
+app.put('/api/publishing/sites/:id', (req, res) => {
+  const index = publishingData.sites.findIndex(s => s.id === req.params.id)
+  if (index === -1) {
+    return res.status(404).json({error: 'Site not found'})
+  }
+
+  publishingData.sites[index] = {
+    ...publishingData.sites[index],
+    ...req.body,
+    updatedAt: new Date().toISOString(),
+  }
+
+  res.json(publishingData.sites[index])
+})
+
+// Publish site
+app.post('/api/publishing/sites/:id/publish', (req, res) => {
+  const site = publishingData.sites.find(s => s.id === req.params.id)
+  if (!site) {
+    return res.status(404).json({error: 'Site not found'})
+  }
+
+  site.status = 'published'
+  site.lastPublished = new Date().toISOString()
+
+  const url = site.customDomain
+    ? `https://${site.customDomain}`
+    : `https://${site.subdomain}.gramps.io`
+
+  res.json({
+    status: 'published',
+    url,
+    publishedAt: site.lastPublished,
+    site,
+  })
+})
+
+// Unpublish site
+app.post('/api/publishing/sites/:id/unpublish', (req, res) => {
+  const site = publishingData.sites.find(s => s.id === req.params.id)
+  if (!site) {
+    return res.status(404).json({error: 'Site not found'})
+  }
+
+  site.status = 'draft'
+  res.json(site)
+})
+
+// Delete site
+app.delete('/api/publishing/sites/:id', (req, res) => {
+  const index = publishingData.sites.findIndex(s => s.id === req.params.id)
+  if (index === -1) {
+    return res.status(404).json({error: 'Site not found'})
+  }
+
+  publishingData.sites.splice(index, 1)
+  res.json({success: true, message: 'Site deleted'})
+})
+
+// ===== Share Link Endpoints =====
+
+// Create share link
+app.post('/api/publishing/shares', (req, res) => {
+  const {name, entityType, entityId, privacyLevel, maxGenerations, expiresAt, password, maxViews} = req.body
+
+  const token = generateToken()
+
+  const shareLink = {
+    id: generateId(),
+    userId: 'demo-user',
+    token,
+    name,
+    entityType,
+    entityId,
+    privacyLevel: privacyLevel || 'public',
+    maxGenerations,
+    expiresAt,
+    hasPassword: !!password,
+    viewCount: 0,
+    maxViews,
+    enabled: true,
+    createdAt: new Date().toISOString(),
+    shareUrl: `https://gramps.io/share/${token}`,
+  }
+
+  publishingData.shareLinks.push(shareLink)
+  res.status(201).json(shareLink)
+})
+
+// Get user's share links
+app.get('/api/publishing/shares', (req, res) => {
+  res.json(publishingData.shareLinks)
+})
+
+// Get specific share link
+app.get('/api/publishing/shares/:id', (req, res) => {
+  const link = publishingData.shareLinks.find(s => s.id === req.params.id)
+  if (!link) {
+    return res.status(404).json({error: 'Share link not found'})
+  }
+  res.json(link)
+})
+
+// Enable share link
+app.post('/api/publishing/shares/:id/enable', (req, res) => {
+  const link = publishingData.shareLinks.find(s => s.id === req.params.id)
+  if (!link) {
+    return res.status(404).json({error: 'Share link not found'})
+  }
+
+  link.enabled = true
+  res.json({success: true, message: 'Share link enabled'})
+})
+
+// Disable share link
+app.post('/api/publishing/shares/:id/disable', (req, res) => {
+  const link = publishingData.shareLinks.find(s => s.id === req.params.id)
+  if (!link) {
+    return res.status(404).json({error: 'Share link not found'})
+  }
+
+  link.enabled = false
+  res.json({success: true, message: 'Share link disabled'})
+})
+
+// Delete share link
+app.delete('/api/publishing/shares/:id', (req, res) => {
+  const index = publishingData.shareLinks.findIndex(s => s.id === req.params.id)
+  if (index === -1) {
+    return res.status(404).json({error: 'Share link not found'})
+  }
+
+  publishingData.shareLinks.splice(index, 1)
+  res.json({success: true, message: 'Share link deleted'})
+})
+
+// Public access to shared content
+app.get('/api/public/share/:token', (req, res) => {
+  const link = publishingData.shareLinks.find(s => s.token === req.params.token)
+  if (!link) {
+    return res.status(404).json({error: 'Share link not found or has expired'})
+  }
+
+  if (!link.enabled) {
+    return res.status(403).json({error: 'This share link has been disabled'})
+  }
+
+  if (link.expiresAt && new Date() > new Date(link.expiresAt)) {
+    return res.status(403).json({error: 'This share link has expired'})
+  }
+
+  if (link.maxViews && link.viewCount >= link.maxViews) {
+    return res.status(403).json({error: 'This share link has reached its maximum view count'})
+  }
+
+  link.viewCount++
+
+  // Return mock shared content
+  const person = db.data.people.find(p => p.handle === link.entityId)
+  res.json({
+    entityType: link.entityType,
+    entityId: link.entityId,
+    privacyLevel: link.privacyLevel,
+    content: {
+      person: person || null,
+      ancestors: [],
+      descendants: [],
+    },
+  })
+})
+
+// ===== Export Endpoints =====
+
+// Get export formats
+app.get('/api/publishing/export-formats', (req, res) => {
+  res.json({
+    types: [
+      {
+        id: 'pdf-book',
+        name: 'Family Book (PDF)',
+        description: 'Printable family history book with photos and narratives',
+        formats: ['narrative', 'ahnentafel', 'descendant'],
+      },
+      {
+        id: 'pdf-report',
+        name: 'Report (PDF)',
+        description: 'Standard genealogy reports',
+        formats: ['ahnentafel', 'descendant', 'custom'],
+      },
+      {
+        id: 'photo-book',
+        name: 'Photo Book (PDF)',
+        description: 'Photo album with captions and dates',
+        formats: ['custom'],
+      },
+      {
+        id: 'calendar',
+        name: 'Calendar (iCal)',
+        description: 'Birthdays and anniversaries for calendar apps',
+        formats: ['custom'],
+      },
+    ],
+    formats: [
+      {id: 'ahnentafel', name: 'Ahnentafel', description: 'Ancestor chart with numbering system'},
+      {id: 'descendant', name: 'Descendant Report', description: 'List of all descendants from a person'},
+      {id: 'narrative', name: 'Narrative', description: 'Story-form biography of the family'},
+      {id: 'custom', name: 'Custom', description: 'Customizable layout and content'},
+    ],
+    pageSizes: [
+      {id: 'letter', name: 'US Letter (8.5" x 11")'},
+      {id: 'a4', name: 'A4 (210mm x 297mm)'},
+      {id: 'legal', name: 'US Legal (8.5" x 14")'},
+    ],
+  })
+})
+
+// Create export job
+app.post('/api/publishing/exports', (req, res) => {
+  const {type, format, settings} = req.body
+
+  const job = {
+    id: generateId(),
+    userId: 'demo-user',
+    type,
+    format,
+    settings,
+    status: 'pending',
+    filePath: null,
+    fileSize: null,
+    errorMessage: null,
+    startedAt: null,
+    completedAt: null,
+    createdAt: new Date().toISOString(),
+  }
+
+  publishingData.exportJobs.push(job)
+
+  // Simulate async processing
+  setTimeout(() => {
+    job.status = 'processing'
+    job.startedAt = new Date().toISOString()
+
+    setTimeout(() => {
+      job.status = 'completed'
+      job.filePath = `/exports/family-${type}-${format}-${job.id}.pdf`
+      job.fileSize = Math.floor(Math.random() * 5000000) + 500000
+      job.completedAt = new Date().toISOString()
+    }, 2000)
+  }, 500)
+
+  res.status(201).json(job)
+})
+
+// Get user's exports
+app.get('/api/publishing/exports', (req, res) => {
+  res.json(publishingData.exportJobs)
+})
+
+// Get specific export
+app.get('/api/publishing/exports/:id', (req, res) => {
+  const job = publishingData.exportJobs.find(j => j.id === req.params.id)
+  if (!job) {
+    return res.status(404).json({error: 'Export not found'})
+  }
+  res.json(job)
+})
+
+// Download export
+app.get('/api/publishing/exports/:id/download', (req, res) => {
+  const job = publishingData.exportJobs.find(j => j.id === req.params.id)
+  if (!job) {
+    return res.status(404).json({error: 'Export not found'})
+  }
+
+  if (job.status !== 'completed') {
+    return res.status(400).json({error: 'Export is not ready for download'})
+  }
+
+  res.json({
+    filePath: job.filePath,
+    fileSize: job.fileSize,
+    mimeType: 'application/pdf',
+    filename: `family-export-${job.id}.pdf`,
+  })
+})
+
+// Delete export
+app.delete('/api/publishing/exports/:id', (req, res) => {
+  const index = publishingData.exportJobs.findIndex(j => j.id === req.params.id)
+  if (index === -1) {
+    return res.status(404).json({error: 'Export not found'})
+  }
+
+  publishingData.exportJobs.splice(index, 1)
+  res.json({success: true, message: 'Export deleted'})
+})
+
+// ===== Embed Widget Endpoints =====
+
+// Get widget types
+app.get('/api/publishing/widget-types', (req, res) => {
+  res.json([
+    {id: 'tree', name: 'Family Tree', description: 'Interactive family tree with ancestors and descendants', defaultHeight: '600px'},
+    {id: 'pedigree', name: 'Pedigree Chart', description: 'Traditional pedigree chart showing ancestors', defaultHeight: '400px'},
+    {id: 'fan', name: 'Fan Chart', description: 'Circular fan chart of ancestors', defaultHeight: '600px'},
+    {id: 'timeline', name: 'Timeline', description: 'Person or family timeline with life events', defaultHeight: '400px'},
+    {id: 'photos', name: 'Photo Gallery', description: 'Carousel of family photos', defaultHeight: '400px'},
+    {id: 'map', name: 'Event Map', description: 'Map showing locations of life events', defaultHeight: '400px'},
+  ])
+})
+
+// Generate embed code
+app.post('/api/publishing/embed', (req, res) => {
+  const {type, entityId, options} = req.body
+
+  const embedToken = Buffer.from(`${type}:${entityId}`).toString('base64url') + '.' + generateToken().slice(0, 8)
+
+  const baseUrl = 'https://gramps.io/embed'
+  const embedUrl = `${baseUrl}/${type}/${embedToken}`
+
+  const defaultOptions = {
+    generations: options?.generations || 3,
+    direction: options?.direction || 'both',
+    width: options?.width || '100%',
+    height: options?.height || '600px',
+    theme: options?.theme || 'light',
+  }
+
+  const iframeCode = `<iframe src="${embedUrl}" width="${defaultOptions.width}" height="${defaultOptions.height}" frameborder="0" style="border: 1px solid #e0e0e0; border-radius: 8px;" loading="lazy" title="Family Tree Widget"></iframe>`
+
+  const scriptCode = `<!-- Gramps Web Widget -->\n<div id="gramps-${type}-widget" data-entity="${entityId}" data-type="${type}" data-theme="${defaultOptions.theme}"></div>\n<script src="https://gramps.io/widget.js" async></script>`
+
+  res.json({
+    embedToken,
+    type,
+    entityId,
+    options: defaultOptions,
+    embedUrl,
+    iframeCode,
+    scriptCode,
+    previewUrl: `/preview/embed/${type}/${entityId}`,
+  })
+})
+
+// Render embed widget
+app.get('/api/publishing/embed/:token', (req, res) => {
+  try {
+    const [encoded] = req.params.token.split('.')
+    const decoded = Buffer.from(encoded, 'base64url').toString('utf8')
+    const [type, entityId] = decoded.split(':')
+
+    const person = db.data.people.find(p => p.handle === entityId)
+
+    res.json({
+      type,
+      entityId,
+      data: {
+        rootPerson: person || null,
+      },
+      renderAt: new Date().toISOString(),
+    })
+  } catch (error) {
+    res.status(400).json({error: 'Invalid embed token'})
+  }
+})
+
+// ===== API Key Endpoints =====
+
+// Get available permissions
+app.get('/api/publishing/api-keys/permissions', (req, res) => {
+  res.json([
+    {id: 'read:people', name: 'Read People', description: 'View person records'},
+    {id: 'read:families', name: 'Read Families', description: 'View family records'},
+    {id: 'read:events', name: 'Read Events', description: 'View event records'},
+    {id: 'read:places', name: 'Read Places', description: 'View place records'},
+    {id: 'read:media', name: 'Read Media', description: 'View media files'},
+    {id: 'read:sources', name: 'Read Sources', description: 'View source records'},
+    {id: 'write:people', name: 'Write People', description: 'Create and update person records'},
+    {id: 'write:families', name: 'Write Families', description: 'Create and update family records'},
+    {id: 'visualizations', name: 'Visualizations', description: 'Access chart and visualization APIs'},
+    {id: 'search', name: 'Search', description: 'Use search APIs'},
+    {id: 'export', name: 'Export', description: 'Export data in various formats'},
+  ])
+})
+
+// Create API key
+app.post('/api/publishing/api-keys', (req, res) => {
+  const {name, permissions, rateLimit, expiresAt} = req.body
+
+  const rawKey = 'gw_live_' + generateToken() + generateToken()
+
+  const apiKey = {
+    id: generateId(),
+    userId: 'demo-user',
+    name,
+    key: rawKey, // Only returned once
+    keyPrefix: rawKey.slice(0, 12) + '...',
+    permissions,
+    rateLimit: rateLimit || 1000,
+    lastUsed: null,
+    expiresAt,
+    enabled: true,
+    createdAt: new Date().toISOString(),
+    warning: 'Save this API key securely. It will not be shown again.',
+  }
+
+  publishingData.apiKeys.push({...apiKey, key: undefined})
+
+  res.status(201).json(apiKey)
+})
+
+// Get user's API keys
+app.get('/api/publishing/api-keys', (req, res) => {
+  res.json(publishingData.apiKeys)
+})
+
+// Get specific API key
+app.get('/api/publishing/api-keys/:id', (req, res) => {
+  const key = publishingData.apiKeys.find(k => k.id === req.params.id)
+  if (!key) {
+    return res.status(404).json({error: 'API key not found'})
+  }
+  res.json(key)
+})
+
+// Get API key stats
+app.get('/api/publishing/api-keys/:id/stats', (req, res) => {
+  const key = publishingData.apiKeys.find(k => k.id === req.params.id)
+  if (!key) {
+    return res.status(404).json({error: 'API key not found'})
+  }
+
+  res.json({
+    keyId: key.id,
+    name: key.name,
+    lastUsed: key.lastUsed,
+    rateLimit: key.rateLimit,
+    usage: {
+      today: Math.floor(Math.random() * key.rateLimit),
+      thisWeek: Math.floor(Math.random() * key.rateLimit * 7),
+      thisMonth: Math.floor(Math.random() * key.rateLimit * 30),
+    },
+  })
+})
+
+// Enable API key
+app.post('/api/publishing/api-keys/:id/enable', (req, res) => {
+  const key = publishingData.apiKeys.find(k => k.id === req.params.id)
+  if (!key) {
+    return res.status(404).json({error: 'API key not found'})
+  }
+
+  key.enabled = true
+  res.json({success: true, message: 'API key enabled'})
+})
+
+// Disable API key
+app.post('/api/publishing/api-keys/:id/disable', (req, res) => {
+  const key = publishingData.apiKeys.find(k => k.id === req.params.id)
+  if (!key) {
+    return res.status(404).json({error: 'API key not found'})
+  }
+
+  key.enabled = false
+  res.json({success: true, message: 'API key disabled'})
+})
+
+// Revoke (delete) API key
+app.delete('/api/publishing/api-keys/:id', (req, res) => {
+  const index = publishingData.apiKeys.findIndex(k => k.id === req.params.id)
+  if (index === -1) {
+    return res.status(404).json({error: 'API key not found'})
+  }
+
+  publishingData.apiKeys.splice(index, 1)
+  res.json({success: true, message: 'API key revoked'})
+})
+
+// ===== Webhook Endpoints =====
+
+// Get available event types
+app.get('/api/publishing/webhooks/event-types', (req, res) => {
+  res.json([
+    {id: 'person.created', name: 'Person Created', description: 'When a new person is added'},
+    {id: 'person.updated', name: 'Person Updated', description: 'When a person is modified'},
+    {id: 'person.deleted', name: 'Person Deleted', description: 'When a person is removed'},
+    {id: 'family.created', name: 'Family Created', description: 'When a new family is created'},
+    {id: 'family.updated', name: 'Family Updated', description: 'When a family is modified'},
+    {id: 'media.uploaded', name: 'Media Uploaded', description: 'When new media is uploaded'},
+    {id: 'export.completed', name: 'Export Completed', description: 'When an export job completes'},
+    {id: 'backup.completed', name: 'Backup Completed', description: 'When a backup completes'},
+  ])
+})
+
+// Create webhook
+app.post('/api/publishing/webhooks', (req, res) => {
+  const {name, url, events} = req.body
+
+  if (!url.startsWith('https://')) {
+    return res.status(400).json({error: 'Webhook URL must use HTTPS'})
+  }
+
+  const secret = 'whsec_' + generateToken()
+
+  const webhook = {
+    id: generateId(),
+    userId: 'demo-user',
+    name,
+    url,
+    events,
+    secret, // Only returned once
+    enabled: true,
+    lastTriggered: null,
+    failCount: 0,
+    createdAt: new Date().toISOString(),
+    warning: 'Save this webhook secret securely. It will not be shown again.',
+  }
+
+  publishingData.webhooks.push({...webhook, secret: undefined})
+
+  res.status(201).json(webhook)
+})
+
+// Get user's webhooks
+app.get('/api/publishing/webhooks', (req, res) => {
+  res.json(publishingData.webhooks)
+})
+
+// Get specific webhook
+app.get('/api/publishing/webhooks/:id', (req, res) => {
+  const webhook = publishingData.webhooks.find(w => w.id === req.params.id)
+  if (!webhook) {
+    return res.status(404).json({error: 'Webhook not found'})
+  }
+  res.json(webhook)
+})
+
+// Update webhook
+app.put('/api/publishing/webhooks/:id', (req, res) => {
+  const webhook = publishingData.webhooks.find(w => w.id === req.params.id)
+  if (!webhook) {
+    return res.status(404).json({error: 'Webhook not found'})
+  }
+
+  Object.assign(webhook, req.body)
+  res.json(webhook)
+})
+
+// Test webhook
+app.post('/api/publishing/webhooks/:id/test', (req, res) => {
+  const webhook = publishingData.webhooks.find(w => w.id === req.params.id)
+  if (!webhook) {
+    return res.status(404).json({error: 'Webhook not found'})
+  }
+
+  res.json({
+    success: true,
+    message: 'Test webhook sent (simulated)',
+    payload: {
+      event: 'webhook.test',
+      timestamp: new Date().toISOString(),
+      data: {
+        message: 'This is a test webhook from Gramps Web',
+        webhookId: webhook.id,
+        webhookName: webhook.name,
+      },
+    },
+  })
+})
+
+// Delete webhook
+app.delete('/api/publishing/webhooks/:id', (req, res) => {
+  const index = publishingData.webhooks.findIndex(w => w.id === req.params.id)
+  if (index === -1) {
+    return res.status(404).json({error: 'Webhook not found'})
+  }
+
+  publishingData.webhooks.splice(index, 1)
+  res.json({success: true, message: 'Webhook deleted'})
+})
+
+// ===== Social & Calendar Endpoints =====
+
+// Generate social card
+app.get('/api/publishing/social-card/:entityType/:entityId', (req, res) => {
+  const {entityType, entityId} = req.params
+
+  let title = 'Family History'
+  let description = 'Explore the family tree on Gramps Web'
+
+  if (entityType === 'person' || entityType === 'Person') {
+    const person = db.data.people.find(p => p.handle === entityId)
+    if (person) {
+      const name = `${person.primary_name?.first_name || ''} ${person.primary_name?.surname_list?.[0]?.surname || ''}`.trim()
+      title = name
+      description = `Explore the family tree and history of ${name}`
+    }
+  }
+
+  res.json({
+    og: {
+      title,
+      description,
+      type: entityType === 'person' ? 'profile' : 'website',
+      url: `https://gramps.io/${entityType}/${entityId}`,
+      image: `https://gramps.io/api/social-card/${entityType}/${entityId}.png`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      image: `https://gramps.io/api/social-card/${entityType}/${entityId}.png`,
+    },
+  })
+})
+
+// Get share links for social media
+app.get('/api/publishing/share-links/:entityType/:entityId', (req, res) => {
+  const {entityType, entityId} = req.params
+  const url = req.query.url || `https://gramps.io/${entityType}/${entityId}`
+  const encodedUrl = encodeURIComponent(url)
+  const title = 'Family History on Gramps Web'
+  const encodedTitle = encodeURIComponent(title)
+
+  res.json({
+    url,
+    platforms: [
+      {id: 'facebook', name: 'Facebook', url: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, icon: 'facebook'},
+      {id: 'twitter', name: 'Twitter/X', url: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`, icon: 'twitter'},
+      {id: 'linkedin', name: 'LinkedIn', url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`, icon: 'linkedin'},
+      {id: 'pinterest', name: 'Pinterest', url: `https://pinterest.com/pin/create/button/?url=${encodedUrl}&description=${encodedTitle}`, icon: 'pinterest'},
+      {id: 'email', name: 'Email', url: `mailto:?subject=${encodedTitle}&body=${url}`, icon: 'email'},
+      {id: 'copy', name: 'Copy Link', url, icon: 'link', action: 'copy'},
+    ],
+  })
+})
+
+// Export calendar
+app.get('/api/publishing/calendar/export', (req, res) => {
+  const format = req.query.format || 'ical'
+  const scope = (req.query.scope || 'birthdays').split(',')
+
+  const events = []
+  const currentYear = new Date().getFullYear()
+
+  // Get birthdays
+  if (scope.includes('birthdays')) {
+    for (const person of db.data.people) {
+      if (person.profile?.birth?.date) {
+        const name = `${person.primary_name?.first_name || ''} ${person.primary_name?.surname_list?.[0]?.surname || ''}`.trim()
+        const dateMatch = person.profile.birth.date.match(/(\d{4})-(\d{2})-(\d{2})/)
+        if (dateMatch) {
+          events.push({
+            type: 'birthday',
+            title: `${name}'s Birthday`,
+            month: parseInt(dateMatch[2], 10),
+            day: parseInt(dateMatch[3], 10),
+            year: parseInt(dateMatch[1], 10),
+          })
+        }
+      }
+    }
+  }
+
+  if (format === 'ical') {
+    let ical = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Gramps Web//Family Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Family Events
+`
+
+    for (const event of events) {
+      const startDate = `${currentYear}${String(event.month).padStart(2, '0')}${String(event.day).padStart(2, '0')}`
+      ical += `BEGIN:VEVENT
+UID:${generateId()}@gramps.io
+DTSTART;VALUE=DATE:${startDate}
+SUMMARY:${event.title}
+RRULE:FREQ=YEARLY
+END:VEVENT
+`
+    }
+
+    ical += 'END:VCALENDAR'
+
+    res.json({
+      format: 'ical',
+      mimeType: 'text/calendar',
+      filename: 'family-calendar.ics',
+      content: ical,
+      eventCount: events.length,
+    })
+  } else {
+    let csv = 'Type,Title,Month,Day,Year\n'
+    for (const event of events) {
+      csv += `${event.type},"${event.title}",${event.month},${event.day},${event.year}\n`
+    }
+
+    res.json({
+      format: 'csv',
+      mimeType: 'text/csv',
+      filename: 'family-calendar.csv',
+      content: csv,
+      eventCount: events.length,
+    })
+  }
+})
+
 // Generic handler for other requests (logging)
 app.use('/api', (req, res) => {
   console.log(`[Unimplemented] ${req.method} ${req.originalUrl}`)

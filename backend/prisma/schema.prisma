@@ -463,3 +463,102 @@ model Activity {
   @@index([createdAt])
   @@index([visibility])
 }
+
+// Phase 16: Publishing, Sharing & External Integration
+
+// Published Site Configuration
+model PublishedSite {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  name          String
+  subdomain     String    @unique
+  customDomain  String?   @map("custom_domain")
+  theme         String    @default("classic")
+  settings      String?   // JSON configuration
+  status        String    @default("draft") // draft, published, archived
+  lastPublished DateTime? @map("last_published")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("published_sites")
+  @@index([userId])
+  @@index([subdomain])
+}
+
+// Share Links for public access
+model ShareLink {
+  id             String    @id @default(uuid())
+  userId         String    @map("user_id")
+  token          String    @unique
+  name           String
+  entityType     String    @map("entity_type") // Person, Family, Branch
+  entityId       String    @map("entity_id")
+  privacyLevel   String    @default("public") @map("privacy_level") // all, living, deceased, public
+  maxGenerations Int?      @map("max_generations")
+  expiresAt      DateTime? @map("expires_at")
+  password       String?   // Optional password protection (hashed)
+  viewCount      Int       @default(0) @map("view_count")
+  maxViews       Int?      @map("max_views")
+  enabled        Boolean   @default(true)
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  @@map("share_links")
+  @@index([token])
+  @@index([userId])
+}
+
+// API Keys for external integrations
+model ApiKey {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  name        String
+  keyPrefix   String    @map("key_prefix") // First 8 chars for identification
+  keyHash     String    @map("key_hash") // bcrypt hash of full key
+  permissions String    // JSON array of permissions
+  rateLimit   Int       @default(1000) @map("rate_limit") // requests per hour
+  lastUsed    DateTime? @map("last_used")
+  expiresAt   DateTime? @map("expires_at")
+  enabled     Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@map("api_keys")
+  @@index([keyPrefix])
+  @@index([userId])
+}
+
+// Webhooks for event notifications
+model Webhook {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  name          String
+  url           String
+  events        String    // JSON array of event types
+  secret        String    // For signature verification
+  enabled       Boolean   @default(true)
+  lastTriggered DateTime? @map("last_triggered")
+  failCount     Int       @default(0) @map("fail_count")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@map("webhooks")
+  @@index([userId])
+}
+
+// Export Jobs for PDF/book generation
+model ExportJob {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  type         String    // pdf-book, pdf-report, photo-book, calendar
+  format       String    // ahnentafel, descendant, narrative, custom
+  status       String    @default("pending") // pending, processing, completed, failed
+  settings     String    // JSON configuration
+  filePath     String?   @map("file_path")
+  fileSize     Int?      @map("file_size")
+  errorMessage String?   @map("error_message")
+  startedAt    DateTime? @map("started_at")
+  completedAt  DateTime? @map("completed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@map("export_jobs")
+  @@index([userId])
+  @@index([status])
+}
