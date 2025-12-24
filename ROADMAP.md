@@ -333,31 +333,31 @@ This roadmap outlines a comprehensive 10-phase plan to transform Gramps Web into
 
 **Goal:** Enable users to share their family history with the world through publishing, sharing, and integration features.
 
-**Status:** 🚧 IN PROGRESS
+**Status:** ✅ COMPLETE
 
-- [ ] **Static Site Generation:**
-  - [ ] **Family Website Builder:** Generate standalone HTML/CSS websites that can be hosted anywhere.
-  - [ ] **Theme Templates:** Multiple professionally designed themes for family websites.
-  - [ ] **Custom Domain Support:** Configure custom domains for published sites.
-- [ ] **PDF & Print Publishing:**
-  - [ ] **Family Book Generator:** Create printable PDF books with family histories, photos, and charts.
-  - [ ] **Report Templates:** Ahnentafel, descendant, and narrative report formats.
-  - [ ] **Photo Book Creation:** Design and export photo books for printing services.
-- [ ] **Public Sharing:**
-  - [ ] **Shareable Links:** Generate secure, time-limited or permanent public links to specific branches.
-  - [ ] **Privacy-Filtered Views:** Automatic filtering of living persons for public shares.
-  - [ ] **Guest Access Tokens:** Create access tokens for family members without accounts.
-- [ ] **Embeddable Widgets:**
-  - [ ] **Tree Widget:** Embed interactive family tree charts in external websites.
-  - [ ] **Timeline Widget:** Embed person/family timelines.
-  - [ ] **Customizable Styles:** Match embedded widgets to host site design.
-- [ ] **API & Integration:**
-  - [ ] **API Key Management:** Generate and manage API keys for third-party integrations.
-  - [ ] **Webhook Support:** Configure webhooks for real-time notifications.
-  - [ ] **OAuth2 Provider:** Allow third-party apps to access data with user consent.
-- [ ] **Social & Export:**
-  - [ ] **Social Media Cards:** Generate Open Graph and Twitter cards for shared links.
-  - [ ] **Social Sharing:** Quick share buttons for Facebook, Twitter, Pinterest.
-  - [ ] **Calendar Export:** Export birthdays and anniversaries to iCal/Google Calendar.
+- [x] **Static Site Generation:**
+  - [x] **Family Website Builder:** Generate standalone HTML/CSS websites that can be hosted anywhere.
+  - [x] **Theme Templates:** Multiple professionally designed themes for family websites.
+  - [x] **Custom Domain Support:** Configure custom domains for published sites.
+- [x] **PDF & Print Publishing:**
+  - [x] **Family Book Generator:** Create printable PDF books with family histories, photos, and charts.
+  - [x] **Report Templates:** Ahnentafel, descendant, and narrative report formats.
+  - [x] **Photo Book Creation:** Design and export photo books for printing services.
+- [x] **Public Sharing:**
+  - [x] **Shareable Links:** Generate secure, time-limited or permanent public links to specific branches.
+  - [x] **Privacy-Filtered Views:** Automatic filtering of living persons for public shares.
+  - [x] **Guest Access Tokens:** Create access tokens for family members without accounts.
+- [x] **Embeddable Widgets:**
+  - [x] **Tree Widget:** Embed interactive family tree charts in external websites.
+  - [x] **Timeline Widget:** Embed person/family timelines.
+  - [x] **Customizable Styles:** Match embedded widgets to host site design.
+- [x] **API & Integration:**
+  - [x] **API Key Management:** Generate and manage API keys for third-party integrations.
+  - [x] **Webhook Support:** Configure webhooks for real-time notifications.
+  - [ ] **OAuth2 Provider:** Allow third-party apps to access data with user consent. (Future enhancement)
+- [x] **Social & Export:**
+  - [x] **Social Media Cards:** Generate Open Graph and Twitter cards for shared links.
+  - [x] **Social Sharing:** Quick share buttons for Facebook, Twitter, Pinterest.
+  - [x] **Calendar Export:** Export birthdays and anniversaries to iCal/Google Calendar.
 
 **Implementation Details:** See [PHASE16_IMPLEMENTATION.md](PHASE16_IMPLEMENTATION.md) for complete documentation.
