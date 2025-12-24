@@ -27,6 +27,7 @@ import {ActivityFeedModule} from './activity-feed/activity-feed.module'
 import {AiModule} from './ai/ai.module'
 import {AdminModule} from './admin/admin.module'
 import {GrampsXmlModule} from './gramps-xml/gramps-xml.module'
+import {PublishingModule} from './publishing/publishing.module'
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import {GrampsXmlModule} from './gramps-xml/gramps-xml.module'
     AiModule,
     AdminModule,
     GrampsXmlModule,
+    PublishingModule,
   ],
 })
 export class AppModule {}
